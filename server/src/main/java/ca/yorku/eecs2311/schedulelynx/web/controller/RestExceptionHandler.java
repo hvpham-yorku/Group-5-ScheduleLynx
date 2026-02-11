@@ -30,4 +30,18 @@ public class RestExceptionHandler {
     return ResponseEntity.badRequest().body(
         Map.of("error", "BAD_REQUEST", "message", ex.getMessage()));
   }
+
+  @ExceptionHandler(AvailabilityNotFoundException.class)
+  public ResponseEntity<Map<String, Object>>
+  handleAvailabilityNotFound(AvailabilityNotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(Map.of("error", "NOT_FOUND", "message", ex.getMessage()));
+  }
+
+  @ExceptionHandler(FixedEventNotFoundException.class)
+  public ResponseEntity<Map<String, Object>>
+  handleFixedEventNotFound(FixedEventNotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(Map.of("error", "NOT_FOUND", "message", ex.getMessage()));
+  }
 }

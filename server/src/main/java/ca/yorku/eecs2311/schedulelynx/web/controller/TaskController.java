@@ -4,6 +4,7 @@ import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.service.TaskService;
 import ca.yorku.eecs2311.schedulelynx.web.dto.TaskCreateRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.TaskResponse;
+import ca.yorku.eecs2311.schedulelynx.web.dto.TaskUpdateRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -43,5 +44,26 @@ public class TaskController {
   private TaskResponse toResponse(Task task) {
     return new TaskResponse(task.getId(), task.getTitle(), task.getDueDate(),
                             task.getEstimatedHours(), task.getDifficulty());
+  }
+
+  @PutMapping("/{id}")
+  public TaskResponse update(@PathVariable long id,
+                             @Valid @RequestBody TaskUpdateRequest request) {
+    Task updated =
+        new Task(null, request.getTitle(), request.getDueDate(),
+                 request.getEstimatedHours(), request.getDifficulty());
+
+    return taskService.update(id, updated)
+        .map(this::toResponse)
+        .orElseThrow(() -> new TaskNotFoundException(id));
+  }
+
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete(@PathVariable long id) {
+    boolean deleted = taskService.delete(id);
+    if (!deleted) {
+      throw new TaskNotFoundException(id);
+    }
   }
 }

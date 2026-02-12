@@ -6,7 +6,65 @@
     <title>Planner - ScheduleLynx</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="timetable-page">
+  <header class="topbar">
+    <h1 class="brand">Schedule Lynx</h1>
+
+    
+      <div class="month-label" id="monthLabel">February 2026</div>
+
+    <div class="topbar-actions">
+      <button class="btn" id="prevBtn">◀</button>
+      <button class="btn" id="todayBtn">Today</button>
+      <button class="btn" id="nextBtn">▶</button>
+  </div>
+</header>
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <section class="panel">
+      <h2>Add Event</h2>
+
+      <form id="taskForm" class="task-form">
+          
+      <label>
+        Title
+        <input id="taskTitle" type="text" placeholder="e.g., EECS lab" required />
+      </label>
+
+    <label>
+      Date
+      <input id="taskDate" type="date" required />
+    </label>
+
+    <label>
+      Time
+      <input id="taskTime" type="time" required />
+    </label>
+
+    <button class="btn" type="submit">Add</button>
+  </form>
+</section>
+</aside>
+  <main class="calendar">
+    <div class="dow-row">
+        <div class="dow">Sun</div>
+        <div class="dow">Mon</div>
+        <div class="dow">Tue</div>
+        <div class="dow">Wed</div>
+        <div class="dow">Thu</div>
+        <div class="dow">Fri</div>
+        <div class="dow">Sat</div>
+    </div>
+    
+    <div id="monthGrid" class="month-grid"></div>
+  </main>
+
+</div>
+  
+
+  <script src="script.js"></script>
 
 
 </body>

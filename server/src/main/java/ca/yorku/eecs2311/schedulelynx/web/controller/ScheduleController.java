@@ -7,6 +7,7 @@ import ca.yorku.eecs2311.schedulelynx.web.dto.ScheduledTaskBlockResponse;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,9 +21,11 @@ public class ScheduleController {
   }
 
   @GetMapping("/weekly")
-  public ScheduleResponse generateWeekly() {
+  public ScheduleResponse generateWeekly(@RequestParam String weekStart) {
+    java.time.LocalDate start = java.time.LocalDate.parse(weekStart);
+
     ScheduleService.ScheduleResult result =
-        scheduleService.generateWeeklyPlan();
+        scheduleService.generateWeeklyPlan(start);
 
     List<ScheduledTaskBlockResponse> blocks =
         result.getBlocks().stream().map(this::toResponse).toList();

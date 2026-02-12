@@ -1720,7 +1720,7 @@ body.timetable-page {
 /*day-of-week labels */
 .timetable-page .dow-row {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, 1fr);
   gap: 10px;           
   margin-bottom: 10px;
 }
@@ -1728,7 +1728,7 @@ body.timetable-page {
 /*  month grid - 7 days collums */
 .timetable-page .month-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, 1fr);
   gap: 10px;
   margin-top: 10px;
 }
@@ -1772,6 +1772,7 @@ body.timetable-page {
 .timetable-page .panel h2{
   margin: 0 0 12px;
   font-size: 16px;
+  color: #e8eefc
 }
 
 .timetable-page .task-form{
@@ -1855,4 +1856,42 @@ body.timetable-page {
 .timetable-page .sidebar{
   position: sticky;
   top: 90px;
+}
+
+
+body.timetable-page .sidebar{
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+body.timetable-page .app-layout{
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 16px 24px !important;
+  grid-template-columns: 240px 1fr !important;
+  gap: 24px !important;
+}
+
+body.timetable-page .month-grid{
+  grid-template-columns: repeat(7, 1fr) !important;
+}
+
+body.timetable-page .day{
+  min-height: 140px !important;
+  min-width: 0px;
+}
+
+
+
+/* calendar shrinking */
+body.timetable-page .calendar {
+  width: 100%;
+  min-width: 0; 
+}
+
+/* responsive calendar grid */
+body.timetable-page .month-grid {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }

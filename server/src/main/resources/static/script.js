@@ -14,22 +14,25 @@ let currentUser = null;
 
 // Check if user is logged in
 function isLoggedIn() {
+
     const storedUser = localStorage.getItem('schedulelynxUser');
     return storedUser !== null;
 }
 
 // Get current logged in user
 function getCurrentUser() {
+
     const storedUser = localStorage.getItem('schedulelynxUser');
     return storedUser ? JSON.parse(storedUser) : null;
 }
 
 // Handle login
 function handleLogin(event) {
+
     if (event) event.preventDefault();
 
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
+    const username   = document.getElementById('username').value.trim();
+    const password   = document.getElementById('password').value;
     const rememberMe = document.getElementById('rememberMe').checked;
 
     if (!username || !password) {
@@ -39,24 +42,21 @@ function handleLogin(event) {
 
     // Simple authentication (in real app, validate against backend)
     const user = {
-        username: username,
-        email: username.includes('@') ? username : username + '@schedulelynx.app',
-        loginTime: new Date().toISOString(),
-        rememberMe: rememberMe
+        username    : username,
+        email       : username.includes('@') ? username : username + '@schedulelynx.app',
+        loginTime   : new Date().toISOString(),
+        rememberMe  : rememberMe
     };
 
-    // Store user in localStorage
-    localStorage.setItem('schedulelynxUser', JSON.stringify(user));
 
-    // Load tasks for this user
-    loadUserTasks(username);
-
-    // Redirect to dashboard
-    window.location.href = 'index.html';
+    localStorage.setItem('schedulelynxUser', JSON.stringify(user)); // store user in localStorage
+    loadUserTasks(username); // load tasks for this user
+    window.location.href = 'index.html'; // redirect to dashboard
 }
 
 // Demo login
 function loginDemo() {
+
     document.getElementById('username').value = 'demo';
     document.getElementById('password').value = 'demo123';
     handleLogin();
@@ -64,13 +64,14 @@ function loginDemo() {
 
 // Handle signup
 function handleSignup(event) {
+
     if (event) event.preventDefault();
 
-    const name = document.getElementById('signupName').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const username = document.getElementById('signupUsername').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    const confirmPassword = document.getElementById('signupConfirmPassword').value;
+    const name              = document.getElementById('signupName').value.trim();
+    const email             = document.getElementById('signupEmail').value.trim();
+    const username          = document.getElementById('signupUsername').value.trim();
+    const password          = document.getElementById('signupPassword').value;
+    const confirmPassword   = document.getElementById('signupConfirmPassword').value;
 
     if (!name || !email || !username || !password || !confirmPassword) {
         alert('Please fill in all fields');
@@ -127,16 +128,18 @@ function handleSignup(event) {
 
 // Logout
 function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('schedulelynxUser');
-        window.location.href = 'login.html';
-    }
+
+    if (!confirm('Are you sure you want to logout?')) return;
+
+    localStorage.removeItem('schedulelynxUser');
+    window.location.href = 'login.html';
 }
 
 // Toggle signup form
 function toggleSignup(event) {
+
     event.preventDefault();
-    const loginBox = document.querySelector('.login-box');
+    const loginBox  = document.querySelector('.login-box');
     const signupBox = document.getElementById('signupForm');
 
     if (loginBox.style.display === 'none') {
@@ -150,9 +153,10 @@ function toggleSignup(event) {
 
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', function () {
+
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
-    // If on login page and already logged in, redirect to dashboard
+    // redirect to dashboard if logged in
     if (currentPage === 'login.html' && isLoggedIn()) {
         window.location.href = 'index.html';
         return;
@@ -165,20 +169,18 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    // Load user data if logged in
-    if (isLoggedIn()) {
+    if (isLoggedIn()) { // load user data if logged in
         currentUser = getCurrentUser();
-        if (document.getElementById('userName')) {
+        if (document.getElementById('userName'))
             document.getElementById('userName').textContent = currentUser.username;
-        }
     }
 
     // Initialize page-specific handlers
-    if (currentPage === 'login.html') {
+    if (currentPage === 'login.html')
         initializeLoginHandlers();
-    } else if (currentPage === 'index.html') {
+    else if (currentPage === 'index.html')
         initializeDashboard();
-    } else if (currentPage === 'timetable.html') {
+    else if (currentPage === 'timetable.html') {
         initializeFormHandlers();
         initializeScheduleDisplay();
         loadTasksFromStorage();
@@ -187,30 +189,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Initialize login form handlers
 function initializeLoginHandlers() {
-    const loginForm = document.getElementById('loginForm');
+
+    const loginForm  = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupFormElement');
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    }
-
-    if (signupForm) {
-        signupForm.addEventListener('submit', handleSignup);
-    }
+    if (loginForm ) loginForm.addEventListener ('submit', handleLogin);
+    if (signupForm) signupForm.addEventListener('submit', handleSignup);
 }
 
 // Load user-specific tasks
 function loadUserTasks(username) {
+
     const userTasks = localStorage.getItem(`tasks_${username}`);
-    if (userTasks) {
-        tasks = JSON.parse(userTasks);
-    } else {
-        tasks = [];
-    }
+    if (userTasks) tasks = JSON.parse(userTasks);
+    else tasks = [];
 }
 
 // Save user-specific tasks
 function saveUserTasks(username) {
+
     localStorage.setItem(`tasks_${username}`, JSON.stringify(tasks));
 }
 
@@ -220,41 +217,51 @@ function saveUserTasks(username) {
 
 // Get the Monday of the current week
 function getMonday(d) {
+
     d = new Date(d);
-    const day = d.getDay();
+
+    const day  = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+
     return new Date(d.setDate(diff));
 }
 
 // Format date as YYYY-MM-DD
 function formatDate(date) {
-    const year = date.getFullYear();
+
+    const year  = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const day   = String(date.getDate()).padStart(2, '0');
+
     return `${year}-${month}-${day}`;
 }
 
 // Format date for display
 function formatDateDisplay(date) {
+
     const options = {month: 'short', day: 'numeric', year: 'numeric'};
     return date.toLocaleDateString('en-US', options);
 }
 
 // Get day name
 function getDayName(date) {
+
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     return days[date.getDay()];
 }
 
 // Add days to a date
 function addDays(date, days) {
+
     const result = new Date(date);
     result.setDate(result.getDate() + days);
+
     return result;
 }
 
 // Get unique ID
 function generateId() {
+
     return Date.now() + Math.random().toString(36).substr(2, 9);
 }
 
@@ -263,10 +270,12 @@ function generateId() {
 // ============================
 
 function initializeDashboard() {
+
     if (!isLoggedIn()) return;
 
     currentUser = getCurrentUser();
     loadUserTasks(currentUser.username);
+
     updateDashboardStats();
     updateUpcomingTasks();
     updateWeekScheduleMini();
@@ -275,17 +284,20 @@ function initializeDashboard() {
 
 // Refresh helper: update dashboard widgets when visible
 function refreshDashboardIfVisible() {
+
     // Only run if dashboard elements exist on the page
-    if (document.getElementById('totalTasksCount')) {
-        updateDashboardStats();
-        updateUpcomingTasks();
-        updateWeekScheduleMini();
-        updateTaskBreakdown();
-    }
+    if (!document.getElementById('totalTasksCount')) return;
+
+    updateDashboardStats();
+    updateUpcomingTasks();
+    updateWeekScheduleMini();
+    updateTaskBreakdown();
+
 }
 
 function updateDashboardStats() {
-    const today = new Date();
+
+    const today       = new Date();
     const weekFromNow = addDays(today, 7);
 
     // Total tasks
@@ -317,15 +329,18 @@ function updateDashboardStats() {
 }
 
 function updateUpcomingTasks() {
+
+    const today             = new Date();
+    const weekFromNow       = addDays(today, 7);
     const upcomingTasksList = document.getElementById('upcomingTasksList');
-    const today = new Date();
-    const weekFromNow = addDays(today, 7);
 
     // Get upcoming tasks, sorted by deadline
     const upcoming = tasks
         .filter(task => {
             const deadline = new Date(task.deadline);
-            return deadline > today && deadline <= weekFromNow && !task.completed;
+            return deadline > today
+                && deadline <= weekFromNow
+                && !task.completed;
         })
         .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
         .slice(0, 5); // Show top 5
@@ -345,8 +360,9 @@ function updateUpcomingTasks() {
 }
 
 function updateWeekScheduleMini() {
+
+    const monday           = getMonday(new Date());
     const weekScheduleMini = document.getElementById('weekScheduleMini');
-    const monday = getMonday(new Date());
 
     let hasEvents = false;
     const weekDays = [];
@@ -370,14 +386,21 @@ function updateWeekScheduleMini() {
         `);
     }
 
-    if (!hasEvents) {
-        weekScheduleMini.innerHTML = '<p class="empty-state">No events scheduled. <a href="timetable.html">Create your schedule</a>!</p>';
-    } else {
-        weekScheduleMini.innerHTML = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.75rem;">' + weekDays.join('') + '</div>';
-    }
+    if (!hasEvents)
+        weekScheduleMini.innerHTML =
+            '<p class="empty-state">No events scheduled. ' +
+            '<a href="timetable.html">Create your schedule</a>!</p>';
+    else
+        weekScheduleMini.innerHTML =
+            '<div style="display: grid; ' +
+            'grid-template-columns: repeat(7, 1fr); ' +
+            'gap: 0.75rem;">' +
+            weekDays.join('') +
+            '</div>';
 }
 
 function updateTaskBreakdown() {
+
     const taskBreakdown = document.getElementById('taskBreakdown');
     const types = ['class', 'assignment', 'exam', 'shift', 'personal'];
 
@@ -394,11 +417,11 @@ function updateTaskBreakdown() {
     }
 
     const typeLabels = {
-        class: 'Classes',
-        assignment: 'Assignments',
-        exam: 'Exams',
-        shift: 'Shifts',
-        personal: 'Personal'
+        class       : 'Classes',
+        assignment  : 'Assignments',
+        exam        : 'Exams',
+        shift       : 'Shifts',
+        personal    : 'Personal'
     };
 
     taskBreakdown.innerHTML = types
@@ -416,22 +439,24 @@ function updateTaskBreakdown() {
 // ============================
 
 function initializeFormHandlers() {
-    const taskForm = document.getElementById('taskForm');
-    const taskTypeSelect = document.getElementById('taskType');
-    const isRecurringCheckbox = document.getElementById('isRecurring');
-    const recurrenceTypeSelect = document.getElementById('recurrenceType');
+
+    const taskForm              = document.getElementById('taskForm');
+    const taskTypeSelect        = document.getElementById('taskType');
+    const isRecurringCheckbox   = document.getElementById('isRecurring');
+    const recurrenceTypeSelect  = document.getElementById('recurrenceType');
 
     // Show/hide time fields based on task type
     taskTypeSelect.addEventListener('change', function () {
-        const startTimeGroup = document.getElementById('startTimeGroup');
-        const endTimeGroup = document.getElementById('endTimeGroup');
+
+        const startTimeGroup    = document.getElementById('startTimeGroup');
+        const endTimeGroup      = document.getElementById('endTimeGroup');
 
         if (this.value === 'class' || this.value === 'shift') {
             startTimeGroup.style.display = 'flex';
-            endTimeGroup.style.display = 'flex';
+            endTimeGroup.style.display   = 'flex';
         } else {
             startTimeGroup.style.display = 'none';
-            endTimeGroup.style.display = 'none';
+            endTimeGroup.style.display   = 'none';
         }
     });
 
@@ -459,16 +484,17 @@ function initializeFormHandlers() {
 }
 
 function addTask() {
-    const taskTitle = document.getElementById('taskTitle').value.trim();
-    const taskType = document.getElementById('taskType').value;
-    const deadline = document.getElementById('deadline').value;
-    const estimatedHours = parseFloat(document.getElementById('estimatedHours').value);
-    const startTime = document.getElementById('startTime').value;
-    const endTime = document.getElementById('endTime').value;
-    const description = document.getElementById('description').value.trim();
-    const isRecurring = document.getElementById('isRecurring').checked;
-    const recurrenceType = document.getElementById('recurrenceType').value;
-    const recurrenceEnd = document.getElementById('recurrenceEnd').value;
+
+    const taskTitle         = document.getElementById('taskTitle').value.trim();
+    const taskType          = document.getElementById('taskType').value;
+    const deadline          = document.getElementById('deadline').value;
+    const estimatedHours    = parseFloat(document.getElementById('estimatedHours').value);
+    const startTime         = document.getElementById('startTime').value;
+    const endTime           = document.getElementById('endTime').value;
+    const description       = document.getElementById('description').value.trim();
+    const isRecurring       = document.getElementById('isRecurring').checked;
+    const recurrenceType    = document.getElementById('recurrenceType').value;
+    const recurrenceEnd     = document.getElementById('recurrenceEnd').value;
 
     if (!taskTitle || !taskType || !deadline || !estimatedHours) {
         alert('Please fill in all required fields');
@@ -519,6 +545,7 @@ function addTask() {
 // ============================
 
 function updateTasksDisplay() {
+
     const tasksList = document.getElementById('tasksList');
 
     if (tasks.length === 0) {
@@ -538,11 +565,12 @@ function updateTasksDisplay() {
 }
 
 function viewTaskDetails(taskId) {
+
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    selectedTaskId = taskId;
-    const modal = document.getElementById('taskModal');
+    selectedTaskId  = taskId;
+    const modal     = document.getElementById('taskModal');
     const modalBody = document.getElementById('modalBody');
 
     const recurrenceText = task.isRecurring
@@ -598,41 +626,48 @@ function viewTaskDetails(taskId) {
 // ============================
 
 document.addEventListener('DOMContentLoaded', function () {
+
     const modal = document.getElementById('taskModal');
 
     if (modal) {
-        const closeBtn = document.querySelector('.close-modal');
+        const closeBtn      = document.querySelector('.close-modal');
         const closeModalBtn = document.getElementById('closeModalBtn');
         const deleteTaskBtn = document.getElementById('deleteTaskBtn');
-        const editTaskBtn = document.getElementById('editTaskBtn');
+        const editTaskBtn   = document.getElementById('editTaskBtn');
 
-        closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+        closeBtn.addEventListener     ('click', () => modal.classList.remove('active'));
         closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
 
         window.addEventListener('click', (e) => {
-            if (e.target === modal) {
+            if (e.target === modal)
                 modal.classList.remove('active');
-            }
         });
 
         deleteTaskBtn.addEventListener('click', deleteSelectedTask);
-        editTaskBtn.addEventListener('click', editSelectedTask);
+        editTaskBtn.addEventListener  ('click', editSelectedTask);
     }
 });
 
 function deleteSelectedTask() {
-    if (selectedTaskId && confirm('Are you sure you want to delete this task?')) {
-        tasks = tasks.filter(t => t.id !== selectedTaskId);
-        saveTasksToStorage();
-        updateTasksDisplay();
-        refreshDashboardIfVisible();
-        document.getElementById('taskModal').classList.remove('active');
-        alert('Task deleted successfully!');
-    }
+
+    if (!selectedTaskId) return;
+    if (!confirm('Are you sure you want to delete this task?')) return;
+
+    tasks = tasks.filter(t => t.id !== selectedTaskId);
+
+    saveTasksToStorage();
+    updateTasksDisplay();
+    refreshDashboardIfVisible();
+
+    document.getElementById('taskModal').classList.remove('active');
+
+    alert('Task deleted successfully!');
 }
 
 function editSelectedTask() {
+
     const task = tasks.find(t => t.id === selectedTaskId);
+
     if (task) {
         // Populate form with task data
         document.getElementById('taskTitle').value = task.title;
@@ -676,6 +711,7 @@ function editSelectedTask() {
 // ============================
 
 function initializeScheduleDisplay() {
+
     updateWeekDisplay();
     renderScheduleGrid();
 
@@ -696,13 +732,15 @@ function initializeScheduleDisplay() {
 }
 
 function updateWeekDisplay() {
+
     const weekEnd = addDays(currentWeekStart, 6);
     const displayText = `Week of ${formatDateDisplay(currentWeekStart)} - ${formatDateDisplay(weekEnd)}`;
     document.getElementById('weekDisplay').textContent = displayText;
 }
 
 function renderScheduleGrid() {
-    const scheduleGrid = document.getElementById('scheduleGrid');
+
+    const scheduleGrid     = document.getElementById('scheduleGrid');
     scheduleGrid.innerHTML = '';
 
     for (let i = 0; i < 7; i++) {
@@ -735,34 +773,37 @@ function renderScheduleGrid() {
 }
 
 function getEventsForDay(dateStr) {
+
     const events = [];
 
     tasks.forEach(task => {
-        // Check if task falls on this day
-        if (task.isRecurring) {
+
+        if (task.isRecurring) { // Check if task falls on this day
+
             const taskDate = new Date(dateStr);
-            const dayName = getDayName(taskDate);
+            const dayName  = getDayName(taskDate);
 
             if (task.recurrenceDays.includes(dayName)) {
                 const recurrenceEnd = new Date(task.recurrenceEnd);
                 if (taskDate <= recurrenceEnd) {
                     events.push({
-                        id: task.id,
-                        title: task.title,
-                        type: task.type,
-                        startTime: task.startTime,
-                        endTime: task.endTime
+                        id          : task.id,
+                        title       : task.title,
+                        type        : task.type,
+                        startTime   : task.startTime,
+                        endTime     : task.endTime
                     });
                 }
             }
         } else {
-            if (task.deadline === dateStr || (task.type === 'class' || task.type === 'shift')) {
+            if (task.deadline === dateStr ||
+               (task.type === 'class' || task.type === 'shift')) {
                 events.push({
-                    id: task.id,
-                    title: task.title,
-                    type: task.type,
-                    startTime: task.startTime,
-                    endTime: task.endTime
+                    id          : task.id,
+                    title       : task.title,
+                    type        : task.type,
+                    startTime   : task.startTime,
+                    endTime     : task.endTime
                 });
             }
         }
@@ -770,9 +811,8 @@ function getEventsForDay(dateStr) {
 
     // Sort by start time
     events.sort((a, b) => {
-        if (a.startTime && b.startTime) {
+        if (a.startTime && b.startTime)
             return a.startTime.localeCompare(b.startTime);
-        }
         return 0;
     });
 
@@ -780,13 +820,15 @@ function getEventsForDay(dateStr) {
 }
 
 function generateSchedule() {
+
     if (tasks.length === 0) {
         alert('Please add at least one task before generating a schedule');
         return;
     }
 
     // Get non-recurring tasks that need scheduling
-    const tasksToSchedule = tasks.filter(t => !t.isRecurring && (t.type === 'assignment' || t.type === 'exam' || t.type === 'personal'));
+    const tasksToSchedule = tasks.filter(t =>
+        !t.isRecurring && (t.type === 'assignment' || t.type === 'exam' || t.type === 'personal'));
 
     if (tasksToSchedule.length === 0) {
         alert('Add assignment, exam, or personal tasks to generate a schedule');
@@ -801,6 +843,7 @@ function generateSchedule() {
 }
 
 function distributeTasksAcrossTime(tasksToSchedule) {
+
     // Sort tasks by deadline
     const sortedTasks = tasksToSchedule.sort((a, b) => {
         return new Date(a.deadline) - new Date(b.deadline);
@@ -823,10 +866,10 @@ function distributeTasksAcrossTime(tasksToSchedule) {
                 const scheduledHours = Math.min(hoursPerDay, remainingHours);
 
                 scheduledItems.push({
-                    date: formatDateDisplay(currentDate),
-                    dateStr: formatDate(currentDate),
-                    task: task,
-                    hours: scheduledHours
+                    date    : formatDateDisplay(currentDate),
+                    dateStr : formatDate(currentDate),
+                    task    : task,
+                    hours   : scheduledHours
                 });
 
                 remainingHours -= scheduledHours;
@@ -834,11 +877,11 @@ function distributeTasksAcrossTime(tasksToSchedule) {
             }
         }
     });
-
     return scheduledItems;
 }
 
 function renderTimeline(scheduledItems) {
+
     const timeline = document.getElementById('timeline');
 
     if (scheduledItems.length === 0) {
@@ -856,8 +899,9 @@ function renderTimeline(scheduledItems) {
     });
 
     // Render timeline
-    timeline.innerHTML = Object.keys(groupedByDate).sort((a, b) => {
-        return new Date(a) - new Date(b);
+    timeline.innerHTML = Object.keys(groupedByDate)
+        .sort((a, b) => {
+            return new Date(a) - new Date(b);
     }).map(date => {
         const dateItems = groupedByDate[date];
         return `
@@ -882,36 +926,43 @@ function renderTimeline(scheduledItems) {
 // ============================
 
 function saveTasksToStorage() {
-    if (currentUser) {
-        saveUserTasks(currentUser.username);
-        // update dashboard widgets if they're present
-        refreshDashboardIfVisible();
-    }
+
+    if (!currentUser) return;
+
+    saveUserTasks(currentUser.username);
+    refreshDashboardIfVisible(); // update dashboard widgets if they're present
 }
 
 function loadTasksFromStorage() {
-    if (currentUser) {
-        loadUserTasks(currentUser.username);
-        updateTasksDisplay();
-        if (tasks.length > 0) {
-            document.getElementById('generateSchedule').disabled = false;
-        }
-        // refresh dashboard after loading
-        refreshDashboardIfVisible();
-    }
+
+    if (!currentUser) return;
+
+    loadUserTasks(currentUser.username);
+    updateTasksDisplay();
+
+    if (tasks.length > 0)
+        document.getElementById('generateSchedule').disabled = false;
+
+    refreshDashboardIfVisible(); // refresh dashboard after loading
 }
 
 function clearAllTasks() {
-    if (confirm('Are you sure you want to clear all tasks? This cannot be undone.')) {
-        tasks = [];
-        saveTasksToStorage();
-        updateTasksDisplay();
-        document.getElementById('timeline').innerHTML = '<p class="empty-state">Tasks will appear here once you add them and generate the schedule.</p>';
-        renderScheduleGrid();
-        document.getElementById('generateSchedule').disabled = true;
-        refreshDashboardIfVisible();
-        alert('All tasks cleared!');
-    }
+
+    if (!confirm('Are you sure you want to clear all tasks? This cannot be undone.')) return;
+
+    tasks = [];
+    saveTasksToStorage();
+    updateTasksDisplay();
+
+    document.getElementById('timeline').innerHTML =
+        '<p class="empty-state">Tasks will appear here once you add them and generate the schedule.</p>';
+
+    renderScheduleGrid();
+
+    document.getElementById('generateSchedule').disabled = true;
+
+    refreshDashboardIfVisible();
+    alert('All tasks cleared!');
 }
 
 // ============================
@@ -919,16 +970,19 @@ function clearAllTasks() {
 // ============================
 
 document.addEventListener('DOMContentLoaded', function () {
+
     // Highlight current page in navigation
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const navLinks = document.querySelectorAll('.nav-link');
 
     navLinks.forEach(link => {
+
         const href = link.getAttribute('href');
-        if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+
+        if (href === currentPage ||
+           (currentPage === '' && href === 'index.html'))
             link.classList.add('active');
-        } else {
+        else
             link.classList.remove('active');
-        }
     });
 });

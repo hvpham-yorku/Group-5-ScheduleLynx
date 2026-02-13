@@ -171,28 +171,55 @@
         renderMonth(current);
     });
 
-    const taskForm = document.getElementById("taskForm");
+    const taskForm  = document.getElementById("taskForm");
     const taskTitle = document.getElementById("taskTitle");
-    const taskDate = document.getElementById("taskDate");
-    const taskTime = document.getElementById("taskTime");
+    const taskDate  = document.getElementById("taskDate");
+    const taskTime  = document.getElementById("taskTime");
 
-    // default date = today
-    taskDate.value = toISODate(new Date());
+    taskDate.value = toISODate(new Date()); // default to today
 
-    taskForm.addEventListener("submit", (e) => {
-        e.preventDefault(); // stops page refresh
+    taskForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const titleVal = taskTitle.value.trim();
+        const dateVal  = taskDate.value;
+        const timeVal  = taskTime.value;
+
+        const newTaskData = {
+            title          : titleVal,
+            dueDate        : dateVal,
+            estimatedHours : 5,         // TODO: let the user decide this
+            difficulty     : "MEDIUM"   // TODO: let the user decide this too
+        };
+
+        try { const response = await fetch('/api/tasks', {
+            method  : 'POST',
+            headers : {'Content-Type': 'application/json'},
+            body    : JSON.stringify(newTaskData)});
+
+            if (!response.ok) {
+                alert("Task failed to send!");
+                return;
+            }
+            await response.json();
+        }
+        catch (e) {
+            alert("Make sure your Spring Boot server is running on localhost:8080");
+            return;
+        }
 
         tasks.push({
-            title: taskTitle.value.trim(),
-            date: taskDate.value,
-            time: taskTime.value
+            title: titleVal,
+            date: dateVal,
+            time: timeVal
         });
 
-        // clear title + time (keep date)
         taskTitle.value = "";
         taskTime.value = "";
-
         renderMonth(current);
+        alert("Task successfully sent to Java server!");
+
     });
 
 

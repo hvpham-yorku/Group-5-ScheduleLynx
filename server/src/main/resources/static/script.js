@@ -475,69 +475,11 @@ function initializeFormHandlers() {
     // Form submission
     taskForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        addTask();
         taskForm.reset();
         document.getElementById('recurrenceOptions').style.display = 'none';
         document.getElementById('startTimeGroup').style.display = 'none';
         document.getElementById('endTimeGroup').style.display = 'none';
     });
-}
-
-function addTask() {
-
-    const taskTitle         = document.getElementById('taskTitle').value.trim();
-    const taskType          = document.getElementById('taskType').value;
-    const deadline          = document.getElementById('deadline').value;
-    const estimatedHours    = parseFloat(document.getElementById('estimatedHours').value);
-    const startTime         = document.getElementById('startTime').value;
-    const endTime           = document.getElementById('endTime').value;
-    const description       = document.getElementById('description').value.trim();
-    const isRecurring       = document.getElementById('isRecurring').checked;
-    const recurrenceType    = document.getElementById('recurrenceType').value;
-    const recurrenceEnd     = document.getElementById('recurrenceEnd').value;
-
-    if (!taskTitle || !taskType || !deadline || !estimatedHours) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    // Get selected days of week if recurring
-    let selectedDays = [];
-    if (isRecurring && (recurrenceType === 'weekly' || recurrenceType === 'biweekly')) {
-        const checkboxes = document.querySelectorAll('.days-checkbox input[type="checkbox"]:checked');
-        selectedDays = Array.from(checkboxes).map(cb => cb.value);
-        if (selectedDays.length === 0) {
-            alert('Please select at least one day for recurring tasks');
-            return;
-        }
-    }
-
-    const task = {
-        id: generateId(),
-        title: taskTitle,
-        type: taskType,
-        deadline: deadline,
-        estimatedHours: estimatedHours,
-        startTime: startTime || null,
-        endTime: endTime || null,
-        description: description,
-        isRecurring: isRecurring,
-        recurrenceType: recurrenceType,
-        recurrenceEnd: recurrenceEnd,
-        recurrenceDays: selectedDays,
-        completed: false,
-        createdAt: new Date().toISOString()
-    };
-
-    tasks.push(task);
-    saveUserTasks(currentUser.username);
-    updateTasksDisplay();
-    refreshDashboardIfVisible();
-
-    // Enable generate schedule button
-    document.getElementById('generateSchedule').disabled = false;
-
-    alert(`Task "${taskTitle}" added successfully!`);
 }
 
 // ============================

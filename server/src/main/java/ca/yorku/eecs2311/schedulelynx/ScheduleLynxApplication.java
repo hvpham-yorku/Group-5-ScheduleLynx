@@ -8,5 +8,6 @@ public class ScheduleLynxApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(ScheduleLynxApplication.class, args);
+    System.out.println("SpringBoot Server now running at: http://localhost:8080");
   }
 }

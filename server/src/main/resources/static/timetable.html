@@ -66,16 +66,26 @@
 
 <script>
 
-    const monthGrid = document.getElementById("monthGrid");
-    const monthLabel = document.getElementById("monthLabel");
-
-    //ck the month you want to display (ex. Feb 2026)
-    //change this later to get the real date
-    const now = new Date();
-    let current = new Date(now.getFullYear(), now.getMonth(), 1);
-
     const tasks = [];
 
+    const monthGrid  = document.getElementById("monthGrid");
+    const monthLabel = document.getElementById("monthLabel");
+
+    const prevBtn   = document.getElementById("prevBtn");
+    const nextBtn   = document.getElementById("nextBtn");
+    const todayBtn  = document.getElementById("todayBtn");
+
+    const taskForm  = document.getElementById("taskForm");
+    const taskTitle = document.getElementById("taskTitle");
+    const taskDate  = document.getElementById("taskDate");
+    const taskTime  = document.getElementById("taskTime");
+
+    const now = new Date();
+    let current = new Date(
+        now.getFullYear(), now.getMonth(), 1);
+
+    // initialization
+    taskDate.value = toISODate(new Date()); // set taskDate field to today
 
     function pad(n) {
         return String(n).padStart(2, "0");
@@ -85,14 +95,35 @@
         return d.toLocaleString(undefined, {month: "long", year: "numeric"});
     }
 
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const todayBtn = document.getElementById("todayBtn");
-
     function toISODate(d) {
         return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     }
 
+    async function loadTasksFromServer() {
+
+        try { const response = await fetch('/api/tasks');
+
+            if (!response.ok) return;
+
+            const serverTasks = await response.json();
+
+            // clear already loaded tasks to not have duplicated tasks
+            tasks.length = 0;
+
+            serverTasks.forEach(t => {
+                tasks.push({
+                    title : t.title,
+                    date  : t.dueDate,
+                    time  : "12:00" // TODO: backend needs to be able to save this
+                });
+            });
+
+            // redraw screen
+            renderMonth(current);
+            console.log("Tasks loaded from server!");
+
+        } catch (e) { console.error("Failed to load tasks:", e); }
+    }
 
     function renderMonth(date) {
         // label at the top
@@ -101,7 +132,7 @@
         //  clear old boxes (for re-rendering)
         monthGrid.innerHTML = "";
 
-        const year = date.getFullYear();
+        const year  = date.getFullYear();
         const month = date.getMonth();
 
         //set first day of the month (always the 1st of the month)
@@ -171,13 +202,6 @@
         renderMonth(current);
     });
 
-    const taskForm  = document.getElementById("taskForm");
-    const taskTitle = document.getElementById("taskTitle");
-    const taskDate  = document.getElementById("taskDate");
-    const taskTime  = document.getElementById("taskTime");
-
-    taskDate.value = toISODate(new Date()); // default to today
-
     taskForm.addEventListener("submit", async (e) => {
 
         e.preventDefault();
@@ -205,7 +229,7 @@
             await response.json();
         }
         catch (e) {
-            alert("Make sure your Spring Boot server is running on localhost:8080");
+            alert("Failure!\n Make sure your Spring Boot server is running on localhost:8080");
             return;
         }
 
@@ -217,11 +241,14 @@
 
         taskTitle.value = "";
         taskTime.value = "";
-        renderMonth(current);
-        alert("Task successfully sent to Java server!");
 
+        await loadTasksFromServer();
+
+        console.log("Task successfully sent to Java server!");
     });
 
+
+    loadTasksFromServer(); // load tasks on page load
 
 </script>
 

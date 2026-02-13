@@ -269,17 +269,33 @@ function generateId() {
 // DASHBOARD FUNCTIONS
 // ============================
 
-function initializeDashboard() {
+async function initializeDashboard() {
 
     if (!isLoggedIn()) return;
 
     currentUser = getCurrentUser();
-    loadUserTasks(currentUser.username);
 
-    updateDashboardStats();
-    updateUpcomingTasks();
-    updateWeekScheduleMini();
-    updateTaskBreakdown();
+    try { const response = await fetch('/api/tasks');
+
+        if (!response.ok) return;
+        
+        const serverData = await response.json();
+
+        tasks = serverData.map(t => ({
+            id             : t.id,
+            title          : t.title,
+            deadline       : t.dueDate,
+            estimatedHours : t.estimatedHours || 1,
+            type           : 'assignment',
+            completed      : false
+        }));
+
+        updateDashboardStats();
+        updateUpcomingTasks();
+        updateWeekScheduleMini();
+        updateTaskBreakdown();
+
+    } catch (e) { console.error("Dashboard failed to load:", e); }
 }
 
 // Refresh helper: update dashboard widgets when visible

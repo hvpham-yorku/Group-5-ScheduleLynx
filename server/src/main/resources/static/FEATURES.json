@@ -5,7 +5,11 @@
     "type": "MVP",
     "status": "Complete",
     "description": "A smart schedule and workload manager for students and professionals",
-    "targetAudience": ["Students", "Professionals", "Part-time Workers"]
+    "targetAudience": [
+      "Students",
+      "Professionals",
+      "Part-time Workers"
+    ]
   },
   "files": {
     "html": [
@@ -59,7 +63,12 @@
           "Dark and light theme ready",
           "Mobile-first approach"
         ],
-        "breakpoints": ["480px", "768px", "1024px", "1600px"]
+        "breakpoints": [
+          "480px",
+          "768px",
+          "1024px",
+          "1600px"
+        ]
       }
     ],
     "javascript": [
@@ -99,7 +108,13 @@
         "items": [
           {
             "feature": "Add multiple task types",
-            "types": ["Classes", "Assignments", "Exams", "Work Shifts", "Personal Tasks"],
+            "types": [
+              "Classes",
+              "Assignments",
+              "Exams",
+              "Work Shifts",
+              "Personal Tasks"
+            ],
             "status": "✓ Implemented"
           },
           {
@@ -127,7 +142,12 @@
           },
           {
             "feature": "Recurring events",
-            "frequencies": ["Daily", "Weekly", "Bi-weekly", "Monthly"],
+            "frequencies": [
+              "Daily",
+              "Weekly",
+              "Bi-weekly",
+              "Monthly"
+            ],
             "status": "✓ Implemented"
           },
           {
@@ -190,7 +210,11 @@
         "items": [
           {
             "feature": "Multi-page navigation",
-            "pages": ["Home", "Features", "Planner"],
+            "pages": [
+              "Home",
+              "Features",
+              "Planner"
+            ],
             "status": "✓ Implemented"
           },
           {
@@ -258,8 +282,17 @@
       "storage": "Browser localStorage API"
     },
     "compatibility": {
-      "desktop_browsers": ["Chrome 90+", "Firefox 88+", "Safari 14+", "Edge 90+"],
-      "mobile_browsers": ["iOS Safari 14+", "Chrome Mobile 90+", "Firefox Mobile 88+"],
+      "desktop_browsers": [
+        "Chrome 90+",
+        "Firefox 88+",
+        "Safari 14+",
+        "Edge 90+"
+      ],
+      "mobile_browsers": [
+        "iOS Safari 14+",
+        "Chrome Mobile 90+",
+        "Firefox Mobile 88+"
+      ],
       "minimum_resolution": "320px width"
     }
   },

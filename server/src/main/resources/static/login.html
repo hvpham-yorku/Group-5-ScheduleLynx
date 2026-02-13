@@ -8,116 +8,116 @@
 </head>
 
 <body class="login-page">
-    <div class="login-container">
-        <div class="login-box">
-            <div class="login-header">
-                <h1>ScheduleLynx</h1>
-                <p> The All-in-One Life Planner </p>
-            </div>
-
-            <form id="loginForm" class="login-form">
-                <div class="form-group">
-                    <label for="username">Username or Email</label>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        placeholder="Enter your username or email"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        placeholder="Enter your password"
-                        required
-                    >
-                </div>
-
-                <div class="form-group checkbox">
-                    <label>
-                        <input type="checkbox" id="rememberMe">
-                        Remember me
-                    </label>
-                </div>
-
-                <button type="submit" class="btn-login">Login</button>
-            </form>
-
-            <div class="signup-link">
-                Don't have an account? <a href="#" onclick="toggleSignup(event)">Sign up now</a>
-            </div>
+<div class="login-container">
+    <div class="login-box">
+        <div class="login-header">
+            <h1>ScheduleLynx</h1>
+            <p> The All-in-One Life Planner </p>
         </div>
 
-        <!-- Signup Form (Hidden by default) -->
-        <div id="signupForm" class="signup-box" style="display: none;">
-            <div class="login-header">
-                <h1>Create Account</h1>
-                <p>Join ScheduleLynx Today</p>
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                <input
+                        type="text"
+                        id="username"
+                        placeholder="Enter your username or email"
+                        required
+                >
             </div>
 
-            <form id="signupFormElement" class="login-form">
-                <div class="form-group">
-                    <label for="signupName">Full Name</label>
-                    <input 
-                        type="text" 
-                        id="signupName" 
-                        placeholder="Enter your full name"
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter your password"
                         required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="signupEmail">Email</label>
-                    <input 
-                        type="email" 
-                        id="signupEmail" 
-                        placeholder="Enter your email"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="signupUsername">Username</label>
-                    <input 
-                        type="text" 
-                        id="signupUsername" 
-                        placeholder="Choose a username"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="signupPassword">Password</label>
-                    <input 
-                        type="password" 
-                        id="signupPassword" 
-                        placeholder="Create a password"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="signupConfirmPassword">Confirm Password</label>
-                    <input 
-                        type="password" 
-                        id="signupConfirmPassword" 
-                        placeholder="Confirm your password"
-                        required
-                    >
-                </div>
-
-                <button type="submit" class="btn-login">Create Account</button>
-            </form>
-
-            <div class="signup-link">
-                Already have an account? <a href="#" onclick="toggleSignup(event)">Login here</a>
+                >
             </div>
+
+            <div class="form-group checkbox">
+                <label>
+                    <input type="checkbox" id="rememberMe">
+                    Remember me
+                </label>
+            </div>
+
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+
+        <div class="signup-link">
+            Don't have an account? <a href="#" onclick="toggleSignup(event)">Sign up now</a>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Signup Form (Hidden by default) -->
+    <div id="signupForm" class="signup-box" style="display: none;">
+        <div class="login-header">
+            <h1>Create Account</h1>
+            <p>Join ScheduleLynx Today</p>
+        </div>
+
+        <form id="signupFormElement" class="login-form">
+            <div class="form-group">
+                <label for="signupName">Full Name</label>
+                <input
+                        type="text"
+                        id="signupName"
+                        placeholder="Enter your full name"
+                        required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input
+                        type="email"
+                        id="signupEmail"
+                        placeholder="Enter your email"
+                        required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="signupUsername">Username</label>
+                <input
+                        type="text"
+                        id="signupUsername"
+                        placeholder="Choose a username"
+                        required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input
+                        type="password"
+                        id="signupPassword"
+                        placeholder="Create a password"
+                        required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="signupConfirmPassword">Confirm Password</label>
+                <input
+                        type="password"
+                        id="signupConfirmPassword"
+                        placeholder="Confirm your password"
+                        required
+                >
+            </div>
+
+            <button type="submit" class="btn-login">Create Account</button>
+        </form>
+
+        <div class="signup-link">
+            Already have an account? <a href="#" onclick="toggleSignup(event)">Login here</a>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

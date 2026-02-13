@@ -27,7 +27,7 @@ function getCurrentUser() {
 // Handle login
 function handleLogin(event) {
     if (event) event.preventDefault();
-    
+
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     const rememberMe = document.getElementById('rememberMe').checked;
@@ -47,10 +47,10 @@ function handleLogin(event) {
 
     // Store user in localStorage
     localStorage.setItem('schedulelynxUser', JSON.stringify(user));
-    
+
     // Load tasks for this user
     loadUserTasks(username);
-    
+
     // Redirect to dashboard
     window.location.href = 'index.html';
 }
@@ -106,7 +106,7 @@ function handleSignup(event) {
     // Store user credentials
     existingUsers[username] = newUser;
     localStorage.setItem('allUsers', JSON.stringify(existingUsers));
-    
+
     // Auto-login
     const user = {
         username: username,
@@ -115,12 +115,12 @@ function handleSignup(event) {
         loginTime: new Date().toISOString(),
         rememberMe: true
     };
-    
+
     localStorage.setItem('schedulelynxUser', JSON.stringify(user));
-    
+
     // Create empty tasks array for new user
     localStorage.setItem(`tasks_${username}`, JSON.stringify([]));
-    
+
     alert('Account created successfully! Logging in...');
     window.location.href = 'index.html';
 }
@@ -138,7 +138,7 @@ function toggleSignup(event) {
     event.preventDefault();
     const loginBox = document.querySelector('.login-box');
     const signupBox = document.getElementById('signupForm');
-    
+
     if (loginBox.style.display === 'none') {
         loginBox.style.display = 'block';
         signupBox.style.display = 'none';
@@ -149,22 +149,22 @@ function toggleSignup(event) {
 }
 
 // Check authentication on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    
+
     // If on login page and already logged in, redirect to dashboard
     if (currentPage === 'login.html' && isLoggedIn()) {
         window.location.href = 'index.html';
         return;
     }
-    
+
     // Allow public pages (home, features, login). Redirect to login for protected pages when not authenticated
     const publicPages = ['home.html', 'features.html', 'login.html'];
     if (!isLoggedIn() && !publicPages.includes(currentPage)) {
         window.location.href = 'login.html';
         return;
     }
-    
+
     // Load user data if logged in
     if (isLoggedIn()) {
         currentUser = getCurrentUser();
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('userName').textContent = currentUser.username;
         }
     }
-    
+
     // Initialize page-specific handlers
     if (currentPage === 'login.html') {
         initializeLoginHandlers();
@@ -189,11 +189,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeLoginHandlers() {
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupFormElement');
-    
+
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
     }
-    
+
     if (signupForm) {
         signupForm.addEventListener('submit', handleSignup);
     }
@@ -236,7 +236,7 @@ function formatDate(date) {
 
 // Format date for display
 function formatDateDisplay(date) {
-    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const options = {month: 'short', day: 'numeric', year: 'numeric'};
     return date.toLocaleDateString('en-US', options);
 }
 
@@ -264,7 +264,7 @@ function generateId() {
 
 function initializeDashboard() {
     if (!isLoggedIn()) return;
-    
+
     currentUser = getCurrentUser();
     loadUserTasks(currentUser.username);
     updateDashboardStats();
@@ -287,24 +287,24 @@ function refreshDashboardIfVisible() {
 function updateDashboardStats() {
     const today = new Date();
     const weekFromNow = addDays(today, 7);
-    
+
     // Total tasks
     document.getElementById('totalTasksCount').textContent = tasks.length;
-    
+
     // Upcoming tasks (next 7 days)
     const upcoming = tasks.filter(task => {
         const deadline = new Date(task.deadline);
         return deadline > today && deadline <= weekFromNow;
     });
     document.getElementById('upcomingCount').textContent = upcoming.length;
-    
+
     // Overdue tasks
     const overdue = tasks.filter(task => {
         const deadline = new Date(task.deadline);
         return deadline < today && !task.completed;
     });
     document.getElementById('overdueCount').textContent = overdue.length;
-    
+
     // This week's hours
     let totalHours = 0;
     tasks.forEach(task => {
@@ -320,7 +320,7 @@ function updateUpcomingTasks() {
     const upcomingTasksList = document.getElementById('upcomingTasksList');
     const today = new Date();
     const weekFromNow = addDays(today, 7);
-    
+
     // Get upcoming tasks, sorted by deadline
     const upcoming = tasks
         .filter(task => {
@@ -329,12 +329,12 @@ function updateUpcomingTasks() {
         })
         .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
         .slice(0, 5); // Show top 5
-    
+
     if (upcoming.length === 0) {
         upcomingTasksList.innerHTML = '<p class="empty-state">No upcoming tasks. <a href="timetable.html">Add a task</a>!</p>';
         return;
     }
-    
+
     upcomingTasksList.innerHTML = upcoming.map(task => `
         <div class="task-item-dashboard ${task.type}" onclick="viewTaskDetails('${task.id}')">
             <div class="task-item-badge ${task.type}">${task.type}</div>
@@ -347,19 +347,19 @@ function updateUpcomingTasks() {
 function updateWeekScheduleMini() {
     const weekScheduleMini = document.getElementById('weekScheduleMini');
     const monday = getMonday(new Date());
-    
+
     let hasEvents = false;
     const weekDays = [];
-    
+
     for (let i = 0; i < 7; i++) {
         const dayDate = addDays(monday, i);
         const dayName = getDayName(dayDate).substring(0, 1);
         const dateStr = formatDate(dayDate);
-        
+
         const dayEvents = getEventsForDay(dateStr);
         const eventCount = dayEvents.length;
         hasEvents = hasEvents || eventCount > 0;
-        
+
         weekDays.push(`
             <div class="day-mini">
                 <div class="day-mini-label">${dayName}</div>
@@ -369,7 +369,7 @@ function updateWeekScheduleMini() {
             </div>
         `);
     }
-    
+
     if (!hasEvents) {
         weekScheduleMini.innerHTML = '<p class="empty-state">No events scheduled. <a href="timetable.html">Create your schedule</a>!</p>';
     } else {
@@ -380,19 +380,19 @@ function updateWeekScheduleMini() {
 function updateTaskBreakdown() {
     const taskBreakdown = document.getElementById('taskBreakdown');
     const types = ['class', 'assignment', 'exam', 'shift', 'personal'];
-    
+
     const breakdown = {};
     types.forEach(type => {
         breakdown[type] = tasks.filter(t => t.type === type).length;
     });
-    
+
     const hasAnyTasks = Object.values(breakdown).some(count => count > 0);
-    
+
     if (!hasAnyTasks) {
         taskBreakdown.innerHTML = '<p class="empty-state">Add tasks to see breakdown</p>';
         return;
     }
-    
+
     const typeLabels = {
         class: 'Classes',
         assignment: 'Assignments',
@@ -400,7 +400,7 @@ function updateTaskBreakdown() {
         shift: 'Shifts',
         personal: 'Personal'
     };
-    
+
     taskBreakdown.innerHTML = types
         .filter(type => breakdown[type] > 0)
         .map(type => `
@@ -420,12 +420,12 @@ function initializeFormHandlers() {
     const taskTypeSelect = document.getElementById('taskType');
     const isRecurringCheckbox = document.getElementById('isRecurring');
     const recurrenceTypeSelect = document.getElementById('recurrenceType');
-    
+
     // Show/hide time fields based on task type
-    taskTypeSelect.addEventListener('change', function() {
+    taskTypeSelect.addEventListener('change', function () {
         const startTimeGroup = document.getElementById('startTimeGroup');
         const endTimeGroup = document.getElementById('endTimeGroup');
-        
+
         if (this.value === 'class' || this.value === 'shift') {
             startTimeGroup.style.display = 'flex';
             endTimeGroup.style.display = 'flex';
@@ -436,19 +436,19 @@ function initializeFormHandlers() {
     });
 
     // Show/hide recurrence options
-    isRecurringCheckbox.addEventListener('change', function() {
+    isRecurringCheckbox.addEventListener('change', function () {
         const recurrenceOptions = document.getElementById('recurrenceOptions');
         recurrenceOptions.style.display = this.checked ? 'block' : 'none';
     });
 
     // Show/hide days of week based on recurrence type
-    recurrenceTypeSelect.addEventListener('change', function() {
+    recurrenceTypeSelect.addEventListener('change', function () {
         const daysOfWeekGroup = document.getElementById('daysOfWeekGroup');
         daysOfWeekGroup.style.display = this.value === 'weekly' || this.value === 'biweekly' ? 'flex' : 'none';
     });
 
     // Form submission
-    taskForm.addEventListener('submit', function(e) {
+    taskForm.addEventListener('submit', function (e) {
         e.preventDefault();
         addTask();
         taskForm.reset();
@@ -507,10 +507,10 @@ function addTask() {
     saveUserTasks(currentUser.username);
     updateTasksDisplay();
     refreshDashboardIfVisible();
-    
+
     // Enable generate schedule button
     document.getElementById('generateSchedule').disabled = false;
-    
+
     alert(`Task "${taskTitle}" added successfully!`);
 }
 
@@ -520,7 +520,7 @@ function addTask() {
 
 function updateTasksDisplay() {
     const tasksList = document.getElementById('tasksList');
-    
+
     if (tasks.length === 0) {
         tasksList.innerHTML = '<p class="empty-state">No tasks added yet. Add a task to get started!</p>';
         return;
@@ -545,7 +545,7 @@ function viewTaskDetails(taskId) {
     const modal = document.getElementById('taskModal');
     const modalBody = document.getElementById('modalBody');
 
-    const recurrenceText = task.isRecurring 
+    const recurrenceText = task.isRecurring
         ? `${task.recurrenceType.charAt(0).toUpperCase() + task.recurrenceType.slice(1)} (${task.recurrenceDays.join(', ')})`
         : 'No';
 
@@ -597,9 +597,9 @@ function viewTaskDetails(taskId) {
 // MODAL HANDLING
 // ============================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('taskModal');
-    
+
     if (modal) {
         const closeBtn = document.querySelector('.close-modal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -667,7 +667,7 @@ function editSelectedTask() {
         tasks = tasks.filter(t => t.id !== selectedTaskId);
         document.getElementById('taskModal').classList.remove('active');
         document.getElementById('taskTitle').focus();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 }
 
@@ -678,7 +678,7 @@ function editSelectedTask() {
 function initializeScheduleDisplay() {
     updateWeekDisplay();
     renderScheduleGrid();
-    
+
     document.getElementById('prevWeek').addEventListener('click', () => {
         currentWeekStart = addDays(currentWeekStart, -7);
         updateWeekDisplay();
@@ -718,15 +718,15 @@ function renderScheduleGrid() {
         dayColumn.innerHTML = `
             <div class="day-header">${dayName}<br>${dayDate.getDate()}</div>
             <div class="day-content">
-                ${dayEvents.length > 0 
-                    ? dayEvents.map(event => `
+                ${dayEvents.length > 0
+            ? dayEvents.map(event => `
                         <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
                             <div class="schedule-event-title">${event.title}</div>
                             ${event.startTime ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>` : ''}
                         </div>
                     `).join('')
-                    : '<p class="empty-state">No events</p>'
-                }
+            : '<p class="empty-state">No events</p>'
+        }
             </div>
         `;
 
@@ -742,7 +742,7 @@ function getEventsForDay(dateStr) {
         if (task.isRecurring) {
             const taskDate = new Date(dateStr);
             const dayName = getDayName(taskDate);
-            
+
             if (task.recurrenceDays.includes(dayName)) {
                 const recurrenceEnd = new Date(task.recurrenceEnd);
                 if (taskDate <= recurrenceEnd) {
@@ -795,7 +795,7 @@ function generateSchedule() {
 
     // Simple scheduling algorithm: distribute tasks across available days
     const scheduledTasks = distributeTasksAcrossTime(tasksToSchedule);
-    
+
     renderTimeline(scheduledTasks);
     alert('Schedule generated successfully! Check the timeline below.');
 }
@@ -815,13 +815,13 @@ function distributeTasksAcrossTime(tasksToSchedule) {
 
         if (daysAvailable > 0) {
             const hoursPerDay = Math.min(3, hoursNeeded / daysAvailable);
-            
+
             let currentDate = new Date();
             let remainingHours = hoursNeeded;
 
             while (remainingHours > 0 && currentDate < deadline) {
                 const scheduledHours = Math.min(hoursPerDay, remainingHours);
-                
+
                 scheduledItems.push({
                     date: formatDateDisplay(currentDate),
                     dateStr: formatDate(currentDate),
@@ -918,11 +918,11 @@ function clearAllTasks() {
 // PAGE NAVIGATION
 // ============================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Highlight current page in navigation
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const navLinks = document.querySelectorAll('.nav-link');
-    
+
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
         if (href === currentPage || (currentPage === '' && href === 'index.html')) {

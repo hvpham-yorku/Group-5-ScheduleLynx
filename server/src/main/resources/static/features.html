@@ -6,162 +6,167 @@
     <title>Features - ScheduleLynx</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <h1>ScheduleLynx</h1>
+<!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <h1>ScheduleLynx</h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="home.html" class="nav-link">Home</a></li>
+            <li><a href="index.html" class="nav-link">Dashboard</a></li>
+            <li><a href="timetable.html" class="nav-link">Planner</a></li>
+            <li><a href="features.html" class="nav-link active">Features</a></li>
+            <li><a href="#" onclick="logout()" class="nav-link logout-link">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Features Head -->
+<section class="features-header">
+    <div class="container">
+        <h2>Powerful Features for Smart Scheduling</h2>
+        <p>Everything you need to manage your academic, professional, and personal responsibilities</p>
+    </div>
+</section>
+
+<!-- Main Features -->
+<section class="features-section">
+    <div class="container">
+        <div class="features-list">
+            <!-- Feature 1 -->
+            <div class="feature-item">
+                <div class="feature-icon">📝</div>
+                <h3>Task Type Management</h3>
+                <p>Easily categorize different types of tasks:</p>
+                <ul>
+                    <li><strong>Classes & Lectures:</strong> Fixed-time events with automatic recurrence</li>
+                    <li><strong>Assignments:</strong> Tasks with specific deadlines and estimated completion time</li>
+                    <li><strong>Exams:</strong> Important events with fixed dates</li>
+                    <li><strong>Work Shifts:</strong> Professional commitments with fixed schedules</li>
+                    <li><strong>Personal Tasks:</strong> Any other responsibility you need to track</li>
+                </ul>
             </div>
-            <ul class="nav-menu">
-                <li><a href="home.html" class="nav-link">Home</a></li>
-                <li><a href="index.html" class="nav-link">Dashboard</a></li>
-                <li><a href="timetable.html" class="nav-link">Planner</a></li>
-                <li><a href="features.html" class="nav-link active">Features</a></li>
-                <li><a href="#" onclick="logout()" class="nav-link logout-link">Logout</a></li>
-            </ul>
-        </div>
-    </nav>
 
-    <!-- Features Head -->
-    <section class="features-header">
-        <div class="container">
-            <h2>Powerful Features for Smart Scheduling</h2>
-            <p>Everything you need to manage your academic, professional, and personal responsibilities</p>
-        </div>
-    </section>
-
-    <!-- Main Features -->
-    <section class="features-section">
-        <div class="container">
-            <div class="features-list">
-                <!-- Feature 1 -->
-                <div class="feature-item">
-                    <div class="feature-icon">📝</div>
-                    <h3>Task Type Management</h3>
-                    <p>Easily categorize different types of tasks:</p>
-                    <ul>
-                        <li><strong>Classes & Lectures:</strong> Fixed-time events with automatic recurrence</li>
-                        <li><strong>Assignments:</strong> Tasks with specific deadlines and estimated completion time</li>
-                        <li><strong>Exams:</strong> Important events with fixed dates</li>
-                        <li><strong>Work Shifts:</strong> Professional commitments with fixed schedules</li>
-                        <li><strong>Personal Tasks:</strong> Any other responsibility you need to track</li>
-                    </ul>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="feature-item">
-                    <div class="feature-icon">🔄</div>
-                    <h3>Recurring Events</h3>
-                    <p>Add repeating tasks and events without duplicate entries. Set frequency as:</p>
-                    <ul>
-                        <li>Daily - activities that repeat every single day</li>
-                        <li>Weekly - events that occur on specific days of the week</li>
-                        <li>Bi-weekly - tasks that repeat every two weeks</li>
-                        <li>Monthly - recurring monthly obligations</li>
-                        <li>Custom - flexible recurrence patterns</li>
-                    </ul>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="feature-item">
-                    <div class="feature-icon">🤖</div>
-                    <h3>Intelligent Schedule Generation</h3>
-                    <p>Our rule-based algorithm automatically creates your optimal schedule by:</p>
-                    <ul>
-                        <li>Analyzing all deadlines and time requirements</li>
-                        <li>Distributing tasks evenly across available time slots</li>
-                        <li>Preventing task overload on any single day</li>
-                        <li>Respecting fixed commitments (classes, shifts, events)</li>
-                        <li>Ensuring all deadlines are met with buffer time</li>
-                    </ul>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="feature-item">
-                    <div class="feature-icon">⏰</div>
-                    <h3>Available Time Input</h3>
-                    <p>Define when you're available to work on tasks:</p>
-                    <ul>
-                        <li>Set daily available hours</li>
-                        <li>Mark busy times and conflicts</li>
-                        <li>Account for sleep and personal care time</li>
-                        <li>Adjust availability for different days of the week</li>
-                    </ul>
-                </div>
-
-                <!-- Feature 5 -->
-                <div class="feature-item">
-                    <div class="feature-icon">✏️</div>
-                    <h3>Real-Time Schedule Updates</h3>
-                    <p>Manage your schedule with full flexibility:</p>
-                    <ul>
-                        <li>Modify existing tasks and deadlines</li>
-                        <li>Add new tasks at any time</li>
-                        <li>Delete or complete tasks</li>
-                        <li>Watch your schedule update automatically</li>
-                        <li>No manual rescheduling needed</li>
-                    </ul>
-                </div>
-
-                <!-- Feature 6 -->
-                <div class="feature-item">
-                    <div class="feature-icon">📊</div>
-                    <h3>Visual Schedule Display</h3>
-                    <p>See your entire schedule at a glance:</p>
-                    <ul>
-                        <li>Weekly calendar view with all events</li>
-                        <li>Color-coded task categories</li>
-                        <li>Clear deadline indicators</li>
-                        <li>Time estimation for each task</li>
-                        <li>Progress tracking for assignments</li>
-                    </ul>
-                </div>
+            <!-- Feature 2 -->
+            <div class="feature-item">
+                <div class="feature-icon">🔄</div>
+                <h3>Recurring Events</h3>
+                <p>Add repeating tasks and events without duplicate entries. Set frequency as:</p>
+                <ul>
+                    <li>Daily - activities that repeat every single day</li>
+                    <li>Weekly - events that occur on specific days of the week</li>
+                    <li>Bi-weekly - tasks that repeat every two weeks</li>
+                    <li>Monthly - recurring monthly obligations</li>
+                    <li>Custom - flexible recurrence patterns</li>
+                </ul>
             </div>
-        </div>
-    </section>
 
-    <!-- Benefits Section -->
-    <section class="benefits-section">
-        <div class="container">
-            <h2>Key Benefits</h2>
-            <div class="benefits-grid">
-                <div class="benefit-card">
-                    <h4>Reduced Stress</h4>
-                    <p>Never think about manual planning again. Let ScheduleLynx handle the organization so you can focus on work.</p>
-                </div>
-                <div class="benefit-card">
-                    <h4>Better Time Management</h4>
-                    <p>Intelligently distributed tasks ensure optimal use of your available time without overwhelming any single day.</p>
-                </div>
-                <div class="benefit-card">
-                    <h4>Improved Productivity</h4>
-                    <p>With a clear, automatically-generated schedule, you can work more efficiently and complete tasks effectively.</p>
-                </div>
-                <div class="benefit-card">
-                    <h4>Never Miss Deadlines</h4>
-                    <p>Our rule-based system ensures every task is scheduled before its deadline with appropriate buffer time.</p>
-                </div>
+            <!-- Feature 3 -->
+            <div class="feature-item">
+                <div class="feature-icon">🤖</div>
+                <h3>Intelligent Schedule Generation</h3>
+                <p>Our rule-based algorithm automatically creates your optimal schedule by:</p>
+                <ul>
+                    <li>Analyzing all deadlines and time requirements</li>
+                    <li>Distributing tasks evenly across available time slots</li>
+                    <li>Preventing task overload on any single day</li>
+                    <li>Respecting fixed commitments (classes, shifts, events)</li>
+                    <li>Ensuring all deadlines are met with buffer time</li>
+                </ul>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="feature-item">
+                <div class="feature-icon">⏰</div>
+                <h3>Available Time Input</h3>
+                <p>Define when you're available to work on tasks:</p>
+                <ul>
+                    <li>Set daily available hours</li>
+                    <li>Mark busy times and conflicts</li>
+                    <li>Account for sleep and personal care time</li>
+                    <li>Adjust availability for different days of the week</li>
+                </ul>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="feature-item">
+                <div class="feature-icon">✏️</div>
+                <h3>Real-Time Schedule Updates</h3>
+                <p>Manage your schedule with full flexibility:</p>
+                <ul>
+                    <li>Modify existing tasks and deadlines</li>
+                    <li>Add new tasks at any time</li>
+                    <li>Delete or complete tasks</li>
+                    <li>Watch your schedule update automatically</li>
+                    <li>No manual rescheduling needed</li>
+                </ul>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="feature-item">
+                <div class="feature-icon">📊</div>
+                <h3>Visual Schedule Display</h3>
+                <p>See your entire schedule at a glance:</p>
+                <ul>
+                    <li>Weekly calendar view with all events</li>
+                    <li>Color-coded task categories</li>
+                    <li>Clear deadline indicators</li>
+                    <li>Time estimation for each task</li>
+                    <li>Progress tracking for assignments</li>
+                </ul>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <h2>Ready to Transform Your Schedule?</h2>
-            <p>Start managing your time smarter today</p>
-            <a href="timetable.html" class="cta-button">Try the Planner Now</a>
+<!-- Benefits Section -->
+<section class="benefits-section">
+    <div class="container">
+        <h2>Key Benefits</h2>
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <h4>Reduced Stress</h4>
+                <p>Never think about manual planning again. Let ScheduleLynx handle the organization so you can focus on
+                    work.</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Better Time Management</h4>
+                <p>Intelligently distributed tasks ensure optimal use of your available time without overwhelming any
+                    single day.</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Improved Productivity</h4>
+                <p>With a clear, automatically-generated schedule, you can work more efficiently and complete tasks
+                    effectively.</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Never Miss Deadlines</h4>
+                <p>Our rule-based system ensures every task is scheduled before its deadline with appropriate buffer
+                    time.</p>
+            </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 ScheduleLynx. Smart scheduling for better time management.</p>
-        </div>
-    </footer>
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Transform Your Schedule?</h2>
+        <p>Start managing your time smarter today</p>
+        <a href="timetable.html" class="cta-button">Try the Planner Now</a>
+    </div>
+</section>
 
-    <script src="script.js"></script>
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2026 ScheduleLynx. Smart scheduling for better time management.</p>
+    </div>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>

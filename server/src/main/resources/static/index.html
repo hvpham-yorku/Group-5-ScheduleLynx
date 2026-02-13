@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ScheduleLynx</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>ScheduleLynx</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link">Home</a></li>
+                <li><a href="index.html" class="nav-link active">Dashboard</a></li>
+                <li><a href="timetable.html" class="nav-link">Planner</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
+                <li><a href="#" onclick="logout()" class="nav-link logout-link">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Welcome Header -->
+        <section class="dashboard-header">
+            <div class="container">
+                <div class="header-content">
+                    <h2>Welcome, <span id="userName">User</span>! 👋</h2>
+                    <p>Here's your schedule overview and upcoming tasks</p>
+                </div>
+                <div class="header-actions">
+                    <a href="timetable.html" class="btn-primary">+ Add New Task</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="dashboard-stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3>Total Tasks</h3>
+                            <span class="stat-icon">📋</span>
+                        </div>
+                        <div class="stat-value" id="totalTasksCount">0</div>
+                        <p class="stat-subtitle">tasks created</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3>Upcoming Deadlines</h3>
+                            <span class="stat-icon">⏰</span>
+                        </div>
+                        <div class="stat-value" id="upcomingCount">0</div>
+                        <p class="stat-subtitle">next 7 days</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3>Overdue Tasks</h3>
+                            <span class="stat-icon">⚠️</span>
+                        </div>
+                        <div class="stat-value" id="overdueCount">0</div>
+                        <p class="stat-subtitle">needs attention</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3>This Week Hours</h3>
+                            <span class="stat-icon">⏳</span>
+                        </div>
+                        <div class="stat-value" id="weekHoursCount">0h</div>
+                        <p class="stat-subtitle">scheduled</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <div class="dashboard-content">
+            <div class="container">
+                <div class="content-grid">
+                    <!-- Left: Upcoming Tasks -->
+                    <section class="upcoming-tasks">
+                        <div class="section-header">
+                            <h3>📅 Upcoming Tasks</h3>
+                            <a href="timetable.html" class="link-small">View All →</a>
+                        </div>
+                        <div id="upcomingTasksList" class="tasks-list-dashboard">
+                            <p class="empty-state">No upcoming tasks. Start by <a href="timetable.html">adding a task</a>!</p>
+                        </div>
+                    </section>
+
+                    <!-- Right: This Week's Schedule -->
+                    <section class="week-schedule">
+                        <div class="section-header">
+                            <h3>📆 This Week</h3>
+                            <a href="timetable.html" class="link-small">View Full Week →</a>
+                        </div>
+                        <div id="weekScheduleMini" class="week-schedule-mini">
+                            <p class="empty-state">No events scheduled. <a href="timetable.html">Create your schedule</a>!</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Quick Stats by Task Type -->
+                <section class="task-breakdown">
+                    <div class="section-header">
+                        <h3>Task Breakdown</h3>
+                    </div>
+                    <div class="breakdown-grid" id="taskBreakdown">
+                        <p class="empty-state">Add tasks to see breakdown</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <section class="dashboard-cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h3>Ready to organize your schedule?</h3>
+                    <p>Create your first task and let ScheduleLynx generate an optimized schedule for you</p>
+                    <a href="timetable.html" class="cta-button">Start Planning Now</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ScheduleLynx. Smart scheduling for better time management.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

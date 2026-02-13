@@ -283,6 +283,7 @@ function refreshDashboardIfVisible() {
         updateTaskBreakdown();
     }
 }
+
 function updateDashboardStats() {
     const today = new Date();
     const weekFromNow = addDays(today, 7);

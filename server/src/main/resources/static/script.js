@@ -476,41 +476,58 @@ function initializeFormHandlers() {
 
         e.preventDefault();
 
-        const titleVal = document.getElementById('taskTitle').value.trim();
-        const dateVal  = document.getElementById('deadline') .value;
-        const hoursVal = parseFloat(document.getElementById('estimatedHours').value) || 1;
+        const isRecurring = document.getElementById('isRecurring').checked;
+        const titleVal = document.getElementById('taskTitle')     .value.trim();
+        const dateVal = document.getElementById('deadline')       .value;
 
-        const newTaskData = {
-            title          : titleVal,
-            dueDate        : dateVal,
-            estimatedHours : hoursVal,
-            difficulty     : "MEDIUM"
-        };
+        try { if (isRecurring) { // one-time Event
 
-        try { const response = await fetch('/api/tasks', {
-                method  : 'POST',
-                headers : {'Content-Type': 'application/json'},
-                body    : JSON.stringify(newTaskData)
-            });
+                const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+                const dayOfWeek = days[new Date(dateVal + 'T00:00:00Z').getUTCDay()];
 
-            if (!response.ok) {
-                alert("Task failed to send to Java server!");
-                return;
+                const payload = {
+                    title : titleVal,
+                    day   : dayOfWeek,
+                    start : document.getElementById('startTime').value || "09:00",
+                    end   : document.getElementById('endTime').value || "10:00"
+                };
+
+                const response = await fetch('/api/fixed-events', {
+                    method  : 'POST',
+                    headers : {'Content-Type': 'application/json'},
+                    body    : JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error("Fixed Event save failed");
+
+            } else { // recurring Event
+
+                const payload = {
+                    title          : titleVal,
+                    dueDate        : dateVal,
+                    estimatedHours : Math.round(parseFloat(document.getElementById('estimatedHours').value)) || 1,
+                    difficulty     : "MEDIUM"
+                };
+
+                const response = await fetch('/api/tasks', {
+                    method  : 'POST',
+                    headers : {'Content-Type': 'application/json'},
+                    body    : JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error("Task save failed");
             }
 
             await loadTasksFromServer();
-
             taskForm.reset();
 
             document.getElementById('recurrenceOptions').style.display = 'none';
-            document.getElementById('startTimeGroup')   .style.display = 'none';
-            document.getElementById('endTimeGroup')     .style.display = 'none';
+            document.getElementById('startTimeGroup').style.display = 'none';
+            document.getElementById('endTimeGroup').style.display = 'none';
 
-            console.log("Success: Task saved to Spring Boot.");
+            alert("Successfully saved to ScheduleLynx!");
 
         } catch (error) {
-            console.error("Fetch error:", error);
-            alert("Failure!\nMake sure your Spring Boot server is running on localhost:8080");
+            console.error("Submission error:", error);
+            alert("Backend Error: " + error.message);
         }
     });
 }
@@ -521,27 +538,44 @@ function initializeFormHandlers() {
 
 async function loadTasksFromServer() {
 
-    try { const response = await fetch('/api/tasks');
+    try { const [tasksRes, fixedRes] = await Promise.all([
+            fetch('/api/tasks'),
+            fetch('/api/fixed-events')
+        ]);
 
-        if (!response.ok) return;
+        const serverTasks = await tasksRes.json();
+        const serverFixed = await fixedRes.json();
 
-        const serverTasks = await response.json();
+        const dayMap = {
+            'SATURDAY' : 'Sat', 'MONDAY'  : 'Mon', 'TUESDAY': 'Tue',
+            'WEDNESDAY': 'Wed', 'THURSDAY': 'Thu', 'FRIDAY' : 'Fri', 'SUNDAY': 'Sun'
+        };
 
-        tasks = serverTasks.map(t => ({
-            id             : t.id || generateId(),
-            title          : t.title,
-            deadline       : t.dueDate, // The new GUI uses 'deadline', not 'date'
-            estimatedHours : t.estimatedHours || 1,
-            type           : t.type || 'assignment',
-            completed      : false
-        }));
+        tasks = [
+            ...serverTasks.map(t => ({
+                id          : t.id,
+                title       : t.title,
+                deadline    : t.dueDate,
+                type        : 'assignment',
+                isRecurring : false
+            })),
+            ...serverFixed.map(f => ({
+                id             : f.id,
+                title          : f.title,
+                startTime      : f.start,
+                endTime        : f.end,
+                type           : 'class',
+                isRecurring    : true,
+                recurrenceDays : [dayMap[f.day] || 'Mon'],
+                recurrenceEnd  : '2026-12-31'
+            }))
+        ];
 
         updateTasksDisplay();
         renderScheduleGrid();
 
-        console.log("Tasks loaded from server!");
     } catch (e) {
-        console.error("Failed to load tasks:", e);
+        console.error("Failed to sync with backend:", e);
     }
 }
 

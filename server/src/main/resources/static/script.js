@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
     else if (currentPage === 'timetable.html') {
         initializeFormHandlers();
         initializeScheduleDisplay();
-        loadTasksFromStorage();
+        loadTasksFromServer();
     }
 });
 
@@ -456,51 +456,94 @@ function updateTaskBreakdown() {
 
 function initializeFormHandlers() {
 
-    const taskForm              = document.getElementById('taskForm');
-    const taskTypeSelect        = document.getElementById('taskType');
-    const isRecurringCheckbox   = document.getElementById('isRecurring');
-    const recurrenceTypeSelect  = document.getElementById('recurrenceType');
+    const taskForm = document.getElementById('taskForm');
 
-    // Show/hide time fields based on task type
-    taskTypeSelect.addEventListener('change', function () {
+    if (!taskForm) return;
 
-        const startTimeGroup    = document.getElementById('startTimeGroup');
-        const endTimeGroup      = document.getElementById('endTimeGroup');
+    const taskTypeSelect = document.getElementById('taskType');
 
-        if (this.value === 'class' || this.value === 'shift') {
-            startTimeGroup.style.display = 'flex';
-            endTimeGroup.style.display   = 'flex';
-        } else {
-            startTimeGroup.style.display = 'none';
-            endTimeGroup.style.display   = 'none';
-        }
+    taskTypeSelect.addEventListener('change', function() {
+        const isTimeBased = (this.value === 'class' || this.value === 'shift');
+        document.getElementById('startTimeGroup').style.display = isTimeBased ? 'block' : 'none';
+        document.getElementById('endTimeGroup')  .style.display = isTimeBased ? 'block' : 'none';
     });
 
-    // Show/hide recurrence options
-    isRecurringCheckbox.addEventListener('change', function () {
-        const recurrenceOptions = document.getElementById('recurrenceOptions');
-        recurrenceOptions.style.display = this.checked ? 'block' : 'none';
+    document.getElementById('isRecurring').addEventListener('change', function() {
+        document.getElementById('recurrenceOptions').style.display = this.checked ? 'block' : 'none';
     });
 
-    // Show/hide days of week based on recurrence type
-    recurrenceTypeSelect.addEventListener('change', function () {
-        const daysOfWeekGroup = document.getElementById('daysOfWeekGroup');
-        daysOfWeekGroup.style.display = this.value === 'weekly' || this.value === 'biweekly' ? 'flex' : 'none';
-    });
+    taskForm.addEventListener('submit', async function (e) {
 
-    // Form submission
-    taskForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        taskForm.reset();
-        document.getElementById('recurrenceOptions').style.display = 'none';
-        document.getElementById('startTimeGroup').style.display = 'none';
-        document.getElementById('endTimeGroup').style.display = 'none';
+
+        const titleVal = document.getElementById('taskTitle').value.trim();
+        const dateVal  = document.getElementById('deadline') .value;
+        const hoursVal = parseFloat(document.getElementById('estimatedHours').value) || 1;
+
+        const newTaskData = {
+            title          : titleVal,
+            dueDate        : dateVal,
+            estimatedHours : hoursVal,
+            difficulty     : "MEDIUM"
+        };
+
+        try { const response = await fetch('/api/tasks', {
+                method  : 'POST',
+                headers : {'Content-Type': 'application/json'},
+                body    : JSON.stringify(newTaskData)
+            });
+
+            if (!response.ok) {
+                alert("Task failed to send to Java server!");
+                return;
+            }
+
+            await loadTasksFromServer();
+
+            taskForm.reset();
+
+            document.getElementById('recurrenceOptions').style.display = 'none';
+            document.getElementById('startTimeGroup')   .style.display = 'none';
+            document.getElementById('endTimeGroup')     .style.display = 'none';
+
+            console.log("Success: Task saved to Spring Boot.");
+
+        } catch (error) {
+            console.error("Fetch error:", error);
+            alert("Failure!\nMake sure your Spring Boot server is running on localhost:8080");
+        }
     });
 }
 
 // ============================
 // TASK DISPLAY
 // ============================
+
+async function loadTasksFromServer() {
+
+    try { const response = await fetch('/api/tasks');
+
+        if (!response.ok) return;
+
+        const serverTasks = await response.json();
+
+        tasks = serverTasks.map(t => ({
+            id             : t.id || generateId(),
+            title          : t.title,
+            deadline       : t.dueDate, // The new GUI uses 'deadline', not 'date'
+            estimatedHours : t.estimatedHours || 1,
+            type           : t.type || 'assignment',
+            completed      : false
+        }));
+
+        updateTasksDisplay();
+        renderScheduleGrid();
+
+        console.log("Tasks loaded from server!");
+    } catch (e) {
+        console.error("Failed to load tasks:", e);
+    }
+}
 
 function updateTasksDisplay() {
 

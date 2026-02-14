@@ -6,252 +6,153 @@
     <title>Planner - ScheduleLynx</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="timetable-page">
-<header class="topbar">
-    <h1 class="brand">ScheduleLynx</h1>
+<body class="planner-page">
 
-
-    <div class="month-label" id="monthLabel">February 2026</div>
-
-    <div class="topbar-actions">
-        <button class="btn" id="prevBtn">◀</button>
-        <button class="btn" id="todayBtn">Today</button>
-        <button class="btn" id="nextBtn">▶</button>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <h1>ScheduleLynx</h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="home.html" class="nav-link">Home</a></li>
+            <li><a href="index.html" class="nav-link">Dashboard</a></li>
+            <li><a href="timetable.html" class="nav-link active">Planner</a></li>
+            <li><a href="features.html" class="nav-link">Features</a></li>
+            <li><a href="#" onclick="logout()" class="nav-link logout-link">Logout</a></li>
+        </ul>
     </div>
-</header>
+</nav>
 
-<div class="app-layout">
-
+<div class="planner-container container">
     <aside class="sidebar">
         <section class="panel">
-            <h2>Add Event</h2>
-
+            <h2>Add / Edit Task</h2>
             <form id="taskForm" class="task-form">
-
-                <label>
-                    Title
+                <div class="form-group">
+                    <label for="taskTitle">Title</label>
                     <input id="taskTitle" type="text" placeholder="e.g., EECS lab" required/>
-                </label>
+                </div>
 
-                <label>
-                    Date
-                    <input id="taskDate" type="date" required/>
-                </label>
+                <div class="form-group">
+                    <label for="taskType">Type</label>
+                    <select id="taskType">
+                        <option value="assignment">Assignment</option>
+                        <option value="class">Class</option>
+                        <option value="exam">Exam</option>
+                        <option value="shift">Shift</option>
+                        <option value="personal">Personal</option>
+                    </select>
+                </div>
 
-                <label>
-                    Time
-                    <input id="taskTime" type="time" required/>
-                </label>
+                <div class="form-group">
+                    <label for="deadline">Date (deadline)</label>
+                    <input id="deadline" type="date" required/>
+                </div>
 
-                <button class="btn" type="submit">Add</button>
+                <div id="startTimeGroup" class="form-group" style="display:none;">
+                    <label for="startTime">Start Time</label>
+                    <input id="startTime" type="time"/>
+                </div>
+
+                <div id="endTimeGroup" class="form-group" style="display:none;">
+                    <label for="endTime">End Time</label>
+                    <input id="endTime" type="time"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="estimatedHours">Estimated Hours</label>
+                    <input id="estimatedHours" type="number" min="0" step="0.5" value="1" required/>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Optional details..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label><input id="isRecurring" type="checkbox"/> Recurring</label>
+                </div>
+
+                <div id="recurrenceOptions" style="display:none;">
+                    <div class="form-group">
+                        <label for="recurrenceType">Recurrence</label>
+                        <select id="recurrenceType">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="biweekly">Biweekly</option>
+                        </select>
+                    </div>
+
+                    <div id="daysOfWeekGroup" class="form-group days-checkbox" style="display:none;">
+                        <label><input type="checkbox" value="Mon"/> Mon</label>
+                        <label><input type="checkbox" value="Tue"/> Tue</label>
+                        <label><input type="checkbox" value="Wed"/> Wed</label>
+                        <label><input type="checkbox" value="Thu"/> Thu</label>
+                        <label><input type="checkbox" value="Fri"/> Fri</label>
+                        <label><input type="checkbox" value="Sat"/> Sat</label>
+                        <label><input type="checkbox" value="Sun"/> Sun</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="recurrenceEnd">Recurrence End Date</label>
+                        <input id="recurrenceEnd" type="date"/>
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button class="btn-primary" type="submit">Save Task</button>
+                    <button class="btn-secondary" id="clearForm" type="button"
+                            onclick="document.getElementById('taskForm').reset(); document.getElementById('recurrenceOptions').style.display='none'; document.getElementById('startTimeGroup').style.display='none'; document.getElementById('endTimeGroup').style.display='none';">
+                        Reset
+                    </button>
+                </div>
             </form>
         </section>
     </aside>
-    <main class="calendar">
-        <div class="dow-row">
-            <div class="dow">Sun</div>
-            <div class="dow">Mon</div>
-            <div class="dow">Tue</div>
-            <div class="dow">Wed</div>
-            <div class="dow">Thu</div>
-            <div class="dow">Fri</div>
-            <div class="dow">Sat</div>
+
+    <main class="main-content">
+        <div class="controls">
+            <div class="control-buttons">
+                <button class="btn-nav" id="prevWeek">◀ Prev</button>
+                <div class="week-display" id="weekDisplay">Week</div>
+                <button class="btn-nav" id="nextWeek">Next ▶</button>
+            </div>
+            <div class="control-actions">
+                <button class="btn-primary" id="generateSchedule" disabled>Generate Schedule</button>
+                <button class="btn-danger" id="clearAll">Clear All</button>
+            </div>
         </div>
 
-        <div id="monthGrid" class="month-grid"></div>
-    </main>
+        <section class="tasks-panel">
+            <h3>Your Tasks</h3>
+            <div id="tasksList" class="tasks-list"></div>
+        </section>
 
+        <section class="schedule-section">
+            <h3>This Week</h3>
+            <div id="scheduleGrid" class="schedule-grid"></div>
+        </section>
+
+        <section class="timeline-section">
+            <h3>Generated Timeline</h3>
+            <div id="timeline"><p class="empty-state">Tasks will appear here once you add them and generate the
+                schedule.</p></div>
+        </section>
+    </main>
 </div>
 
-
-<script>
-
-    const tasks = [];
-
-    const monthGrid  = document.getElementById("monthGrid");
-    const monthLabel = document.getElementById("monthLabel");
-
-    const prevBtn   = document.getElementById("prevBtn");
-    const nextBtn   = document.getElementById("nextBtn");
-    const todayBtn  = document.getElementById("todayBtn");
-
-    const taskForm  = document.getElementById("taskForm");
-    const taskTitle = document.getElementById("taskTitle");
-    const taskDate  = document.getElementById("taskDate");
-    const taskTime  = document.getElementById("taskTime");
-
-    const now = new Date();
-    let current = new Date(
-        now.getFullYear(), now.getMonth(), 1);
-
-    // initialization
-    taskDate.value = toISODate(new Date()); // set taskDate field to today
-
-    function pad(n) {
-        return String(n).padStart(2, "0");
-    }
-
-    function monthTitle(d) {
-        return d.toLocaleString(undefined, {month: "long", year: "numeric"});
-    }
-
-    function toISODate(d) {
-        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-    }
-
-    async function loadTasksFromServer() {
-
-        try { const response = await fetch('/api/tasks');
-
-            if (!response.ok) return;
-
-            const serverTasks = await response.json();
-
-            // clear already loaded tasks to not have duplicated tasks
-            tasks.length = 0;
-
-            serverTasks.forEach(t => {
-                tasks.push({
-                    title : t.title,
-                    date  : t.dueDate,
-                    time  : "12:00" // TODO: backend needs to be able to save this
-                });
-            });
-
-            // redraw screen
-            renderMonth(current);
-            console.log("Tasks loaded from server!");
-
-        } catch (e) { console.error("Failed to load tasks:", e); }
-    }
-
-    function renderMonth(date) {
-        // label at the top
-        monthLabel.textContent = monthTitle(date);
-
-        //  clear old boxes (for re-rendering)
-        monthGrid.innerHTML = "";
-
-        const year  = date.getFullYear();
-        const month = date.getMonth();
-
-        //set first day of the month (always the 1st of the month)
-        const first = new Date(year, month, 1);
-
-        const firstDow = first.getDay(); // make sunday = 0
-
-        //set the startday shown on calendar (might be old month)
-        const start = new Date(first);
-        start.setDate(first.getDate() - firstDow);
-
-        // month view shows 6 weeks = 42 boxes
-        for (let i = 0; i < 42; i++) {
-            const day = new Date(start);
-            day.setDate(start.getDate() + i);
-
-            const cell = document.createElement("div");
-            cell.className = "day";
-
-            // tint the days not in the current month
-            if (day.getMonth() !== month) cell.classList.add("other-month");
-
-            //add the day number in the cell
-            const num = document.createElement("div");
-            num.className = "day-number";
-            num.textContent = day.getDate();
-            cell.appendChild(num);
-
-            //task chips
-            const chips = document.createElement("div");
-            chips.className = "chips";
-            cell.appendChild(chips);
-
-            const iso = toISODate(day);
-            const todaysTasks = tasks
-                .filter(t => t.date === iso)
-                .sort((a, b) => a.time.localeCompare(b.time));
-
-            for (const t of todaysTasks) {
-                const chip = document.createElement("div");
-                chip.className = "chip";
-                chip.innerHTML = `<span>${t.title}</span><span class="time">${t.time}</span>`;
-                chips.appendChild(chip);
-            }
-            monthGrid.appendChild(cell);
-        }
-    }
-
-    renderMonth(current);
-
-    prevBtn.addEventListener("click", () => {
-        //go to previous month
-        current = new Date(current.getFullYear(), current.getMonth() - 1, 1);
-        renderMonth(current);
-    });
-
-    nextBtn.addEventListener("click", () => {
-        //go to next month
-        current = new Date(current.getFullYear(), current.getMonth() + 1, 1);
-        renderMonth(current);
-    });
-
-    todayBtn.addEventListener("click", () => {
-        //jump to the current real month
-        const now = new Date();
-        current = new Date(now.getFullYear(), now.getMonth(), 1);
-        renderMonth(current);
-    });
-
-    taskForm.addEventListener("submit", async (e) => {
-
-        e.preventDefault();
-
-        const titleVal = taskTitle.value.trim();
-        const dateVal  = taskDate.value;
-        const timeVal  = taskTime.value;
-
-        const newTaskData = {
-            title          : titleVal,
-            dueDate        : dateVal,
-            estimatedHours : 5,         // TODO: let the user decide this
-            difficulty     : "MEDIUM"   // TODO: let the user decide this too
-        };
-
-        try { const response = await fetch('/api/tasks', {
-            method  : 'POST',
-            headers : {'Content-Type': 'application/json'},
-            body    : JSON.stringify(newTaskData)});
-
-            if (!response.ok) {
-                alert("Task failed to send!");
-                return;
-            }
-            await response.json();
-        }
-        catch (e) {
-            alert("Failure!\n Make sure your Spring Boot server is running on localhost:8080");
-            return;
-        }
-
-        tasks.push({
-            title: titleVal,
-            date: dateVal,
-            time: timeVal
-        });
-
-        taskTitle.value = "";
-        taskTime.value = "";
-
-        await loadTasksFromServer();
-
-        console.log("Task successfully sent to Java server!");
-    });
-
-
-    loadTasksFromServer(); // load tasks on page load
-
-</script>
-
-
+<!-- Modal for task details -->
+<div id="taskModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div id="modalBody"></div>
+        <div class="modal-actions">
+            <button id="editTaskBtn" class="btn-primary">Edit</button>
+            <button id="deleteTaskBtn" class="btn-danger">Delete</button>
+            <button id="closeModalBtn" class="btn-secondary">Close</button>
+        </div>
+    </div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>

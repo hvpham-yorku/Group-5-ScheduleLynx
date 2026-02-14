@@ -1,4 +1,5 @@
 # Log.MD $\color{#333333}{\textit{(a.k.a. Dr. Log)}}$
+<!-- The name's Log; Dr. Log (que dramatic theme music) -->
 
 ## Meeting Minutes
 

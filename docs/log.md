@@ -5,20 +5,20 @@
 * We lost our meeting minutes, but we did like 5 of them on Mondays.
 
 
-<p>
+
 ## Plan Changes and Design Rationale
 
 * 
 
 
-<p>
+
 ## Concerns
 
 * Group members down from 6 to 5
 * Some of use are learning SpringBoot and JS as we go along which makes progress much slower
 
 
-<p>
+
 ## Task Assignments
 
 * Backend Server - Mykola
@@ -27,7 +27,7 @@
 * Log.MD - Eric
 
 
-<p>
+
 ## User Story 🔗 Development Tasks
 
 * 

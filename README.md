@@ -120,9 +120,13 @@ Server runs at:
 ### Run Tests
 
     cd server
+    
 Windows:
+
     mvnw.cmd clean test
+    
 Mac/linux:
+
     ./mvnw clean test
 
 ------------------------------------------------------------------------

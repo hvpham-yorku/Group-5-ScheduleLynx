@@ -33,7 +33,7 @@
 * 
 
 
-<p></p>
+
 ## Estimated and Actual Development Task Times
 
 * We work on a 'It's done when it's done basis'

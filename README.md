@@ -107,8 +107,10 @@ From project root:
 
     cd server
 Windows:
+
     mvnw.cmd spring-boot:run
 Mac/linux:
+
     ./mvnw spring-boot:run
 
 Server runs at:

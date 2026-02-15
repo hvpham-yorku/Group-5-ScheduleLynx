@@ -1,123 +1,275 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - ScheduleLynx</title>
-    <link rel="stylesheet" href="style.css">
+	<title>You Login Template</title>
+	<!-- Site favicon -->
+	<link rel="shortcut icon" href="images/favicon.ico">
+	<!-- Mobile Specific Metas -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<!-- Google Font -->
+	<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700" rel="stylesheet">
+	<!-- Icon Font -->
+	<link rel="stylesheet" href="fonts/ionicons/css/ionicons.css">
+	<!-- Text Font -->
+	<link rel="stylesheet" href="fonts/font.css">
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<!-- Normal style CSS -->
+	<link rel="stylesheet" href="css/style.css">
+	<!-- Normal media CSS -->
+	<link rel="stylesheet" href="css/media.css">
 </head>
+<body>
 
-<body class="login-page">
-<div class="login-container">
-    <div class="login-box">
-        <div class="login-header">
-            <h1>ScheduleLynx</h1>
-            <p> The All-in-One Life Planner </p>
-        </div>
+	<!-- Header start -->
+	<div class="header-wrap">
+		<div class="clearfix">
+			<div class="logo">
+				<a href="index.php"><img src="images/logo.svg" alt=""></a>
+			</div>
+			<div class="menu">
+				<div class="dropdown">
+					<a class="dropdown-toggle hamburgler" href="#" role="button" data-toggle="dropdown">
+						<span class="menu-icon">
+							<div class="bun top"></div>
+							<div class="meat"></div>
+							<div class="bun bottom"></div>
+						</span>
+					</a>
+					<div class="dropdown-menu dropdown-menu-right">
+						<ul>
+							<li><a class="dropdown-item selected" href="index.php">Login Style 1</a></li>
+							<li><a class="dropdown-item" href="index2.php">Login Style 2</a></li>
+							<li><a class="dropdown-item" href="index3.php">Login Style 3</a></li>
+							<li><a class="dropdown-item" href="index4.php">Login Style 4</a></li>
+							<li><a class="dropdown-item" href="index5.php">Login Style 5</a></li>
+							<li><a class="dropdown-item" href="index6.php">Login Style 6</a></li>
+							<li><a class="dropdown-item" href="index7.php">Login Style 7</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Header end -->
 
-        <form id="loginForm" class="login-form">
-            <div class="form-group">
-                <label for="username">Username or Email</label>
-                <input
-                        type="text"
-                        id="username"
-                        placeholder="Enter your username or email"
-                        required
-                >
-            </div>
+	<main class="cd-main">
+		<section class="cd-section index visible ">
+			<div class="cd-content style1">
+				<div class="login-box d-md-flex align-items-center">
+					<div class="login-form-box">
+						<div class="login-form-slider">
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input
-                        type="password"
-                        id="password"
-                        placeholder="Enter your password"
-                        required
-                >
-            </div>
+							<!-- login slide start -->
+							<div class="login-slide slide login-style1">
+								<div class="box-brand">
+									<div class="brand-name">ScheduleLynx</div>
+								</div>
+								<form id="loginForm">
+									<div class="form-group">
+										<input type="text" class="form-control" placeholder="Username or email" aria-label="Username or email" required>
+									</div>
+									<div class="form-group">
+										<input type="password" class="form-control" placeholder="Password" aria-label="Password" required>
+									</div>
+									<div class="form-group">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" id="customCheck1">
+											<label class="custom-control-label" for="customCheck1">Remember me</label>
+										</div>
+									</div>
+									<div class="form-group">
+										<input type="submit" class="submit" value="Login">
+									</div>
+								</form>
+								<div class="sign-up-txt">
+									Don't have an account? <a href="javascript:;" class="sign-up-click">Sign Up</a>
+								</div>
 
-            <div class="form-group checkbox">
-                <label>
-                    <input type="checkbox" id="rememberMe">
-                    Remember me
-                </label>
-            </div>
+								<div class="forgot-txt">
+									<a href="javascript:;" class="forgot-password-click">Forgot password?</a>
+								</div>
 
-            <button type="submit" class="btn-login">Login</button>
-        </form>
+								<div class="login-with">
+									<h7>Login with your social</h7>
+									<ul class="social-login-btn">
+										<li class="facebook-btn"><a href="#"><i class="ion-social-facebook"></i></a></li>
+										<li class="twitter-btn">
+											<a href="#" aria-label="Twitter">
+												<svg class="w-3 h-3 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 55 55" fill="currentColor">
+													<path d="M13.795 10.533 20.68 2h-3.073l-5.255 6.517L7.69 2H1l7.806 10.91L1.47 22h3.074l5.705-7.07L15.31 22H22l-8.205-11.467Zm-2.38 2.95L9.97 11.464 4.36 3.627h2.31l4.528 6.317 1.443 2.02 6.018 8.409h-2.31l-4.934-6.89Z"/>
+												</svg>
+											</a>
+										</li>
+										<li class="google-btn"><a href="#"><img src="images/google.svg"></a></li>
+									</ul>
+								</div>
+							</div>
+							<!-- login slide end -->
 
-        <div class="signup-link">
-            Don't have an account? <a href="#" onclick="toggleSignup(event)">Sign up now</a>
-        </div>
-    </div>
+							<!-- signup slide start -->
+							<div class="signup-slide slide login-style1">
+								<div class="d-flex height-100-percentage">
+									<div class="align-self-center width-100-percentage">
+										<div class="box-brand">
+											<div class="brand-name">ScheduleLynx</div>
+										</div>
+										<form id="signupForm">
+											<div class="form-group">
+												<label class="label">Name</label>
+												<input type="text" class="form-control" required>
+											</div>
+											<div class="form-group">
+												<label class="label">Email</label>
+												<input type="email" class="form-control" required>
+											</div>
+											<div class="form-group">
+												<label class="label">Password</label>
+												<input type="password" class="form-control" id="signupPassword" required>
+											</div>
+											<div class="form-group">
+												<label class="label">Confirm Password</label>
+												<input type="password" class="form-control" id="signupConfirmPassword" required>
+											</div>
+											<div class="form-group padding-top-15px">
+												<input type="submit" class="submit" value="Sign Up">
+											</div>
+										</form>
+										<div class="sign-up-txt">
+											Already have an account? <a href="javascript:;" class="login-click">Login</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- signup slide end -->
 
-    <!-- Signup Form (Hidden by default) -->
-    <div id="signupForm" class="signup-box" style="display: none;">
-        <div class="login-header">
-            <h1>Create Account</h1>
-            <p>Join ScheduleLynx Today</p>
-        </div>
+							<!-- forgot password slide start -->
+							<div class="forgot-password-slide slide login-style1">
+								<div class="d-flex height-100-percentage">
+									<div class="align-self-center width-100-percentage">
+										<div class="box-brand">
+											<div class="brand-name">ScheduleLynx</div>
+										</div>
+										<form id="forgotForm">
+											<div class="form-group">
+												<h7>Enter your email address for instructions to reset your password</h7>
+												<input type="email" class="form-control" required>
+											</div>
+											<div class="form-group">
+												<input type="submit" class="submit" value="Submit">
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+							<!-- forgot password slide end -->
 
-        <form id="signupFormElement" class="login-form">
-            <div class="form-group">
-                <label for="signupName">Full Name</label>
-                <input
-                        type="text"
-                        id="signupName"
-                        placeholder="Enter your full name"
-                        required
-                >
-            </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
 
-            <div class="form-group">
-                <label for="signupEmail">Email</label>
-                <input
-                        type="email"
-                        id="signupEmail"
-                        placeholder="Enter your email"
-                        required
-                >
-            </div>
+	<div id="cd-loading-bar" data-scale="1"></div>
 
-            <div class="form-group">
-                <label for="signupUsername">Username</label>
-                <input
-                        type="text"
-                        id="signupUsername"
-                        placeholder="Choose a username"
-                        required
-                >
-            </div>
+	<!-- JS File -->
+	<script src="js/modernizr.js"></script>
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/popper.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
+	<script src="js/velocity.min.js"></script>
 
-            <div class="form-group">
-                <label for="signupPassword">Password</label>
-                <input
-                        type="password"
-                        id="signupPassword"
-                        placeholder="Create a password"
-                        required
-                >
-            </div>
+	<!-- Inline script updated for persistent login -->
+	<script type="text/javascript">
+	jQuery(window).on("load",function() {
+		jQuery(".pre-loader").fadeToggle("medium");
+	});
 
-            <div class="form-group">
-                <label for="signupConfirmPassword">Confirm Password</label>
-                <input
-                        type="password"
-                        id="signupConfirmPassword"
-                        placeholder="Confirm your password"
-                        required
-                >
-            </div>
+	jQuery(document).ready(function(){
+		var signup_slide = jQuery('.signup-slide');
+		var login_slide  = jQuery('.login-slide');
+		var forgot_slide = jQuery('.forgot-password-slide');
 
-            <button type="submit" class="btn-login">Create Account</button>
-        </form>
+		// Auto redirect if already logged in
+		if(localStorage.getItem('schedulelynxUser')) {
+			window.location.href = 'home.html';
+			return;
+		}
 
-        <div class="signup-link">
-            Already have an account? <a href="#" onclick="toggleSignup(event)">Login here</a>
-        </div>
-    </div>
-</div>
+		// Slides
+		jQuery('.sign-up-click').click(function(){
+			signup_slide.velocity({translateX:['0%','-100%']},{display:'block'});
+			login_slide.velocity({translateX:'100%'},{display:'none'});
+		});
+		jQuery('.login-click').click(function(){
+			login_slide.velocity({translateX:['0%','-100%']},{display:'block'});
+			signup_slide.velocity({translateX:'100%'},{display:'none'});
+			forgot_slide.velocity({translateX:'100%'},{display:'none'});
+		});
+		jQuery('.forgot-password-click').click(function(){
+			forgot_slide.velocity({translateX:['0%','-100%']},{display:'block'});
+			login_slide.velocity({translateX:'100%'},{display:'none'});
+		});
 
-<script src="script.js"></script>
+		// LOGIN
+		jQuery('#loginForm').submit(function(e){
+			e.preventDefault();
+			var username = jQuery('#loginForm input[type=text]').val();
+			var rememberMe = jQuery('#customCheck1').is(':checked');
+			var user = { username: username, loginTime: new Date().toISOString(), rememberMe: rememberMe };
+			localStorage.setItem('schedulelynxUser', JSON.stringify(user));
+			window.location.href = 'home.html';
+		});
+
+		// SIGNUP
+		jQuery('#signupForm').submit(function(e){
+			e.preventDefault();
+			var pw = jQuery('#signupPassword').val();
+			var cpw = jQuery('#signupConfirmPassword').val();
+			if(pw !== cpw){
+				alert("Passwords do not match!");
+				return;
+			}
+			var username = jQuery('#signupForm input[type=email]').val();
+			var user = { username: username, loginTime: new Date().toISOString(), rememberMe: true };
+			localStorage.setItem('schedulelynxUser', JSON.stringify(user));
+			window.location.href = 'home.html';
+		});
+
+		// FORGOT PASSWORD
+		jQuery('#forgotForm').submit(function(e){
+			e.preventDefault();
+			alert("Password reset instructions sent!");
+			jQuery('.login-click').click();
+		});
+
+		// Floating form behavior
+		var refresh = function() {
+			jQuery('.floating-form .form-group .form-control').each(function(index, el) {
+				var text_val = jQuery(this).val();
+				if(text_val === "") {
+					jQuery(this).parent().removeClass('has-value');
+				}else {
+					jQuery(this).parent().addClass('has-value');
+				}
+				jQuery(this).focus(function(){
+					jQuery(this).parent().addClass("is-focus");
+					jQuery(this).parent().addClass('has-value');
+				})
+				.blur(function(){
+					if(jQuery(this).val() === "" || jQuery(this).val() === " " || jQuery(this).val() === null){
+						jQuery(this).parent().removeClass("is-focus");
+						jQuery(this).parent().removeClass('has-value');
+					}
+				})
+			});
+		};
+		refresh();
+	});
+	</script>
+
 </body>
 </html>
+

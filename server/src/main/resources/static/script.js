@@ -414,30 +414,56 @@ function updateTaskBreakdown() {
 // FORM HANDLING
 // ============================
 
+
+
 function initializeFormHandlers() {
     const taskForm = document.getElementById('taskForm');
     const taskTypeSelect = document.getElementById('taskType');
     const isRecurringCheckbox = document.getElementById('isRecurring');
     const recurrenceTypeSelect = document.getElementById('recurrenceType');
-    
+
     // Show/hide time fields based on task type
     taskTypeSelect.addEventListener('change', function() {
         const startTimeGroup = document.getElementById('startTimeGroup');
         const endTimeGroup = document.getElementById('endTimeGroup');
+        const estimatedHoursGroup = document.getElementById('estimatedHoursGroup');
+        const recurringGroup = document.getElementById('recurringGroup');
+        const recurrenceOptions = document.getElementById('recurenceOptions');
+        const daysOfWeekGroup = document.getElementById('daysOfWeekGroup');
+        const isRecurringCheckbox = document.getElementById('isRecurring');
         
-        if (this.value === 'class' || this.value === 'shift') {
-            startTimeGroup.style.display = 'flex';
-            endTimeGroup.style.display = 'flex';
-        } else {
+        if (this.value === 'task') {
             startTimeGroup.style.display = 'none';
             endTimeGroup.style.display = 'none';
+            estimatedHoursGroup.style.display = 'block';
+            recurringGroup.style.display = 'none';
+            isRecurringCheckbox.checked = false;
+            recurrenceOptions.style.display = 'none';
+            daysOfWeekGroup.style.display = 'none';
+        } else {
+            startTimeGroup.style.display = 'flex';
+            endTimeGroup.style.display = 'flex';
+
+            estimatedHoursGroup.style.display = 'none';
+            recurringGroup.style.display = 'block';
+            recurrenceOptions.style.display = isRecurringCheckbox.checked ? 'block' : 'none';
+
         }
     });
 
     // Show/hide recurrence options
     isRecurringCheckbox.addEventListener('change', function() {
+        if (taskTypeSelect.value !== 'event') return;
+
         const recurrenceOptions = document.getElementById('recurrenceOptions');
+        const daysOfWeekGroup = document.getElementById('daysOfWeekGroup');
+
         recurrenceOptions.style.display = this.checked ? 'block' : 'none';
+
+        if (!this.checked)
+        {
+            daysOfWeekGroup.style.display = 'none';
+        }
     });
 
     // Show/hide days of week based on recurrence type
@@ -455,13 +481,24 @@ function initializeFormHandlers() {
         document.getElementById('startTimeGroup').style.display = 'none';
         document.getElementById('endTimeGroup').style.display = 'none';
     });
+
+    taskTypeSelect.dispatchEvent(new Event('change'));
+
 }
 
 function addTask() {
+    if (!currentUser) {
+        alert("You are not logged in.");
+        return;
+    }
+
     const taskTitle = document.getElementById('taskTitle').value.trim();
     const taskType = document.getElementById('taskType').value;
     const deadline = document.getElementById('deadline').value;
-    const estimatedHours = parseFloat(document.getElementById('estimatedHours').value);
+
+    const estimatedHoursInput = document.getElementById('estimatedHours');
+    const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;    
+    
     const startTime = document.getElementById('startTime').value;
     const endTime = document.getElementById('endTime').value;
     const description = document.getElementById('description').value.trim();
@@ -469,14 +506,29 @@ function addTask() {
     const recurrenceType = document.getElementById('recurrenceType').value;
     const recurrenceEnd = document.getElementById('recurrenceEnd').value;
 
-    if (!taskTitle || !taskType || !deadline || !estimatedHours) {
+    if (!taskTitle || !taskType || !deadline) {
         alert('Please fill in all required fields');
         return;
     }
 
+    if (taskType == 'task')
+    {
+        if(!estimatedHours || estimatedHours <= 0)
+        {
+            alert('Please enter estimated hours for a Task');
+            return;
+        }
+    } else {
+        if (!startTime || !endTime)
+        {
+            alert('Please enter start and end time for an Event');
+            return;
+        }
+    }
+
     // Get selected days of week if recurring
     let selectedDays = [];
-    if (isRecurring && (recurrenceType === 'weekly' || recurrenceType === 'biweekly')) {
+    if (taskType === 'event' && isRecurring && (recurrenceType === 'weekly' || recurrenceType === 'biweekly')) {
         const checkboxes = document.querySelectorAll('.days-checkbox input[type="checkbox"]:checked');
         selectedDays = Array.from(checkboxes).map(cb => cb.value);
         if (selectedDays.length === 0) {
@@ -485,32 +537,47 @@ function addTask() {
         }
     }
 
-    const task = {
+    const item = {
         id: generateId(),
         title: taskTitle,
         type: taskType,
         deadline: deadline,
-        estimatedHours: estimatedHours,
-        startTime: startTime || null,
-        endTime: endTime || null,
         description: description,
-        isRecurring: isRecurring,
-        recurrenceType: recurrenceType,
-        recurrenceEnd: recurrenceEnd,
-        recurrenceDays: selectedDays,
         completed: false,
         createdAt: new Date().toISOString()
     };
 
-    tasks.push(task);
+    if (taskType === 'task')
+    {
+        item.estimatedHours = estimatedHours,
+        item.startTime = null,
+        item.endTime = null,
+        item.isRecurring = false,
+        item.recurrenceType = null;
+        item.recurrenceEnd = null,
+        item.recurrenceDays = [];
+    }
+    else 
+    {
+        item.estimatedHours = 0,
+        item.startTime = startTime,
+        item.endTime = endTime,
+        item.isRecurring = isRecurring,
+        item.recurrenceType = isRecurring ? recurrenceType: null;
+        item.recurrenceEnd = isRecurring ? recurrenceEnd: null;
+        item.recurrenceDays = isRecurring ? selectedDays: [];
+    }
+
+    tasks.push(item);
     saveUserTasks(currentUser.username);
     updateTasksDisplay();
+    renderScheduleGrid();
     refreshDashboardIfVisible();
     
     // Enable generate schedule button
     document.getElementById('generateSchedule').disabled = false;
     
-    alert(`Task "${taskTitle}" added successfully!`);
+    alert(`${taskType === 'task' ? 'Task' : 'Event'} "${taskTitle}" added successfully!`);
 }
 
 // ============================
@@ -530,7 +597,10 @@ function updateTasksDisplay() {
             <div class="task-card-type">${task.type.charAt(0).toUpperCase() + task.type.slice(1)}</div>
             <div class="task-card-title">${task.title}</div>
             <div class="task-card-deadline">Due: ${formatDateDisplay(new Date(task.deadline))}</div>
-            <div class="task-card-time">${task.estimatedHours} hours</div>
+            ${task.type === 'task'
+            ? `<div class="task-card-time">${task.estimatedHours} hours</div>`
+            : (task.startTime ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>` : '')
+            }
             ${task.isRecurring ? '<div class="task-card-time">Recurring: ' + task.recurrenceType + '</div>' : ''}
         </div>
     `).join('');
@@ -624,6 +694,7 @@ function deleteSelectedTask() {
         tasks = tasks.filter(t => t.id !== selectedTaskId);
         saveTasksToStorage();
         updateTasksDisplay();
+        renderScheduleGrid();
         refreshDashboardIfVisible();
         document.getElementById('taskModal').classList.remove('active');
         alert('Task deleted successfully!');
@@ -721,7 +792,10 @@ function renderScheduleGrid() {
                     ? dayEvents.map(event => `
                         <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
                             <div class="schedule-event-title">${event.title}</div>
-                            ${event.startTime ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>` : ''}
+                            ${event.startTime
+                                ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>`
+                                : `<div class="schedule-event-time">${event.label || 'Due'}</div>`
+                            }
                         </div>
                     `).join('')
                     : '<p class="empty-state">No events</p>'
@@ -734,48 +808,79 @@ function renderScheduleGrid() {
 }
 
 function getEventsForDay(dateStr) {
-    const events = [];
+    const items = [];
 
-    tasks.forEach(task => {
+    tasks.forEach(item => {
         // Check if task falls on this day
-        if (task.isRecurring) {
-            const taskDate = new Date(dateStr);
-            const dayName = getDayName(taskDate);
-            
-            if (task.recurrenceDays.includes(dayName)) {
-                const recurrenceEnd = new Date(task.recurrenceEnd);
-                if (taskDate <= recurrenceEnd) {
-                    events.push({
-                        id: task.id,
-                        title: task.title,
-                        type: task.type,
-                        startTime: task.startTime,
-                        endTime: task.endTime
+        if(item.type ==='event'){
+            if(item.isRecurring){
+                const dayName = getDayName(new Date(dateStr)); 
+                const end = item.recurrenceEnd ? new Date(item.recurrenceEnd) : null;
+
+                const allowed = 
+                    !item.recurrenceDays || item.recurrenceDays.length === 0
+                        ? true
+                        : item.recurrenceDays.includes(dayName);
+
+
+                const start = item.deadline ? new Date(item.deadline) : null;
+                const cur = new Date(dateStr);
+
+                if (
+                    allowed &&
+                    (!start || cur >= start) &&   
+                    (!end || cur <= end)          
+                ) {
+                    items.push({
+                    id: item.id,
+                    title: item.title,
+                    type: 'event',
+                    startTime: item.startTime,
+                    endTime: item.endTime,
+                    label: null
                     });
                 }
             }
-        } else {
-            if (task.deadline === dateStr || (task.type === 'class' || task.type === 'shift')) {
-                events.push({
-                    id: task.id,
-                    title: task.title,
-                    type: task.type,
-                    startTime: task.startTime,
-                    endTime: task.endTime
-                });
+            else {
+                 if (item.deadline === dateStr) {
+                    items.push({
+                        id: item.id,
+                        title: item.title,
+                        type: 'event',
+                        startTime: item.startTime,
+                        endTime: item.endTime,
+                        label: null
+                    });
+                }
+            }
+        }
+
+        if(item.type === 'task'){
+            if(item.deadline === dateStr){
+                items.push({
+                    id: item.id,
+                    title: item.title,
+                    type: 'task',     
+                    startTime: null,
+                    endTime: null,
+                    label: 'Due'  
+                })
             }
         }
     });
 
     // Sort by start time
-    events.sort((a, b) => {
-        if (a.startTime && b.startTime) {
-            return a.startTime.localeCompare(b.startTime);
-        }
-        return 0;
+    items.sort((a, b) => {
+        const aTimed = !!a.startTime;
+        const bTimed = !!b.startTime;
+
+        if (aTimed && bTimed) return a.startTime.localeCompare(b.startTime);
+        if (aTimed) return -1;
+        if (bTimed) return 1;
+        return a.title.localeCompare(b.title);
     });
 
-    return events;
+    return items;
 }
 
 function generateSchedule() {
@@ -785,8 +890,7 @@ function generateSchedule() {
     }
 
     // Get non-recurring tasks that need scheduling
-    const tasksToSchedule = tasks.filter(t => !t.isRecurring && (t.type === 'assignment' || t.type === 'exam' || t.type === 'personal'));
-
+    const tasksToSchedule = tasks.filter(t => t.type === 'task');
     if (tasksToSchedule.length === 0) {
         alert('Add assignment, exam, or personal tasks to generate a schedule');
         return;
@@ -892,6 +996,7 @@ function loadTasksFromStorage() {
     if (currentUser) {
         loadUserTasks(currentUser.username);
         updateTasksDisplay();
+        renderScheduleGrid();
         if (tasks.length > 0) {
             document.getElementById('generateSchedule').disabled = false;
         }

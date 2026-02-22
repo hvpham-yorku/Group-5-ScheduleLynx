@@ -511,7 +511,7 @@ function addTask() {
         return;
     }
 
-    if (taskType == 'task')
+    if (taskType === 'task')
     {
         if(!estimatedHours || estimatedHours <= 0)
         {

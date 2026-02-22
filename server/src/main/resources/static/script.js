@@ -370,12 +370,14 @@ function updateWeekScheduleMini() {
             </div>
         `);
     }
-    
-    if (!hasEvents) {
-        weekScheduleMini.innerHTML = '<p class="empty-state">No events scheduled. <a href="timetable.html">Create your schedule</a>!</p>';
-    } else {
-        weekScheduleMini.innerHTML = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.75rem;">' + weekDays.join('') + '</div>';
-    }
+
+    if (!hasEvents) weekScheduleMini.innerHTML =
+        '<p class="empty-state">No events scheduled. ' +
+        '<a href="timetable.html">Create your schedule</a>!</p>';
+    else weekScheduleMini.innerHTML =
+        '<div style="display: grid; ' +
+        'grid-template-columns: repeat(7, 1fr); ' +
+        'gap: 0.75rem;">' + weekDays.join('') + '</div>';
 }
 
 function updateTaskBreakdown() {

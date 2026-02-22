@@ -203,11 +203,9 @@ function initializeLoginHandlers() {
 // Load user-specific tasks
 function loadUserTasks(username) {
     const userTasks = localStorage.getItem(`tasks_${username}`);
-    if (userTasks) {
-        tasks = JSON.parse(userTasks);
-    } else {
-        tasks = [];
-    }
+
+    if (userTasks) tasks = JSON.parse(userTasks);
+    else tasks = [];
 }
 
 // Save user-specific tasks

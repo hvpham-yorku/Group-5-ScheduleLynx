@@ -49,6 +49,7 @@ available time before deadlines and clearly warn me. <p><t>Construct a submissio
 
 ## Estimated and Actual Development Task Times
 
-* Backend - Estimated: 2 weeks - Actual: 2 weeks
-* Frontend - Estimated: 2 weeks - Actual: 2 weeks
-* Front to Back Linking - Estimated: 1 day - Actual: 2 days
+| Task                                    | Estimated Time | Actual Time | Assignee |
+|-----------------------------------------|----------------|-------------|----------|
+| scrum-32-make-variable-names-consistant | 2 hours        |             | Eric     |
+|                                         |                |             |          |

@@ -8,6 +8,7 @@ let currentWeekStart = getMonday(new Date());
 let selectedTaskId = null;
 let currentUser = null;
 
+
 // ============================
 // AUTH FUNCTIONS
 // ============================
@@ -214,6 +215,7 @@ function saveUserTasks(username) {
     localStorage.setItem(`tasks_${username}`, JSON.stringify(tasks));
 }
 
+
 // ============================
 // UTILITY FUNCTIONS
 // ============================
@@ -257,6 +259,7 @@ function addDays(date, days) {
 function generateId() {
     return Date.now() + Math.random().toString(36).substr(2, 9);
 }
+
 
 // ============================
 // DASHBOARD FUNCTIONS
@@ -410,11 +413,10 @@ function updateTaskBreakdown() {
         `).join('');
 }
 
+
 // ============================
 // FORM HANDLING
 // ============================
-
-
 
 function initializeFormHandlers() {
     const taskForm = document.getElementById('taskForm');
@@ -580,6 +582,7 @@ function addTask() {
     alert(`${taskType === 'task' ? 'Task' : 'Event'} "${taskTitle}" added successfully!`);
 }
 
+
 // ============================
 // TASK DISPLAY
 // ============================
@@ -662,6 +665,7 @@ function viewTaskDetails(taskId) {
     modal.classList.add('active');
 }
 
+
 // ============================
 // MODAL HANDLING
 // ============================
@@ -740,6 +744,7 @@ function editSelectedTask() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
+
 
 // ============================
 // SCHEDULE GENERATION & DISPLAY
@@ -980,6 +985,7 @@ function renderTimeline(scheduledItems) {
     }).join('');
 }
 
+
 // ============================
 // STORAGE MANAGEMENT
 // ============================
@@ -1017,6 +1023,7 @@ function clearAllTasks() {
         alert('All tasks cleared!');
     }
 }
+
 
 // ============================
 // PAGE NAVIGATION

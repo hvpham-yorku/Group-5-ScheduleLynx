@@ -1,6 +1,7 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
 import ca.yorku.eecs2311.schedulelynx.domain.*;
+import ca.yorku.eecs2311.schedulelynx.domain.events.Difficulty;
 import ca.yorku.eecs2311.schedulelynx.logic.TimeBlockUtils;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -141,7 +142,7 @@ public class ScheduleService {
   }
 
   private int
-  difficultyRank(ca.yorku.eecs2311.schedulelynx.domain.Difficulty d) {
+  difficultyRank(Difficulty d) {
     // Lower number higher priority
     return switch (d) {
       case HIGH -> 0;

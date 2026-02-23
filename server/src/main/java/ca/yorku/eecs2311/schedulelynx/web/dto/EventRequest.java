@@ -1,8 +1,8 @@
 package ca.yorku.eecs2311.schedulelynx.web.dto;
 
-import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
-import ca.yorku.eecs2311.schedulelynx.domain.EventType;
-import ca.yorku.eecs2311.schedulelynx.domain.Recurrence;
+import ca.yorku.eecs2311.schedulelynx.domain.events.Difficulty;
+import ca.yorku.eecs2311.schedulelynx.domain.events.EventType;
+import ca.yorku.eecs2311.schedulelynx.domain.events.Recurrence;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

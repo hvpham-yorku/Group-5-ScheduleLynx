@@ -1,6 +1,6 @@
 package ca.yorku.eecs2311.schedulelynx.web.dto;
 
-import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
+import ca.yorku.eecs2311.schedulelynx.domain.events.Difficulty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

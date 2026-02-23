@@ -1,5 +1,7 @@
 package ca.yorku.eecs2311.schedulelynx.domain;
 
+import ca.yorku.eecs2311.schedulelynx.domain.events.Difficulty;
+
 import java.time.LocalDate;
 
 public class Task {

@@ -30,6 +30,21 @@ public class EventController {
         return toResponse(event);
     }
 
+    @PutMapping("/{id}")
+    public EventResponse update(
+            @PathVariable long id,
+            @Valid @RequestBody EventRequest request)
+    {
+
+        Event updated =
+                new Event(null, request.title(), request.day(),
+                        request.start(), request.end());
+
+        return service.update(id, updated)
+                .map(this::toResponse)
+                .orElseThrow(() -> new EventNotFoundException(id));
+    }
+
     @GetMapping
     public List<EventResponse> getAll() {
 
@@ -46,20 +61,6 @@ public class EventController {
         var event = service.getEvent(id);
         if (event.isEmpty()) throw new EventNotFoundException(id);
         return toResponse(event.get());
-    }
-
-    @PutMapping("/{id}")
-    public EventResponse update(
-            @PathVariable long id,
-            @Valid @RequestBody EventRequest request)
-    {
-        Event updated =
-                new Event(null, request.title(), request.day(),
-                        request.start(), request.end());
-
-        return service.update(id, updated)
-                .map(this::toResponse)
-                .orElseThrow(() -> new EventNotFoundException(id));
     }
 
     @DeleteMapping("/{id}")

@@ -2,24 +2,24 @@ package ca.yorku.eecs2311.schedulelynx.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ca.yorku.eecs2311.schedulelynx.domain.FixedEvent;
+import ca.yorku.eecs2311.schedulelynx.domain.OneTimeEvent;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
-import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryFixedEventRepository;
+import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryOneTimeEventRepository;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 
-class FixedEventServiceTest {
+class OneTimeEventServiceTest {
 
-  private FixedEventService newService() {
-    return new FixedEventService(new InMemoryFixedEventRepository());
+  private OneTimeEventService newService() {
+    return new OneTimeEventService(new InMemoryOneTimeEventRepository());
   }
 
   @Test
   void create_assignsId_andStoresEvent() {
-    FixedEventService service = newService();
+    OneTimeEventService service = newService();
 
-    FixedEvent created = service.create(
-        new FixedEvent(null, "Lecture", Weekday.TUESDAY, LocalTime.of(10, 0),
+    OneTimeEvent created = service.create(
+        new OneTimeEvent(null, "Lecture", Weekday.TUESDAY, LocalTime.of(10, 0),
                        LocalTime.of(11, 30)));
 
     assertNotNull(created.getId());
@@ -29,25 +29,25 @@ class FixedEventServiceTest {
 
   @Test
   void create_rejectsEmptyTitle() {
-    FixedEventService service = newService();
+    OneTimeEventService service = newService();
 
     assertThrows(IllegalArgumentException.class,
                  ()
-                     -> service.create(new FixedEvent(
+                     -> service.create(new OneTimeEvent(
                          null, "   ", Weekday.TUESDAY, LocalTime.of(10, 0),
                          LocalTime.of(11, 30))));
   }
 
   @Test
   void create_rejectsOverlapSameDay() {
-    FixedEventService service = newService();
+    OneTimeEventService service = newService();
 
-    service.create(new FixedEvent(null, "Lecture", Weekday.TUESDAY,
+    service.create(new OneTimeEvent(null, "Lecture", Weekday.TUESDAY,
                                   LocalTime.of(10, 0), LocalTime.of(11, 30)));
 
     assertThrows(IllegalArgumentException.class,
                  ()
-                     -> service.create(new FixedEvent(
+                     -> service.create(new OneTimeEvent(
                          null, "Lab", Weekday.TUESDAY, LocalTime.of(11, 0),
                          LocalTime.of(12, 0))));
   }

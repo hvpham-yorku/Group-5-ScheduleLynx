@@ -1,34 +1,34 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
-import ca.yorku.eecs2311.schedulelynx.domain.FixedEvent;
-import ca.yorku.eecs2311.schedulelynx.persistence.FixedEventRepository;
+import ca.yorku.eecs2311.schedulelynx.domain.OneTimeEvent;
+import ca.yorku.eecs2311.schedulelynx.persistence.OneTimeEventRepository;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FixedEventService {
+public class OneTimeEventService {
 
-    private final FixedEventRepository repository;
+    private final OneTimeEventRepository repository;
 
-    public FixedEventService(FixedEventRepository repository) {
+    public OneTimeEventService(OneTimeEventRepository repository) {
         this.repository = repository;
     }
 
-    public FixedEvent create(FixedEvent event) {
+    public OneTimeEvent create(OneTimeEvent event) {
         validate(event);
         ensureNoOverlap(event, null);
         return repository.save(event);
     }
 
-    public List<FixedEvent> getAll() { return repository.findAll(); }
+    public List<OneTimeEvent> getAll() { return repository.findAll(); }
 
-    public Optional<FixedEvent> getById(long id) {
+    public Optional<OneTimeEvent> getById(long id) {
         return repository.findById(id);
     }
 
-    public Optional<FixedEvent> update(long id, FixedEvent updated) {
+    public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
         validate(updated);
         ensureNoOverlap(updated, id);
         return repository.update(id, updated);
@@ -36,7 +36,7 @@ public class FixedEventService {
 
     public boolean delete(long id) { return repository.delete(id); }
 
-    private void validate(FixedEvent event) {
+    private void validate(OneTimeEvent event) {
         if (event == null)
             throw new IllegalArgumentException("Fixed event must not be null");
         if (event.getTitle() == null || event.getTitle().trim().isEmpty())
@@ -52,8 +52,8 @@ public class FixedEventService {
             throw new IllegalArgumentException("Start time must be before end time");
     }
 
-    private void ensureNoOverlap(FixedEvent candidate, Long ignoreId) {
-        for (FixedEvent existing : repository.findAll()) {
+    private void ensureNoOverlap(OneTimeEvent candidate, Long ignoreId) {
+        for (OneTimeEvent existing : repository.findAll()) {
             if (existing.getId() == null)
                 continue;
             if (ignoreId != null && existing.getId().equals(ignoreId))

@@ -4,7 +4,7 @@ import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
 
 import java.time.LocalTime;
 
-public record FixedEventResponse(
+public record OneTimeEventResponse(
 
 //      Type        Name
         long        id,

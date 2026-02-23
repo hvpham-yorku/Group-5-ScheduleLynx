@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class FixedEventControllerTest {
+class OneTimeEventControllerTest {
 
   @Autowired private MockMvc mockMvc;
 

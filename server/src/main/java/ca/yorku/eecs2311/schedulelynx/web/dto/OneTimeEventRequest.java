@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalTime;
 
-public record FixedEventRequest(
+public record OneTimeEventRequest(
 
 //      Annotation  Type        Name
         @NotBlank   String      title,

@@ -38,9 +38,9 @@ public class RestExceptionHandler {
         .body(Map.of("error", "NOT_FOUND", "message", ex.getMessage()));
   }
 
-  @ExceptionHandler(FixedEventNotFoundException.class)
+  @ExceptionHandler(OneTimeEventNotFoundException.class)
   public ResponseEntity<Map<String, Object>>
-  handleFixedEventNotFound(FixedEventNotFoundException ex) {
+  handleFixedEventNotFound(OneTimeEventNotFoundException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(Map.of("error", "NOT_FOUND", "message", ex.getMessage()));
   }

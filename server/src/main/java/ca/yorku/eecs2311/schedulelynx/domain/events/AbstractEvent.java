@@ -88,13 +88,13 @@ public abstract class AbstractEvent {
     }
 
     /** @return the {@link Difficulty} of the event. */
-    Difficulty getDifficulty() {
+    public Difficulty getDifficulty() {
 
         return diff;
     }
 
     /** Overwrites the previous difficulty level of the event. */
-    void setDifficulty(@NotNull Difficulty difficulty) {
+    public void setDifficulty(@NotNull Difficulty difficulty) {
 
         this.diff = difficulty;
     }

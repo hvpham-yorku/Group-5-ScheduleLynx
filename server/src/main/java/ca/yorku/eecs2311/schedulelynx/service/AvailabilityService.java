@@ -22,10 +22,10 @@ public class AvailabilityService {
     return repository.save(block);
   }
 
-  public List<AvailabilityBlock> getAll() { return repository.findAll(); }
+  public List<AvailabilityBlock> getAll() { return repository.getAll(); }
 
   public Optional<AvailabilityBlock> getById(long id) {
-    return repository.findById(id);
+    return repository.getById(id);
   }
 
   public Optional<AvailabilityBlock> update(long id,
@@ -52,7 +52,7 @@ public class AvailabilityService {
   }
 
   private void ensureNoOverlap(AvailabilityBlock candidate, Long ignoreId) {
-    for (AvailabilityBlock existing : repository.findAll()) {
+    for (AvailabilityBlock existing : repository.getAll()) {
       if (existing.getId() == null)
         continue;
       if (ignoreId != null && existing.getId().equals(ignoreId))

@@ -23,12 +23,12 @@ public class InMemoryAvailabilityRepository implements AvailabilityRepository {
   }
 
   @Override
-  public List<AvailabilityBlock> findAll() {
+  public List<AvailabilityBlock> getAll() {
     return new ArrayList<>(blocks);
   }
 
   @Override
-  public Optional<AvailabilityBlock> findById(long id) {
+  public Optional<AvailabilityBlock> getById(long id) {
     return blocks.stream()
         .filter(b -> b.getId() != null && b.getId() == id)
         .findFirst();

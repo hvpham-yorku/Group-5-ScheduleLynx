@@ -15,14 +15,14 @@ public class ExamEvent extends AbstractEvent
     public ExamEvent() {}
 
     public ExamEvent(
-            long id,
-            @NotNull EventType type,
-            @NotBlank String name,
-            @Nullable String desc,
-            @NotNull LocalDateTime start,
-            @NotNull LocalDateTime end,
-            @Nullable Integer estimatedStudyTime,
-            @Nullable Difficulty diff)
+                        long            id,
+            @NotNull    EventType       type,
+            @NotBlank   String          name,
+            @Nullable   String          desc,
+            @NotNull    LocalDateTime   start,
+            @NotNull    LocalDateTime   end,
+            @Nullable   Integer         estimatedStudyTime,
+            @Nullable   Difficulty      diff)
     {
         super(id, type, name, desc, end, diff);
 

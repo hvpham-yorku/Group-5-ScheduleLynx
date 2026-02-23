@@ -18,14 +18,14 @@ public class LectureEvent extends AbstractEvent
     public LectureEvent() {}
 
     public LectureEvent(
-            long id,
-            @NotNull  EventType type,
-            @NotBlank  String name,
-            @Nullable String desc,
-            @NotNull  LocalDateTime start,
-            @NotNull  LocalDateTime end,
-            @Nullable Recurrence recurrence,
-            @Nullable Difficulty difficulty)
+                        long            id,
+            @NotNull    EventType       type,
+            @NotBlank   String          name,
+            @Nullable   String          desc,
+            @NotNull    LocalDateTime   start,
+            @NotNull    LocalDateTime   end,
+            @Nullable   Recurrence      recurrence,
+            @Nullable   Difficulty      difficulty)
     {
         super(id, type, name, desc, end, difficulty);
 

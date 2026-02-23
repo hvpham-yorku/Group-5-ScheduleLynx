@@ -24,18 +24,18 @@ abstract class AbstractEvent {
     AbstractEvent() {}
 
     AbstractEvent(
-            long id,
-            @NotNull EventType type,
-            @NotBlank String name,
-            @Nullable String desc,
-            @NotNull LocalDateTime end,
-            @Nullable Difficulty diff)
+                        long            id,
+            @NotNull    EventType       type,
+            @NotBlank   String          name,
+            @Nullable   String          desc,
+            @NotNull    LocalDateTime   end,
+            @Nullable   Difficulty      diff)
     {
-        this.id = id;
-        this.type = type;
-        this.name = name;
+        this.id   =  id;
+        this.type =  type;
+        this.name =  name;
+        this.end  =  end;
         this.desc = (desc != null) ? desc : "";
-        this.end = end;
         this.diff = (diff != null) ? diff : Difficulty.MEDIUM;
     }
 

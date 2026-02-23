@@ -6,6 +6,7 @@ import ca.yorku.eecs2311.schedulelynx.domain.events.Recurrence;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.lang.Nullable;
 
 import java.time.LocalDateTime;
 
@@ -27,13 +28,13 @@ import java.time.LocalDateTime;
  * @param difficulty  (optional) the {@link Difficulty} that the user anticipates the event to be.
  */
 public record EventRequest(
-        Integer id,
-        @NotNull EventType type,
-        @NotBlank String name,
-        String description,
-        LocalDateTime start,
-        @NotNull LocalDateTime end,
-        Recurrence recurrence,
-        @Min(0) Integer estMinutes,
-        Difficulty difficulty
+        @Nullable   Integer         id,
+        @NotNull    EventType       type,
+        @NotBlank   String          name,
+        @Nullable   String          description,
+        @Nullable   LocalDateTime   start,
+        @NotNull    LocalDateTime   end,
+        @Nullable   Recurrence      recurrence,
+        @Min(0)     Integer         estMinutes,
+        @Nullable   Difficulty      difficulty
 ) {}

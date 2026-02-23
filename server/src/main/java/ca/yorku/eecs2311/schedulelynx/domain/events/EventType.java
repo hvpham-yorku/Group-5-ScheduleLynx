@@ -7,5 +7,4 @@ public enum EventType {
     ASSIGNMENT,
     EXAM,
     WORK,
-
 }

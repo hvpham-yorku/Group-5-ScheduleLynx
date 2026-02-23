@@ -67,8 +67,8 @@ public class OneTimeEventController {
 
   private OneTimeEventResponse toResponse(OneTimeEvent event) {
 
-    return new OneTimeEventResponse(event.getId(), event.getTitle(),
-                                  event.getDay(), event.getStart(),
-                                  event.getEnd());
+    return new OneTimeEventResponse(event.getId(),
+            event.getTitle(), event.getDay(),
+            event.getStart(), event.getEnd());
   }
 }

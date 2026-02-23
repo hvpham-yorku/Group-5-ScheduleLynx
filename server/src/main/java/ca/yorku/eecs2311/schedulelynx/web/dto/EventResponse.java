@@ -2,6 +2,7 @@ package ca.yorku.eecs2311.schedulelynx.web.dto;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
 import ca.yorku.eecs2311.schedulelynx.domain.EventType;
+import ca.yorku.eecs2311.schedulelynx.domain.Recurrence;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
 import ca.yorku.eecs2311.schedulelynx.web.controller.EventController;
 
@@ -19,7 +20,7 @@ public record EventResponse(
         Weekday day,
         LocalDateTime start,
         LocalDateTime end,
-        String recurrence,
+        Recurrence recurrence,
         int estMinutes,
         Difficulty difficulty
 ) {}

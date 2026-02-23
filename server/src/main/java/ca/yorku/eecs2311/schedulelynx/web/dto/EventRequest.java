@@ -2,6 +2,7 @@ package ca.yorku.eecs2311.schedulelynx.web.dto;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
 import ca.yorku.eecs2311.schedulelynx.domain.EventType;
+import ca.yorku.eecs2311.schedulelynx.domain.Recurrence;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
  *                    Format as "YYYY-MM-DDTHH:mm:ss".
  * @param end         (REQUIRED) the date and time of when the event ends.<br>
  *                    Format as "YYYY-MM-DDTHH:mm:ss".
- * @param recurrence  (optional) one of either {@code null}, "daily", "weekly", "biweekly", or "monthly"
+ * @param recurrence  (optional) "NONE", "DAILY", "WEEKLY", "BIWEEKLY", or "MONTHLY"
  * @param estMinutes  (optional) how many minutes the user expects to devote their life to the task.
  * @param difficulty  (optional) the {@link Difficulty} that the user anticipates the event to be.
  * @author Eric Hanson
@@ -31,7 +32,7 @@ public record EventRequest(
         String description,
         LocalDateTime start,
         @NotNull LocalDateTime end,
-        String recurrence,
+        Recurrence recurrence,
         @Min(0) Integer estMinutes,
         Difficulty difficulty
 ) {}

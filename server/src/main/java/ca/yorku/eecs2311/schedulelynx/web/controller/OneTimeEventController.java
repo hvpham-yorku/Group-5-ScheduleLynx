@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/fixed-events")
+@RequestMapping("/api/events")
 public class OneTimeEventController {
 
     private final OneTimeEventService service;

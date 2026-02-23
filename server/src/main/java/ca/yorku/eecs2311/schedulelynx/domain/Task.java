@@ -4,6 +4,7 @@ import ca.yorku.eecs2311.schedulelynx.domain.events.Difficulty;
 
 import java.time.LocalDate;
 
+@Deprecated
 public class Task {
 
   private Long id;

@@ -2,6 +2,7 @@ package ca.yorku.eecs2311.schedulelynx.domain;
 
 import java.time.LocalTime;
 
+@Deprecated
 public class TimeBlock {
   private Weekday day;
   private LocalTime start;

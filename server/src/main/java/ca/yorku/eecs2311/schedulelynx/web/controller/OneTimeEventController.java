@@ -44,9 +44,10 @@ public class OneTimeEventController {
   }
 
   @PutMapping("/{id}")
-  public OneTimeEventResponse
-  update(@PathVariable long id, @Valid @RequestBody OneTimeEventRequest request) {
-
+  public OneTimeEventResponse update(
+          @PathVariable long id,
+          @Valid @RequestBody OneTimeEventRequest request)
+  {
     OneTimeEvent updated =
         new OneTimeEvent(null, request.title(), request.day(),
                        request.start(), request.end());

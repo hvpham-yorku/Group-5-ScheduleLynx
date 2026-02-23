@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 /**
  * @param id a unique number representing the specific event.
- * @author Eric Hanson
  * @see EventController for other parameters' documentation.
  */
 public record EventResponse(

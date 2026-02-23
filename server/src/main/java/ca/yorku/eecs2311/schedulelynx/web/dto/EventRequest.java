@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
  * @param recurrence  (optional) "NONE", "DAILY", "WEEKLY", "BIWEEKLY", or "MONTHLY"
  * @param estMinutes  (optional) how many minutes the user expects to devote their life to the task.
  * @param difficulty  (optional) the {@link Difficulty} that the user anticipates the event to be.
- * @author Eric Hanson
  */
 public record EventRequest(
         Integer id,

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
+@Deprecated
 public class TaskCreateRequest {
 
   @NotBlank private String title;

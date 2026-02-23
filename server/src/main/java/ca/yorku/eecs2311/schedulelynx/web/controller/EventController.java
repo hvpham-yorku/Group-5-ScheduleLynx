@@ -42,9 +42,8 @@ public class EventController {
 
         var updateData = new Event(null, title, day, start, end);
 
-        return service.update(id, updateData)
-                .map(this::toResponse)
-                .orElseThrow(() -> new EventNotFoundException(id));
+        service.update(id, updateData);
+        return getEvent(id);
     }
 
     @GetMapping

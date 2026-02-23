@@ -33,14 +33,16 @@ public class EventController {
     @PutMapping("/{id}")
     public EventResponse update(
             @PathVariable long id,
-            @Valid @RequestBody EventRequest request)
+            @Valid @RequestBody EventRequest req)
     {
+        var title = req.title();
+        var day   = req.day();
+        var start = req.start();
+        var end   = req.end();
 
-        Event updated =
-                new Event(null, request.title(), request.day(),
-                        request.start(), request.end());
+        var updateData = new Event(null, title, day, start, end);
 
-        return service.update(id, updated)
+        return service.update(id, updateData)
                 .map(this::toResponse)
                 .orElseThrow(() -> new EventNotFoundException(id));
     }

@@ -11,11 +11,11 @@ import java.util.Optional;
 @Service
 public class OneTimeEventService {
 
-    private final OneTimeEventRepository repository;
+    private final OneTimeEventRepository repo;
 
-    public OneTimeEventService(OneTimeEventRepository repository) {
+    public OneTimeEventService(OneTimeEventRepository repo) {
 
-        this.repository = repository;
+        this.repo = repo;
     }
 
     public OneTimeEvent create(OneTimeEventRequest req) {
@@ -23,28 +23,28 @@ public class OneTimeEventService {
         var event = new OneTimeEvent(null, req.title(), req.day(),req.start(), req.end());
 
         validate(event);
-        return repository.save(event);
+        return repo.save(event);
     }
 
     public List<OneTimeEvent> getAll() {
 
-        return repository.getAllEvents();
+        return repo.getAllEvents();
     }
 
     public Optional<OneTimeEvent> getById(long id) {
 
-        return repository.getEventByID(id);
+        return repo.getEventByID(id);
     }
 
     public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
 
         validate(updated);
-        return repository.update(id, updated);
+        return repo.update(id, updated);
     }
 
     public boolean delete(long id) {
 
-        return repository.delete(id);
+        return repo.delete(id);
     }
 
     private void validate(OneTimeEvent event) {
@@ -70,7 +70,7 @@ public class OneTimeEventService {
 
         var ignorableID = candidate.getId();
 
-        for (var existingEvent : repository.getAllEvents()) {
+        for (var existingEvent : repo.getAllEvents()) {
 
             var id  = existingEvent.getId();
             var day = existingEvent.getDay();

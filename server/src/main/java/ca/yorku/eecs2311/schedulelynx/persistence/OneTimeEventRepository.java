@@ -10,7 +10,7 @@ public interface OneTimeEventRepository {
 
   List<OneTimeEvent> getAll();
 
-  Optional<OneTimeEvent> findById(long id);
+  Optional<OneTimeEvent> getById(long id);
 
   Optional<OneTimeEvent> update(long id, OneTimeEvent updated);
 

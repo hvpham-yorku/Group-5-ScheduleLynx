@@ -35,7 +35,7 @@ public class OneTimeEventService {
 
     public Optional<OneTimeEvent> getById(long id) {
 
-        return repository.findById(id);
+        return repository.getById(id);
     }
 
     public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {

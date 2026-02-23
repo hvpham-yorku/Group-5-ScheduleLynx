@@ -30,7 +30,7 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
   }
 
   @Override
-  public Optional<OneTimeEvent> findById(long id) {
+  public Optional<OneTimeEvent> getById(long id) {
 
     return events.stream()
         .filter(e -> e.getId() != null && e.getId() == id)

@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
  *                    Format as "YYYY-MM-DDTHH:mm:ss".
  * @param recurrence  (optional) one of either {@code null}, "daily", "weekly", "biweekly", or "monthly"
  * @param estMinutes  (optional) how many minutes the user expects to devote their life to the task.
- * @param difficulty  (REQUIRED) the {@link Difficulty} that the user anticipates the event to be.
+ * @param difficulty  (optional) the {@link Difficulty} that the user anticipates the event to be.
  * @author Eric Hanson
  */
 public record EventRequest(
@@ -33,5 +33,5 @@ public record EventRequest(
         @NotNull LocalDateTime end,
         String recurrence,
         @Min(0) Integer estMinutes,
-        @NotNull Difficulty difficulty
+        Difficulty difficulty
 ) {}

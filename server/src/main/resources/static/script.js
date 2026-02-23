@@ -1,6 +1,7 @@
 // ============================
 // SCHEDULE LYNX - MAIN SCRIPT
 // ============================
+// noinspection UnnecessaryLocalVariableJS
 
 // Global Variables
 let tasks = [];

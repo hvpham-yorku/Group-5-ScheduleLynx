@@ -1,6 +1,7 @@
 package ca.yorku.eecs2311.schedulelynx.web.dto;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
+import ca.yorku.eecs2311.schedulelynx.domain.EventType;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
 import ca.yorku.eecs2311.schedulelynx.web.controller.EventController;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
  */
 public record EventResponse(
         long id,
+        EventType type,
         String title,
         Weekday day,
         LocalDateTime start,

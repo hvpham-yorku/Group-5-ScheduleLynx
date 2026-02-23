@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
  * for all event types. Combines {@link FixedEventRequest} and {@link TaskCreateRequest}
  * into one easy to implement record.
  *
- * @param name        (REQUIRED) whatever the user decided to call the event.
  * @param type        (REQUIRED) an {@link EventType} enum stating under what category this event falls under.
+ * @param name        (REQUIRED) whatever the user decided to call the event.
  * @param description (optional) the user's description of the event in detail.
  * @param start       (optional) the date and time of when the event begins.<br>
  *                    Format as "YYYY-MM-DDTHH:mm:ss".
@@ -26,8 +26,8 @@ import java.time.LocalDateTime;
  * @author Eric Hanson
  */
 public record EventRequest(
-        @NotBlank String name,
         @NotNull EventType type,
+        @NotBlank String name,
         String description,
         LocalDateTime start,
         @NotNull LocalDateTime end,

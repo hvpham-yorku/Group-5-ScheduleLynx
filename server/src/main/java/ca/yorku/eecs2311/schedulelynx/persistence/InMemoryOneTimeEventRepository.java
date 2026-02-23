@@ -19,11 +19,16 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
     public OneTimeEvent save(OneTimeEvent event) {
 
         long id = nextId.getAndIncrement();
-        OneTimeEvent stored =
-                new OneTimeEvent(id, event.getTitle(),
-                        event.getDay(), event.getStart(), event.getEnd());
-        events.put(id, stored);
-        return stored;
+        
+        var title = event.getTitle();
+        var day   = event.getDay();
+        var start = event.getStart();
+        var end   = event.getEnd();
+
+        var newEvent = new OneTimeEvent(id, title, day, start, end);
+
+        events.put(id, newEvent);
+        return newEvent;
     }
 
     @Override

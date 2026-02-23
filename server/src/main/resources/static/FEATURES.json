@@ -131,13 +131,13 @@
             "status": "✓ Implemented"
           },
           {
-            "feature": "Deadline-based scheduling",
-            "description": "Schedule assignments before deadlines",
+            "feature": "dueDate-based scheduling",
+            "description": "Schedule assignments before dueDates",
             "status": "✓ Implemented"
           },
           {
             "feature": "Automatic schedule generation",
-            "algorithm": "Deadline-aware task distribution",
+            "algorithm": "dueDate-aware task distribution",
             "status": "✓ Implemented"
           }
         ]
@@ -295,7 +295,7 @@
       "required_fields": [
         "Task Title",
         "Task Type",
-        "Deadline",
+        "dueDate",
         "Estimated Time (hours)"
       ],
       "optional_fields": [
@@ -311,14 +311,14 @@
     },
     "scheduling_algorithm": {
       "steps": [
-        "Sort tasks by deadline",
-        "Calculate days available before deadline",
+        "Sort tasks by dueDate",
+        "Calculate days available before dueDate",
         "Distribute hours evenly across available days",
         "Limit to max 3 hours per day for each task",
         "Generate timeline items for each scheduled session"
       ],
       "constraints": [
-        "Never schedule past deadline",
+        "Never schedule past dueDate",
         "Distribute load evenly",
         "Respect fixed commitments"
       ]
@@ -333,14 +333,14 @@
     "student_workflow": {
       "step1": "Add all classes with recurrence pattern",
       "step2": "Add work shift if applicable",
-      "step3": "Add assignments and exams with deadlines",
+      "step3": "Add assignments and exams with dueDates",
       "step4": "Click Generate Schedule",
       "step5": "Review timeline and start working",
       "step6": "Update as needed"
     },
     "professional_workflow": {
       "step1": "Add fixed meetings and commitments",
-      "step2": "Add work projects with deadlines",
+      "step2": "Add work projects with dueDates",
       "step3": "Add personal goals and tasks",
       "step4": "Generate schedule",
       "step5": "Monitor and adjust workload"

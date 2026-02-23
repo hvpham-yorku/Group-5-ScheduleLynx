@@ -294,23 +294,23 @@ function updateDashboardStats() {
     
     // Upcoming tasks (next 7 days)
     const upcoming = tasks.filter(task => {
-        const deadline = new Date(task.deadline);
-        return deadline > today && deadline <= weekFromNow;
+        const dueDate = new Date(task.dueDate);
+        return dueDate > today && dueDate <= weekFromNow;
     });
     document.getElementById('upcomingCount').textContent = upcoming.length;
     
     // Overdue tasks
     const overdue = tasks.filter(task => {
-        const deadline = new Date(task.deadline);
-        return deadline < today && !task.completed;
+        const dueDate = new Date(task.dueDate);
+        return dueDate < today && !task.completed;
     });
     document.getElementById('overdueCount').textContent = overdue.length;
     
     // This week's hours
     let totalHours = 0;
     tasks.forEach(task => {
-        const deadline = new Date(task.deadline);
-        if (deadline >= getMonday(today) && deadline <= addDays(getMonday(today), 6)) {
+        const dueDate = new Date(task.dueDate);
+        if (dueDate >= getMonday(today) && dueDate <= addDays(getMonday(today), 6)) {
             totalHours += task.estimatedHours;
         }
     });
@@ -322,13 +322,13 @@ function updateUpcomingTasks() {
     const today = new Date();
     const weekFromNow = addDays(today, 7);
     
-    // Get upcoming tasks, sorted by deadline
+    // Get upcoming tasks, sorted by dueDate
     const upcoming = tasks
         .filter(task => {
-            const deadline = new Date(task.deadline);
-            return deadline > today && deadline <= weekFromNow && !task.completed;
+            const dueDate = new Date(task.dueDate);
+            return dueDate > today && dueDate <= weekFromNow && !task.completed;
         })
-        .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
         .slice(0, 5); // Show top 5
     
     if (upcoming.length === 0) {
@@ -340,7 +340,7 @@ function updateUpcomingTasks() {
         <div class="task-item-dashboard ${task.type}" onclick="viewTaskDetails('${task.id}')">
             <div class="task-item-badge ${task.type}">${task.type}</div>
             <div class="task-item-title">${task.title}</div>
-            <div class="task-item-deadline">Due: ${formatDateDisplay(new Date(task.deadline))}</div>
+            <div class="task-item-dueDate">Due: ${formatDateDisplay(new Date(task.dueDate))}</div>
         </div>
     `).join('');
 }
@@ -495,9 +495,9 @@ function addTask() {
         return;
     }
 
-    const taskTitle = document.getElementById('taskTitle').value.trim();
-    const taskType = document.getElementById('taskType').value;
-    const deadline = document.getElementById('deadline').value;
+    const title = document.getElementById('taskTitle').value.trim();
+    const type = document.getElementById('taskType').value;
+    const dueDate = document.getElementById('dueDate').value;
 
     const estimatedHoursInput = document.getElementById('estimatedHours');
     const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;    
@@ -509,12 +509,12 @@ function addTask() {
     const recurrenceType = document.getElementById('recurrenceType').value;
     const recurrenceEnd = document.getElementById('recurrenceEnd').value;
 
-    if (!taskTitle || !taskType || !deadline) {
+    if (!title || !type || !dueDate) {
         alert('Please fill in all required fields');
         return;
     }
 
-    if (taskType === 'task')
+    if (type === 'task')
     {
         if(!estimatedHours || estimatedHours <= 0)
         {
@@ -531,7 +531,7 @@ function addTask() {
 
     // Get selected days of week if recurring
     let selectedDays = [];
-    if (taskType === 'event' && isRecurring && (recurrenceType === 'weekly' || recurrenceType === 'biweekly')) {
+    if (type === 'event' && isRecurring && (recurrenceType === 'weekly' || recurrenceType === 'biweekly')) {
         const checkboxes = document.querySelectorAll('.days-checkbox input[type="checkbox"]:checked');
         selectedDays = Array.from(checkboxes).map(cb => cb.value);
         if (selectedDays.length === 0) {
@@ -542,9 +542,9 @@ function addTask() {
 
     const item = {
         id: generateId(),
-        title: taskTitle,
-        type: taskType,
-        deadline: deadline,
+        title: title,
+        type: type,
+        dueDate: dueDate,
         description: description,
         completed: false,
         createdAt: new Date().toISOString()
@@ -577,7 +577,7 @@ function addTask() {
     // Enable generate schedule button
     document.getElementById('generateSchedule').disabled = false;
     
-    alert(`${taskType === 'task' ? 'Task' : 'Event'} "${taskTitle}" added successfully!`);
+    alert(`${type === 'task' ? 'Task' : 'Event'} "${title}" added successfully!`);
 }
 
 
@@ -597,7 +597,7 @@ function updateTasksDisplay() {
         <div class="task-card ${task.type}" onclick="viewTaskDetails('${task.id}')">
             <div class="task-card-type">${task.type.charAt(0).toUpperCase() + task.type.slice(1)}</div>
             <div class="task-card-title">${task.title}</div>
-            <div class="task-card-deadline">Due: ${formatDateDisplay(new Date(task.deadline))}</div>
+            <div class="task-card-dueDate">Due: ${formatDateDisplay(new Date(task.dueDate))}</div>
             ${task.type === 'task'
             ? `<div class="task-card-time">${task.estimatedHours} hours</div>`
             : (task.startTime ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>` : '')
@@ -629,8 +629,8 @@ function viewTaskDetails(taskId) {
             <span class="modal-detail-value">${task.type}</span>
         </div>
         <div class="modal-detail">
-            <span class="modal-detail-label">Deadline:</span>
-            <span class="modal-detail-value">${formatDateDisplay(new Date(task.deadline))}</span>
+            <span class="modal-detail-label">dueDate:</span>
+            <span class="modal-detail-value">${formatDateDisplay(new Date(task.dueDate))}</span>
         </div>
         <div class="modal-detail">
             <span class="modal-detail-label">Estimated Time:</span>
@@ -709,7 +709,7 @@ function editSelectedTask() {
         // Populate form with task data
         document.getElementById('taskTitle').value = task.title;
         document.getElementById('taskType').value = task.type;
-        document.getElementById('deadline').value = task.deadline;
+        document.getElementById('dueDate').value = task.dueDate;
         document.getElementById('estimatedHours').value = task.estimatedHours;
         document.getElementById('startTime').value = task.startTime || '';
         document.getElementById('endTime').value = task.endTime || '';
@@ -770,8 +770,8 @@ function initializeScheduleDisplay() {
 
 function updateWeekDisplay() {
     const weekEnd = addDays(currentWeekStart, 6);
-    const displayText = `Week of ${formatDateDisplay(currentWeekStart)} - ${formatDateDisplay(weekEnd)}`;
-    document.getElementById('weekDisplay').textContent = displayText;
+    document.getElementById('weekDisplay').textContent =
+        `Week of ${formatDateDisplay(currentWeekStart)} - ${formatDateDisplay(weekEnd)}`;
 }
 
 function renderScheduleGrid() {
@@ -826,7 +826,7 @@ function getEventsForDay(dateStr) {
                         : item.recurrenceDays.includes(dayName);
 
 
-                const start = item.deadline ? new Date(item.deadline) : null;
+                const start = item.dueDate ? new Date(item.dueDate) : null;
                 const cur = new Date(dateStr);
 
                 if (
@@ -845,7 +845,7 @@ function getEventsForDay(dateStr) {
                 }
             }
             else {
-                 if (item.deadline === dateStr) {
+                 if (item.dueDate === dateStr) {
                     items.push({
                         id: item.id,
                         title: item.title,
@@ -859,7 +859,7 @@ function getEventsForDay(dateStr) {
         }
 
         if(item.type === 'task'){
-            if(item.deadline === dateStr){
+            if(item.dueDate === dateStr){
                 items.push({
                     id: item.id,
                     title: item.title,
@@ -907,17 +907,17 @@ function generateSchedule() {
 }
 
 function distributeTasksAcrossTime(tasksToSchedule) {
-    // Sort tasks by deadline
+
     const sortedTasks = tasksToSchedule.sort((a, b) => {
-        return new Date(a.deadline) - new Date(b.deadline);
+        return new Date(a.dueDate) - new Date(b.dueDate);
     });
 
     const scheduledItems = [];
 
     sortedTasks.forEach(task => {
-        const deadline = new Date(task.deadline);
+        const dueDate = new Date(task.dueDate);
         const hoursNeeded = task.estimatedHours;
-        const daysAvailable = Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24));
+        const daysAvailable = Math.ceil((dueDate - new Date()) / (1000 * 60 * 60 * 24));
 
         if (daysAvailable > 0) {
             const hoursPerDay = Math.min(3, hoursNeeded / daysAvailable);
@@ -925,7 +925,7 @@ function distributeTasksAcrossTime(tasksToSchedule) {
             let currentDate = new Date();
             let remainingHours = hoursNeeded;
 
-            while (remainingHours > 0 && currentDate < deadline) {
+            while (remainingHours > 0 && currentDate < dueDate) {
                 const scheduledHours = Math.min(hoursPerDay, remainingHours);
                 
                 scheduledItems.push({
@@ -974,7 +974,7 @@ function renderTimeline(scheduledItems) {
                         <div class="timeline-task-title">${item.task.title}</div>
                         <div class="timeline-task-info">
                             Scheduled: ${item.hours} hours | 
-                            Due: ${formatDateDisplay(new Date(item.task.deadline))}
+                            Due: ${formatDateDisplay(new Date(item.task.dueDate))}
                         </div>
                     </div>
                 `).join('')}

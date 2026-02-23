@@ -31,18 +31,18 @@
 
 ## User Story 🔗 Development Tasks
 
-* As a student I want to add tasks with deadlines(such as assignments and
+* As a student I want to add tasks with dueDates(such as assignments and
 studying for exams) so the system can generate my workload. <p><t>Construct a submission tool and link to backend</t></p>
 * As a student I want to add recurring events such as classes, labs, tutorials,
 shifts, or extracurricular activities. <p><t>Construct a submission tool and link to backend</t></p>
 * As a student I want the app to automatically generate a realistic weekly
 schedule by time-blocking my tasks into my available free time, so I don’t
 have to manually plan everything. <p><t>Construct a submission tool and link to backend</t></p>
-* As a student I want to edit existing tasks/events (deadline, duration, priority,
+* As a student I want to edit existing tasks/events (dueDate, duration, priority,
 availability) and have the schedule automatically update and re-balance, so
 my plan stays realistic when things change. <p><t>Construct a submission tool and link to backend</t></p>
 * As a student I want the system to detect when my workload cannot fit into my
-available time before deadlines and clearly warn me. <p><t>Construct a submission tool and link to backend</t></p>
+available time before dueDates and clearly warn me. <p><t>Construct a submission tool and link to backend</t></p>
 
 
 

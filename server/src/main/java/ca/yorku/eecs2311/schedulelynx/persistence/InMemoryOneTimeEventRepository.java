@@ -1,61 +1,64 @@
 package ca.yorku.eecs2311.schedulelynx.persistence;
 
 import ca.yorku.eecs2311.schedulelynx.domain.OneTimeEvent;
-import java.util.ArrayList;
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
 
-  private final List<OneTimeEvent> events = new ArrayList<>();
+  private final Map<Long, OneTimeEvent> events = new HashMap<>();
   private final AtomicLong nextId = new AtomicLong(1);
 
   @Override
   public OneTimeEvent save(OneTimeEvent event) {
 
+    long id = nextId.getAndIncrement();
     OneTimeEvent stored =
-        new OneTimeEvent(nextId.getAndIncrement(), event.getTitle(),
+        new OneTimeEvent(id, event.getTitle(),
                        event.getDay(), event.getStart(), event.getEnd());
-    events.add(stored);
+    events.put(id, stored);
     return stored;
   }
 
   @Override
   public List<OneTimeEvent> getAllEvents() {
 
-    return new ArrayList<>(events);
+    return List.copyOf(events.values());
   }
 
   @Override
   public Optional<OneTimeEvent> getEventByID(long id) {
 
-    return events.stream()
-        .filter(e -> e.getId() != null && e.getId() == id)
-        .findFirst();
+    return Optional.ofNullable(events.get(id));
   }
 
   @Override
   public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
 
-    for (int i = 0; i < events.size(); i++) {
-      OneTimeEvent existing = events.get(i);
-      if (existing.getId() != null && existing.getId() == id) {
-        OneTimeEvent stored =
-            new OneTimeEvent(id, updated.getTitle(), updated.getDay(),
-                           updated.getStart(), updated.getEnd());
-        events.set(i, stored);
-        return Optional.of(stored);
-      }
-    }
-    return Optional.empty();
+      var savedEvent = events.get(id);
+
+      if (savedEvent == null) return Optional.empty();
+      if (savedEvent.getId() == id)
+        throw new RuntimeException("ID map key and event ID are different!");
+
+      OneTimeEvent stored =
+          new OneTimeEvent(id, updated.getTitle(), updated.getDay(),
+                         updated.getStart(), updated.getEnd());
+
+      events.put(id, stored);
+      return Optional.of(stored);
   }
 
   @Override
   public boolean delete(long id) {
 
-    return events.removeIf(e -> e.getId() != null && e.getId() == id);
+    return events.remove(id) != null;
   }
+
 }

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -32,7 +33,11 @@ public class EventController {
     @GetMapping
     public List<EventResponse> getAll() {
 
-        return service.getAll().stream().map(this::toResponse).toList();
+        var eventResList = new ArrayList<EventResponse>();
+        for (var event : service.getAll())
+            eventResList.add(toResponse(event));
+
+        return eventResList;
     }
 
     @GetMapping("/{id}")

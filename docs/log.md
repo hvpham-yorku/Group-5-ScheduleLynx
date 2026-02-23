@@ -54,3 +54,4 @@ available time before dueDates and clearly warn me. <p><t>Construct a submission
 | scrum-32-make-variable-names-consistant | 2 hours        | 3 hours     | Eric     |
 | scrum-30-simplify-event-creation        | 4 hours        | 5.5 hours   | Eric     |
 | scrum-39-implement-event-deletion       | 1 hour         | 0.5 hours   | Eric     |
+| SCRUM-36-post-new-events-to-backend     | 0.5 hours      | 1.2 hours   | Eric     |

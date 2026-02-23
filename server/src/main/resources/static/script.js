@@ -490,7 +490,8 @@ function initializeFormHandlers() {
 
 }
 
-function addTask() {
+async function addTask() {
+
     if (!currentUser) {
         alert("You are not logged in.");
         return;
@@ -501,8 +502,8 @@ function addTask() {
     const dueDate = document.getElementById('dueDate').value;
 
     const estimatedHoursInput = document.getElementById('estimatedHours');
-    const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;    
-    
+    const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;
+
     const startTime = document.getElementById('startTime').value;
     const endTime = document.getElementById('endTime').value;
     const description = document.getElementById('description').value.trim();
@@ -510,63 +511,106 @@ function addTask() {
     const recurrenceType = document.getElementById('recurrenceType').value;
     const recurrenceEnd = document.getElementById('recurrenceEnd').value;
 
+    // Basic validation (keeps backend errors from being your first feedback)
     if (!title || !type || !dueDate) {
-        alert('Please fill in all required fields');
+        alert("Please fill in Title, Type, and Date.");
         return;
     }
-
-    if (type === 'task')
-    {
-        if(!estimatedHours || estimatedHours <= 0)
-        {
-            alert('Please enter estimated hours for a Task');
+    if (type === "event") {
+        if (!startTime || !endTime) {
+            alert("Please enter start and end time for an Event.");
             return;
         }
-    } else {
-        if (!startTime || !endTime)
-        {
-            alert('Please enter start and end time for an Event');
+    } else if (type === "task") {
+        if (!estimatedHours || estimatedHours < 1) {
+            alert("Estimated hours must be at least 1 for a Task.");
             return;
         }
     }
 
-    // Get selected days of week if recurring
-    let selectedDays = [];
-    if (type === 'event' && isRecurring && (recurrenceType === 'weekly' || recurrenceType === 'biweekly')) {
-        const checkboxes = document.querySelectorAll('.days-checkbox input[type="checkbox"]:checked');
-        selectedDays = Array.from(checkboxes).map(cb => cb.value);
-        if (selectedDays.length === 0) {
-            alert('Please select at least one day for recurring tasks');
-            return;
-        }
+    // Helper: convert YYYY-MM-DD -> backend Weekday enum string
+    function toBackendWeekdayEnum(dateStr) {
+        // Use noon to avoid any weird timezone edge cases around midnight
+        const d = new Date(`${dateStr}T12:00:00`);
+        const jsDay = d.getDay(); // 0=Sun ... 6=Sat
+        const map = {
+            0: "SUNDAY",
+            1: "MONDAY",
+            2: "TUESDAY",
+            3: "WEDNESDAY",
+            4: "THURSDAY",
+            5: "FRIDAY",
+            6: "SATURDAY"
+        };
+        return map[jsDay];
     }
 
     const item = {
-        id: generateId(),
+        id: generateId(),              // will be replaced by backend id on success
         title: title,
         type: type,
-        dueDate: dueDate,
+        dueDate: dueDate,              // kept for your UI calendar/grid
         description: description,
         completed: false,
         createdAt: new Date().toISOString()
     };
 
-    if (type === 'task') {
-        item.estimatedHours = estimatedHours;
+    // Enable generate schedule button
+    document.getElementById('generateSchedule').disabled = false;
+
+    let apiURL;
+    let payload;
+
+    if (type === "event") {
+        apiURL = "http://localhost:8080/api/events";
+
+        payload = {
+            title: title,
+            day: toBackendWeekdayEnum(dueDate),
+            start: startTime, // LocalTime expects "HH:mm" (your input gives this)
+            end: endTime
+        };
+    } else {
+        apiURL = "http://localhost:8080/api/tasks";
+
+        payload = {
+            title: title,
+            dueDate: dueDate, // LocalDate expects "YYYY-MM-DD"
+            estimatedHours: Math.round(estimatedHours), // backend expects int
+            difficulty: "MEDIUM" // required by backend; update later if you add a UI field
+        };
+    }
+
+    let response = await fetch(apiURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+
+    console.log(response);
+    if (!response.ok) return;
+
+    const created = await response.json().catch(() => null);
+    if (created && created.id != null) {
+        item.id = String(created.id);
+    }
+
+    if (type === "event") {
+        item.startTime = startTime;
+        item.endTime = endTime;
+        item.estimatedHours = 0;
+        item.isRecurring = false;
+        item.recurrenceType = null;
+        item.recurrenceEnd = null;
+        item.recurrenceDays = [];
+    } else {
+        item.estimatedHours = Math.round(estimatedHours);
         item.startTime = null;
         item.endTime = null;
         item.isRecurring = false;
         item.recurrenceType = null;
         item.recurrenceEnd = null;
         item.recurrenceDays = [];
-    } else {
-        item.estimatedHours = 0;
-        item.startTime = startTime;
-        item.endTime = endTime;
-        item.isRecurring = isRecurring;
-        item.recurrenceType = isRecurring ? recurrenceType : null;
-        item.recurrenceEnd = isRecurring ? recurrenceEnd : null;
-        item.recurrenceDays = isRecurring ? selectedDays : [];
     }
 
     tasks.push(item);
@@ -574,11 +618,6 @@ function addTask() {
     updateTasksDisplay();
     renderScheduleGrid();
     refreshDashboardIfVisible();
-    
-    // Enable generate schedule button
-    document.getElementById('generateSchedule').disabled = false;
-    
-    alert(`${type === 'task' ? 'Task' : 'Event'} "${title}" added successfully!`);
 }
 
 

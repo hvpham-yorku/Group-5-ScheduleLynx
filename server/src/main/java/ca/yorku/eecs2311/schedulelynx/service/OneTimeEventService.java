@@ -2,12 +2,11 @@ package ca.yorku.eecs2311.schedulelynx.service;
 
 import ca.yorku.eecs2311.schedulelynx.domain.OneTimeEvent;
 import ca.yorku.eecs2311.schedulelynx.persistence.OneTimeEventRepository;
+import ca.yorku.eecs2311.schedulelynx.web.dto.OneTimeEventRequest;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
-import ca.yorku.eecs2311.schedulelynx.web.dto.OneTimeEventRequest;
-import org.springframework.stereotype.Service;
 
 @Service
 public class OneTimeEventService {
@@ -24,7 +23,7 @@ public class OneTimeEventService {
         var event = new OneTimeEvent(null, req.title(), req.day(),req.start(), req.end());
 
         validate(event);
-        ensureNoOverlap(event, null);
+        ensureNoOverlap(event);
         return repository.save(event);
     }
 
@@ -41,7 +40,7 @@ public class OneTimeEventService {
     public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
 
         validate(updated);
-        ensureNoOverlap(updated, id);
+        ensureNoOverlap(updated);
         return repository.update(id, updated);
     }
 
@@ -69,7 +68,9 @@ public class OneTimeEventService {
         throw new IllegalArgumentException("Start time must be before end time");
     }
 
-    private void ensureNoOverlap(OneTimeEvent candidate, Long ignorableID) {
+    private void ensureNoOverlap(OneTimeEvent candidate) {
+
+        var ignorableID = candidate.getId();
 
         for (var existingEvent : repository.getAllEvents()) {
 

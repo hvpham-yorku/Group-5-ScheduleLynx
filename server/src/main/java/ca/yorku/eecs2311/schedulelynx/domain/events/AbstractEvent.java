@@ -1,6 +1,7 @@
 package ca.yorku.eecs2311.schedulelynx.domain.events;
 
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ abstract class AbstractEvent {
     AbstractEvent(
             long id,
             @NotNull EventType type,
-            @NotNull String name,
+            @NotBlank String name,
             @Nullable String desc,
             @NotNull LocalDateTime end,
             @Nullable Difficulty diff)

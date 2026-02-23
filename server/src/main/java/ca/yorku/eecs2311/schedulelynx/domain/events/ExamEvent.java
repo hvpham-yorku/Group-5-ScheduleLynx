@@ -17,7 +17,7 @@ public class ExamEvent extends AbstractEvent
     public ExamEvent(
             long id,
             @NotNull EventType type,
-            @NotNull String name,
+            @NotBlank String name,
             @Nullable String desc,
             @NotNull LocalDateTime start,
             @NotNull LocalDateTime end,

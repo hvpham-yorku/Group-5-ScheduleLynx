@@ -5,7 +5,6 @@ import ca.yorku.eecs2311.schedulelynx.service.FixedEventService;
 import ca.yorku.eecs2311.schedulelynx.web.dto.FixedEventRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.FixedEventResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +26,7 @@ public class FixedEventController {
   public FixedEventResponse create(@Valid @RequestBody FixedEventRequest request)
   {
     FixedEvent created = service.create(
-        new FixedEvent(null, request.getTitle(), request.getDay(),
-                       request.getStart(), request.getEnd()));
+        new FixedEvent(null, request.title(), request.day(),request.start(), request.end()));
     return toResponse(created);
   }
 
@@ -51,8 +49,8 @@ public class FixedEventController {
   update(@PathVariable long id, @Valid @RequestBody FixedEventRequest request) {
 
     FixedEvent updated =
-        new FixedEvent(null, request.getTitle(), request.getDay(),
-                       request.getStart(), request.getEnd());
+        new FixedEvent(null, request.title(), request.day(),
+                       request.start(), request.end());
     return service.update(id, updated)
         .map(this::toResponse)
         .orElseThrow(() -> new FixedEventNotFoundException(id));

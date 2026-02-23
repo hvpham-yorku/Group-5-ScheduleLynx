@@ -23,8 +23,7 @@ public class OneTimeEventController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
 
-  public OneTimeEventResponse create(@Valid @RequestBody OneTimeEventRequest request)
-  {
+  public OneTimeEventResponse create(@Valid @RequestBody OneTimeEventRequest request) {
     OneTimeEvent created = service.create(
         new OneTimeEvent(null, request.title(), request.day(),request.start(), request.end()));
     return toResponse(created);

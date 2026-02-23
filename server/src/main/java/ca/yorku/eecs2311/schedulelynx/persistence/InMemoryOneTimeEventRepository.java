@@ -32,18 +32,6 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
     }
 
     @Override
-    public List<OneTimeEvent> getAllEvents() {
-
-        return List.copyOf(events.values());
-    }
-
-    @Override
-    public Optional<OneTimeEvent> getEventByID(long id) {
-
-        return Optional.ofNullable(events.get(id));
-    }
-
-    @Override
     public Optional<OneTimeEvent> update(long id, OneTimeEvent update) {
 
         var savedEvent = events.get(id);
@@ -61,6 +49,18 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
 
         events.put(id, updatedEvent);
         return Optional.of(updatedEvent);
+    }
+
+    @Override
+    public List<OneTimeEvent> getAllEvents() {
+
+        return List.copyOf(events.values());
+    }
+
+    @Override
+    public Optional<OneTimeEvent> getEventByID(long id) {
+
+        return Optional.ofNullable(events.get(id));
     }
 
     @Override

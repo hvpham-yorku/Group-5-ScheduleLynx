@@ -5,6 +5,8 @@ import ca.yorku.eecs2311.schedulelynx.persistence.OneTimeEventRepository;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+
+import ca.yorku.eecs2311.schedulelynx.web.dto.OneTimeEventRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +18,10 @@ public class OneTimeEventService {
         this.repository = repository;
     }
 
-    public OneTimeEvent create(OneTimeEvent event) {
+    public OneTimeEvent create(OneTimeEventRequest req) {
+
+        var event = new OneTimeEvent(null, req.title(), req.day(),req.start(), req.end());
+
         validate(event);
         ensureNoOverlap(event, null);
         return repository.save(event);

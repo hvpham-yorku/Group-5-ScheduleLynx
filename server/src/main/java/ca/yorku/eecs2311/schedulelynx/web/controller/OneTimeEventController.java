@@ -25,8 +25,7 @@ public class OneTimeEventController {
 
   public OneTimeEventResponse create(@Valid @RequestBody OneTimeEventRequest request) {
 
-    OneTimeEvent created = service.create(
-        new OneTimeEvent(null, request.title(), request.day(),request.start(), request.end()));
+    OneTimeEvent created = service.create(request);
     return toResponse(created);
   }
 
@@ -51,7 +50,7 @@ public class OneTimeEventController {
     OneTimeEvent updated =
         new OneTimeEvent(null, request.title(), request.day(),
                        request.start(), request.end());
-    
+
     return service.update(id, updated)
         .map(this::toResponse)
         .orElseThrow(() -> new OneTimeEventNotFoundException(id));

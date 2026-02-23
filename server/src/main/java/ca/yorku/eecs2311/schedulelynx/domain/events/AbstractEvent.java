@@ -19,6 +19,7 @@ abstract class AbstractEvent {
     protected String name;
     protected String desc; // description
     protected LocalDateTime end;
+    protected Difficulty diff;
 
     AbstractEvent() {}
 
@@ -26,13 +27,15 @@ abstract class AbstractEvent {
                   @NotNull EventType type,
                   @NotNull String name,
                   @Nullable String desc,
-                  @NotNull LocalDateTime end)
+                  @NotNull LocalDateTime end,
+                  @Nullable Difficulty diff)
     {
         this.id = id;
         this.type = type;
         this.name = name;
         this.desc = (desc != null) ? desc : "";
         this.end = end;
+        this.diff = (diff != null) ? diff : Difficulty.MEDIUM;
     }
 
     /** @return the event's unique numerical identifier. */
@@ -81,6 +84,18 @@ abstract class AbstractEvent {
     public void setEndDateTime(LocalDateTime end) {
 
         this.end = end;
+    }
+
+    /** @return the {@link Difficulty} of the event. */
+    Difficulty getDifficulty() {
+
+        return diff;
+    }
+
+    /** Overwrites the previous difficulty level of the event. */
+    void setDifficulty(@NotNull Difficulty difficulty) {
+
+        this.diff = difficulty;
     }
 
 }

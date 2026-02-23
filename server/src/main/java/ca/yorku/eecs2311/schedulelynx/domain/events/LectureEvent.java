@@ -14,7 +14,6 @@ public class LectureEvent extends AbstractEvent
 
     protected LocalDateTime start;
     protected Recurrence recurrence;
-    protected Difficulty difficulty;
 
     public LectureEvent() {}
 
@@ -28,11 +27,10 @@ public class LectureEvent extends AbstractEvent
             @Nullable Recurrence recurrence,
             @Nullable Difficulty difficulty)
     {
-        super(id, type, name, desc, end);
+        super(id, type, name, desc, end, difficulty);
 
         this.start = start;
         this.recurrence = (recurrence != null) ? recurrence : Recurrence.NONE;
-        this.difficulty = (difficulty != null) ? difficulty : Difficulty.MEDIUM;
 
         if (type == EventType.LECTURE) return;
         throw new IllegalArgumentException("""
@@ -63,18 +61,6 @@ public class LectureEvent extends AbstractEvent
     public void setRecurrence(@Nullable Recurrence recurrence) {
 
         this.recurrence = (recurrence != null) ? recurrence : Recurrence.NONE;
-    }
-
-    /** @return the {@link Difficulty} of the lecture. */
-    public Difficulty getDifficulty() {
-
-        return difficulty;
-    }
-
-    /** Overwrites the previous difficulty level of the lecture. */
-    public void setDifficulty(@NotNull Difficulty difficulty) {
-
-        this.difficulty = difficulty;
     }
 
 }

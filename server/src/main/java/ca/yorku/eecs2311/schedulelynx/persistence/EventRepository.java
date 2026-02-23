@@ -14,7 +14,7 @@ public interface EventRepository {
 
   Optional<Event> getEvent(long id);
 
-  Optional<Event> update(long id, Event updated);
+  void deleteAll();
 
   boolean delete(long id);
 }

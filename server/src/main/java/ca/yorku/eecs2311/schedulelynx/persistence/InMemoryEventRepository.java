@@ -61,6 +61,12 @@ public class InMemoryEventRepository implements EventRepository {
     }
 
     @Override
+    public void deleteAll() {
+
+        events.clear();
+    }
+
+    @Override
     public boolean delete(long id) {
 
         return events.remove(id) != null;

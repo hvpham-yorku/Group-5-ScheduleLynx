@@ -42,6 +42,11 @@ public class EventService {
         return repo.update(id, updated);
     }
 
+    public void deleteAll() {
+
+        repo.deleteAll();
+    }
+
     public boolean delete(long id) {
 
         return repo.delete(id);

@@ -64,6 +64,13 @@ public class EventController {
         return toResponse(event.get());
     }
 
+    @DeleteMapping()
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAll() {
+
+        service.deleteAll();
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long id) {

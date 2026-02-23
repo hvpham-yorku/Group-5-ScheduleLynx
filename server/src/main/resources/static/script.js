@@ -1072,9 +1072,15 @@ function loadTasksFromStorage() {
     }
 }
 
-function clearAllTasks() {
+async function clearAllTasks() {
 
     if (!(confirm("Are you sure you want to clear all tasks?\nThis cannot be undone."))) return;
+
+    const request = "http://localhost:8080/api/tasks"
+    let response = await fetch(request, {method: 'DELETE',});
+
+    console.log(response);
+    if (!response.ok) return;
 
     tasks = [];
     saveTasksToStorage();

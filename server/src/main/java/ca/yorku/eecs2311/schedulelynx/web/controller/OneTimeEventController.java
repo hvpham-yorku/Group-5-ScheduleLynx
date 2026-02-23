@@ -60,9 +60,8 @@ public class OneTimeEventController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable long id) {
 
-    if (!service.delete(id)) {
+    if (!service.delete(id))
       throw new OneTimeEventNotFoundException(id);
-    }
   }
 
   private OneTimeEventResponse toResponse(OneTimeEvent event) {

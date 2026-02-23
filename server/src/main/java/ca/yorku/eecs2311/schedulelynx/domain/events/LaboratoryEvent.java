@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
 
 import java.time.LocalDateTime;
 
+/** Contains the data for Lab-type events. */
 public class LaboratoryEvent extends AbstractEvent
         implements StartableEvent, RecurrableEvent {
 

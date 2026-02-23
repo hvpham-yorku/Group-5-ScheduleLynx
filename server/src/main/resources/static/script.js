@@ -686,12 +686,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        deleteTaskBtn.addEventListener('click', deleteSelectedTask);
+        deleteTaskBtn.addEventListener('click', deleteTaskListener);
         editTaskBtn.addEventListener('click', editSelectedTask);
     }
 });
 
-function deleteSelectedTask() {
+function deleteTaskListener() {
+
     if (selectedTaskId && confirm('Are you sure you want to delete this task?')) {
         tasks = tasks.filter(t => t.id !== selectedTaskId);
         saveTasksToStorage();

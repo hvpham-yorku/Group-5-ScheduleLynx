@@ -54,7 +54,7 @@ public class OneTimeEventService {
 
         if (event == null)
             throw new IllegalArgumentException("Fixed event must not be null");
-        if (event.getTitle() == null || event.getTitle().trim().isEmpty())
+        if (event.getTitle() == null || event.getTitle().isBlank())
             throw new IllegalArgumentException("Title must not be empty");
         if (event.getDay() == null)
             throw new IllegalArgumentException("Day must not be null");

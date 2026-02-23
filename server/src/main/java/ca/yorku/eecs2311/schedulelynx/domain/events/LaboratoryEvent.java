@@ -15,7 +15,7 @@ public class LaboratoryEvent extends AbstractEvent
     public LaboratoryEvent() {}
 
     public LaboratoryEvent(
-            @NotBlank long id,
+            long id,
             @NotNull EventType type,
             @NotNull  String name,
             @Nullable String desc,

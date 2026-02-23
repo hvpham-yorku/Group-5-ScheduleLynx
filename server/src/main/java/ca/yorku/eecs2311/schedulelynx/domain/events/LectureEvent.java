@@ -18,7 +18,7 @@ public class LectureEvent extends AbstractEvent
     public LectureEvent() {}
 
     public LectureEvent(
-            @NotBlank long id,
+            long id,
             @NotNull  EventType type,
             @NotNull  String name,
             @Nullable String desc,

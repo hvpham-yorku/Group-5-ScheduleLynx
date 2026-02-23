@@ -25,8 +25,8 @@ public class OneTimeEventController {
 
   public OneTimeEventResponse create(@Valid @RequestBody OneTimeEventRequest request) {
 
-    OneTimeEvent created = service.create(request);
-    return toResponse(created);
+    var event = service.create(request);
+    return toResponse(event);
   }
 
   @GetMapping

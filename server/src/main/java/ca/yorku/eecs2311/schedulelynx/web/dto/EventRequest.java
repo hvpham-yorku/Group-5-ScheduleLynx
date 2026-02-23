@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
  * for all event types. Combines {@code FixedEventRequest} and {@code TaskCreateRequest}
  * into one easy to implement record.
  *
+ * @param id          (optional) if {@code null}, creates a new event; if not, updates the event with that ID.
  * @param type        (REQUIRED) an {@link EventType} enum stating under what category this event falls under.
  * @param name        (REQUIRED) whatever the user decided to call the event.
  * @param description (optional) the user's description of the event in detail.
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
  * @author Eric Hanson
  */
 public record EventRequest(
+        Integer id,
         @NotNull EventType type,
         @NotBlank String name,
         String description,

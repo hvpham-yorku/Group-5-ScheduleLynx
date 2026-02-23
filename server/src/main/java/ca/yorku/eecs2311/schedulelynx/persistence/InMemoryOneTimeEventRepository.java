@@ -15,6 +15,7 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
 
   @Override
   public OneTimeEvent save(OneTimeEvent event) {
+    
     OneTimeEvent stored =
         new OneTimeEvent(nextId.getAndIncrement(), event.getTitle(),
                        event.getDay(), event.getStart(), event.getEnd());
@@ -24,11 +25,13 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
 
   @Override
   public List<OneTimeEvent> findAll() {
+
     return new ArrayList<>(events);
   }
 
   @Override
   public Optional<OneTimeEvent> findById(long id) {
+
     return events.stream()
         .filter(e -> e.getId() != null && e.getId() == id)
         .findFirst();
@@ -36,6 +39,7 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
 
   @Override
   public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
+
     for (int i = 0; i < events.size(); i++) {
       OneTimeEvent existing = events.get(i);
       if (existing.getId() != null && existing.getId() == id) {
@@ -51,6 +55,7 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
 
   @Override
   public boolean delete(long id) {
+
     return events.removeIf(e -> e.getId() != null && e.getId() == id);
   }
 }

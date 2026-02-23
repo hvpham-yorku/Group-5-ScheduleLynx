@@ -1,4 +1,4 @@
-package ca.yorku.eecs2311.schedulelynx.web.controller;
+package ca.yorku.eecs2311.schedulelynx.web.controller.errors;
 
 public class EventNotFoundException extends RuntimeException {
   public EventNotFoundException(long id) {

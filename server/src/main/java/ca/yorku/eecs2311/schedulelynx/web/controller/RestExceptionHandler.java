@@ -1,6 +1,10 @@
 package ca.yorku.eecs2311.schedulelynx.web.controller;
 
 import java.util.Map;
+
+import ca.yorku.eecs2311.schedulelynx.web.controller.errors.AvailabilityNotFoundException;
+import ca.yorku.eecs2311.schedulelynx.web.controller.errors.EventNotFoundException;
+import ca.yorku.eecs2311.schedulelynx.web.controller.errors.TaskNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

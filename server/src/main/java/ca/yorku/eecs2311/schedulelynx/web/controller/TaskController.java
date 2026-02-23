@@ -2,6 +2,7 @@ package ca.yorku.eecs2311.schedulelynx.web.controller;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.service.TaskService;
+import ca.yorku.eecs2311.schedulelynx.web.controller.errors.TaskNotFoundException;
 import ca.yorku.eecs2311.schedulelynx.web.dto.TaskCreateRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.TaskResponse;
 import ca.yorku.eecs2311.schedulelynx.web.dto.TaskUpdateRequest;

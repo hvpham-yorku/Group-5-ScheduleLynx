@@ -2,6 +2,7 @@ package ca.yorku.eecs2311.schedulelynx.web.controller;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Event;
 import ca.yorku.eecs2311.schedulelynx.service.EventService;
+import ca.yorku.eecs2311.schedulelynx.web.controller.errors.EventNotFoundException;
 import ca.yorku.eecs2311.schedulelynx.web.dto.EventRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.EventResponse;
 import jakarta.validation.Valid;

@@ -45,9 +45,13 @@ public class OneTimeEventService {
         return repository.update(id, updated);
     }
 
-    public boolean delete(long id) { return repository.delete(id); }
+    public boolean delete(long id) {
+
+        return repository.delete(id);
+    }
 
     private void validate(OneTimeEvent event) {
+
         if (event == null)
             throw new IllegalArgumentException("Fixed event must not be null");
         if (event.getTitle() == null || event.getTitle().trim().isEmpty())

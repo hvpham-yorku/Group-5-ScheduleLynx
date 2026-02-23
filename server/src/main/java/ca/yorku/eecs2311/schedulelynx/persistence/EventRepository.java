@@ -10,7 +10,7 @@ public interface EventRepository {
 
   List<Event> getAllEvents();
 
-  Optional<Event> getEventByID(long id);
+  Optional<Event> getEvent(long id);
 
   Optional<Event> update(long id, Event updated);
 

@@ -41,9 +41,11 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public EventResponse getByID(@PathVariable long id) {
+    public EventResponse getEvent(@PathVariable long id) {
 
-        return service.getByID(id)
+        var event = service.getEvent(id);
+
+        return service.getEvent(id)
                 .map(this::toResponse)
                 .orElseThrow(() -> new EventNotFoundException(id));
     }

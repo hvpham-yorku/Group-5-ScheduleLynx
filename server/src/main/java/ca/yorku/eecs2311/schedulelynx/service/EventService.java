@@ -31,9 +31,9 @@ public class EventService {
         return repo.getAllEvents();
     }
 
-    public Optional<Event> getByID(long id) {
+    public Optional<Event> getEvent(long id) {
 
-        return repo.getEventByID(id);
+        return repo.getEvent(id);
     }
 
     public Optional<Event> update(long id, Event updated) {

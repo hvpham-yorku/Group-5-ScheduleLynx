@@ -67,11 +67,11 @@ public class OneTimeEventController {
 
     private OneTimeEventResponse toResponse(OneTimeEvent event) {
 
-        var id = event.getId();
+        var id    = event.getId();
         var title = event.getTitle();
-        var day = event.getDay();
+        var day   = event.getDay();
         var start = event.getStart();
-        var end = event.getEnd();
+        var end   = event.getEnd();
 
         return new OneTimeEventResponse(id, title, day, start, end);
     }

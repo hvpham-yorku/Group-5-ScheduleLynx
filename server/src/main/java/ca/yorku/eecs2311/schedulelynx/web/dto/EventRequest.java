@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * The 'Data Transfer Object' for moving information from the frontend to the backend
- * for all event types. Combines {@link FixedEventRequest} and {@link TaskCreateRequest}
+ * for all event types. Combines {@code FixedEventRequest} and {@code TaskCreateRequest}
  * into one easy to implement record.
  *
  * @param type        (REQUIRED) an {@link EventType} enum stating under what category this event falls under.

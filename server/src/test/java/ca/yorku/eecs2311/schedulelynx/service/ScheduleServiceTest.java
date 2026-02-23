@@ -1,16 +1,19 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import ca.yorku.eecs2311.schedulelynx.domain.AvailabilityBlock;
 import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
-import ca.yorku.eecs2311.schedulelynx.domain.Event;
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
-import ca.yorku.eecs2311.schedulelynx.persistence.*;
+import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryAvailabilityRepository;
+import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryEventRepository;
+import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryTaskRepository;
+import ca.yorku.eecs2311.schedulelynx.web.dto.EventRequest;
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ScheduleServiceTest {
 
@@ -29,9 +32,14 @@ class ScheduleServiceTest {
     availabilityService.create(new AvailabilityBlock(
         null, Weekday.MONDAY, LocalTime.of(18, 0), LocalTime.of(21, 0)));
 
-    eventService.create(new Event(null, "Class", Weekday.MONDAY,
-                                            LocalTime.of(19, 0),
-                                            LocalTime.of(20, 0)));
+    var title = "Class";
+    var day   = Weekday.MONDAY;
+    var start = LocalTime.of(19, 0);
+    var end   = LocalTime.of(20, 0);
+
+    var evReq = new EventRequest(title, day, start, end);
+
+    eventService.create(evReq);
 
     taskService.create(new Task(null, "Study", LocalDate.of(2026, 2, 13), 2,
                                 Difficulty.MEDIUM));

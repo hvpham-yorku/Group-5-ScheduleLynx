@@ -6,14 +6,14 @@ ScheduleLynx is a rule-based schedule and workload management system
 designed to help students manage academic, professional, and personal
 responsibilities.
 
-The system allows users to: - Add tasks with deadlines and estimated
+The system allows users to: - Add tasks with dueDates and estimated
 effort - Define weekly availability blocks - Add fixed events (classes,
 labs, shifts, etc.) - Automatically generate a weekly schedule - Modify
 and delete tasks and events - Detect invalid inputs and scheduling
 conflicts
 
 The scheduling engine distributes workload into available time blocks
-before deadlines using a rule-based time-blocking approach.
+before dueDates using a rule-based time-blocking approach.
 
 ------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ Design documentation
 -   Time block tasks into available time
 -   Avoid overlap with fixed events
 -   Split tasks across multiple blocks if necessary
--   Respect deadlines
+-   Respect dueDates
 
 
 ### Testing
@@ -162,7 +162,7 @@ Mac/linux:
 2.  Open the frontend in a browser.
 3.  Add weekly availability blocks.
 4.  Add fixed events (classes, shifts, etc.).
-5.  Add tasks with deadlines and estimated effort.
+5.  Add tasks with dueDates and estimated effort.
 6.  Generate schedule.
 7.  View time-blocked weekly plan.
 

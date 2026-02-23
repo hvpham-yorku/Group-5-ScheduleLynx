@@ -12,14 +12,14 @@ public class ScheduleService {
 
   private final TaskService taskService;
   private final AvailabilityService availabilityService;
-  private final FixedEventService fixedEventService;
+  private final EventService eventService;
 
   public ScheduleService(TaskService taskService,
                          AvailabilityService availabilityService,
-                         FixedEventService fixedEventService) {
+                         EventService eventService) {
     this.taskService = taskService;
     this.availabilityService = availabilityService;
-    this.fixedEventService = fixedEventService;
+    this.eventService = eventService;
   }
 
   public ScheduleResult generateWeeklyPlan(LocalDate weekStart) {
@@ -41,7 +41,7 @@ public class ScheduleService {
             .toList();
 
     List<TimeBlock> fixed =
-        fixedEventService.getAll()
+        eventService.getAll()
             .stream()
             .map(e -> new TimeBlock(e.getDay(), e.getStart(), e.getEnd()))
             .toList();

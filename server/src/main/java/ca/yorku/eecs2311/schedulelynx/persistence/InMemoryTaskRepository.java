@@ -24,12 +24,12 @@ public class InMemoryTaskRepository implements TaskRepository {
   }
 
   @Override
-  public List<Task> findAll() {
+  public List<Task> getAll() {
     return new ArrayList<>(tasks); // return a copy
   }
 
   @Override
-  public Optional<Task> findById(long id) {
+  public Optional<Task> getById(long id) {
     return tasks.stream()
         .filter(t -> t.getId() != null && t.getId() == id)
         .findFirst();

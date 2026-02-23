@@ -20,9 +20,9 @@ public class TaskService {
     return taskRepository.save(task);
   }
 
-  public List<Task> getAll() { return taskRepository.findAll(); }
+  public List<Task> getAll() { return taskRepository.getAll(); }
 
-  public Optional<Task> getById(long id) { return taskRepository.findById(id); }
+  public Optional<Task> getById(long id) { return taskRepository.getById(id); }
 
   public Optional<Task> update(long id, Task task) {
     validate(task);

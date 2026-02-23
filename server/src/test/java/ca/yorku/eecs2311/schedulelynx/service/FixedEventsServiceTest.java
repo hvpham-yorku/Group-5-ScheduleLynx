@@ -1,54 +1,73 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import ca.yorku.eecs2311.schedulelynx.domain.FixedEvent;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
-import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryFixedEventRepository;
-import java.time.LocalTime;
+import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryEventRepository;
+import ca.yorku.eecs2311.schedulelynx.web.dto.EventRequest;
 import org.junit.jupiter.api.Test;
 
-class FixedEventServiceTest {
+import java.time.LocalTime;
 
-  private FixedEventService newService() {
-    return new FixedEventService(new InMemoryFixedEventRepository());
+import static org.junit.jupiter.api.Assertions.*;
+
+class EventServiceTest {
+
+  private EventService newService() {
+    return new EventService(new InMemoryEventRepository());
   }
 
   @Test
   void create_assignsId_andStoresEvent() {
-    FixedEventService service = newService();
 
-    FixedEvent created = service.create(
-        new FixedEvent(null, "Lecture", Weekday.TUESDAY, LocalTime.of(10, 0),
-                       LocalTime.of(11, 30)));
+    var service = newService();
 
-    assertNotNull(created.getId());
-    assertEquals(1L, created.getId());
+    var title = "Lecture";
+    var day   = Weekday.TUESDAY;
+    var start = LocalTime.of(10, 0);
+    var end   = LocalTime.of(11, 30);
+
+    var request = new EventRequest(title, day, start,end);
+    var event = service.create(request);
+
+    assertNotNull(event.getId());
+    assertEquals(1L, event.getId());
     assertEquals(1, service.getAll().size());
   }
 
   @Test
   void create_rejectsEmptyTitle() {
-    FixedEventService service = newService();
 
-    assertThrows(IllegalArgumentException.class,
-                 ()
-                     -> service.create(new FixedEvent(
-                         null, "   ", Weekday.TUESDAY, LocalTime.of(10, 0),
-                         LocalTime.of(11, 30))));
+    var service = newService();
+
+    var title = "   ";
+    var day   = Weekday.TUESDAY;
+    var start = LocalTime.of(10, 0);
+    var end   = LocalTime.of(11, 30);
+
+    var request = new EventRequest(title, day, start,end);
+
+    assertThrows(IllegalArgumentException.class, () -> service.create(request));
   }
 
   @Test
   void create_rejectsOverlapSameDay() {
-    FixedEventService service = newService();
 
-    service.create(new FixedEvent(null, "Lecture", Weekday.TUESDAY,
-                                  LocalTime.of(10, 0), LocalTime.of(11, 30)));
+    var service = newService();
 
-    assertThrows(IllegalArgumentException.class,
-                 ()
-                     -> service.create(new FixedEvent(
-                         null, "Lab", Weekday.TUESDAY, LocalTime.of(11, 0),
-                         LocalTime.of(12, 0))));
+    var title = "Lecture";
+    var day   = Weekday.TUESDAY;
+    var start = LocalTime.of(10, 0);
+    var end   = LocalTime.of(11, 30);
+
+    var request1 = new EventRequest(title, day, start,end);
+    var event = service.create(request1);
+
+    title = "Lab"; // LIKE THE DOG!? but I like cats
+    day   = Weekday.TUESDAY;
+    start = LocalTime.of(11, 0);
+    end   = LocalTime.of(12, 0);
+
+    var request2 = new EventRequest(title, day, start,end);
+
+    assertThrows(IllegalArgumentException.class, () -> service.create(request2));
   }
 }

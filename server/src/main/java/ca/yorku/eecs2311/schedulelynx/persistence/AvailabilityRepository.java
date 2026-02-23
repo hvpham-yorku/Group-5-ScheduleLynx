@@ -8,11 +8,12 @@ public interface AvailabilityRepository {
 
   AvailabilityBlock save(AvailabilityBlock block);
 
-  List<AvailabilityBlock> findAll();
+  List<AvailabilityBlock> getAll();
 
-  Optional<AvailabilityBlock> findById(long id);
+  Optional<AvailabilityBlock> getById(long id);
 
   Optional<AvailabilityBlock> update(long id, AvailabilityBlock updated);
 
   boolean delete(long id);
+
 }

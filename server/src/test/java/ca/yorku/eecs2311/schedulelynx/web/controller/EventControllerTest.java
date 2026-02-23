@@ -12,14 +12,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class FixedEventControllerTest {
+class EventControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
   @Test
   void postAndGetFixedEvents_work() throws Exception {
     mockMvc
-        .perform(post("/api/fixed-events")
+        .perform(post("/api/events")
                      .contentType(MediaType.APPLICATION_JSON)
                      .content("""
                     {
@@ -33,7 +33,7 @@ class FixedEventControllerTest {
         .andExpect(jsonPath("$.id").value(1))
         .andExpect(jsonPath("$.title").value("EECS 2311 Lecture"));
 
-    mockMvc.perform(get("/api/fixed-events"))
+    mockMvc.perform(get("/api/events"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1));
   }
@@ -41,7 +41,7 @@ class FixedEventControllerTest {
   @Test
   void missingTitle_returnsBadRequest() throws Exception {
     mockMvc
-        .perform(post("/api/fixed-events")
+        .perform(post("/api/events")
                      .contentType(MediaType.APPLICATION_JSON)
                      .content("""
                     {

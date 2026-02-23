@@ -2,7 +2,7 @@ package ca.yorku.eecs2311.schedulelynx.service;
 
 import ca.yorku.eecs2311.schedulelynx.domain.OneTimeEvent;
 import ca.yorku.eecs2311.schedulelynx.persistence.OneTimeEventRepository;
-import java.time.LocalTime;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -30,12 +30,12 @@ public class OneTimeEventService {
 
     public List<OneTimeEvent> getAll() {
 
-        return repository.getAll();
+        return repository.getAllEvents();
     }
 
     public Optional<OneTimeEvent> getById(long id) {
 
-        return repository.getById(id);
+        return repository.getEventByID(id);
     }
 
     public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
@@ -71,7 +71,7 @@ public class OneTimeEventService {
 
     private void ensureNoOverlap(OneTimeEvent candidate, Long ignoreId) {
 
-        for (OneTimeEvent existing : repository.getAll()) {
+        for (OneTimeEvent existing : repository.getAllEvents()) {
             if (existing.getId() == null)
                 continue;
             if (ignoreId != null && existing.getId().equals(ignoreId))

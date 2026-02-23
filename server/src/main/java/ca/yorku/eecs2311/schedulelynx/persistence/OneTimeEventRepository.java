@@ -8,9 +8,9 @@ public interface OneTimeEventRepository {
 
   OneTimeEvent save(OneTimeEvent event);
 
-  List<OneTimeEvent> getAll();
+  List<OneTimeEvent> getAllEvents();
 
-  Optional<OneTimeEvent> getById(long id);
+  Optional<OneTimeEvent> getEventByID(long id);
 
   Optional<OneTimeEvent> update(long id, OneTimeEvent updated);
 

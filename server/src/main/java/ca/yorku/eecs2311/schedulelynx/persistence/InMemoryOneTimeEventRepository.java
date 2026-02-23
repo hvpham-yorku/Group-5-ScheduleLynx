@@ -24,13 +24,13 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
   }
 
   @Override
-  public List<OneTimeEvent> getAll() {
+  public List<OneTimeEvent> getAllEvents() {
 
     return new ArrayList<>(events);
   }
 
   @Override
-  public Optional<OneTimeEvent> getById(long id) {
+  public Optional<OneTimeEvent> getEventByID(long id) {
 
     return events.stream()
         .filter(e -> e.getId() != null && e.getId() == id)

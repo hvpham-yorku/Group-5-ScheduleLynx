@@ -51,5 +51,5 @@ available time before dueDates and clearly warn me. <p><t>Construct a submission
 
 | Task                                    | Estimated Time | Actual Time | Assignee |
 |-----------------------------------------|----------------|-------------|----------|
-| scrum-32-make-variable-names-consistant | 2 hours        |             | Eric     |
+| scrum-32-make-variable-names-consistant | 2 hours        | 3 hours     | Eric     |
 |                                         |                |             |          |

@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
  * @param name        (REQUIRED) whatever the user decided to call the event.
  * @param type        (REQUIRED) an {@link EventType} enum stating under what category this event falls under.
  * @param description (optional) the user's description of the event in detail.
- * @param startDate   (optional) the date and time of when the event begins.<br>
+ * @param start       (optional) the date and time of when the event begins.<br>
  *                    Format as "YYYY-MM-DDTHH:mm:ss".
- * @param endDate     (REQUIRED) the date and time of when the event ends.<br>
+ * @param end         (REQUIRED) the date and time of when the event ends.<br>
  *                    Format as "YYYY-MM-DDTHH:mm:ss".
  * @param recurrence  (optional) one of either {@code null}, "daily", "weekly", "biweekly", or "monthly"
  * @param estMinutes  (optional) how many minutes the user expects to devote their life to the task.
@@ -29,8 +29,8 @@ public record EventRequest(
         @NotBlank String name,
         @NotNull EventType type,
         String description,
-        LocalDateTime startDate,
-        @NotNull LocalDateTime endDate,
+        LocalDateTime start,
+        @NotNull LocalDateTime end,
         String recurrence,
         @Min(0) Integer estMinutes,
         @NotNull Difficulty difficulty

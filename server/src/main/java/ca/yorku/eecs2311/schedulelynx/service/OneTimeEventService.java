@@ -23,7 +23,6 @@ public class OneTimeEventService {
         var event = new OneTimeEvent(null, req.title(), req.day(),req.start(), req.end());
 
         validate(event);
-        checkForOverlap(event);
         return repository.save(event);
     }
 
@@ -40,7 +39,6 @@ public class OneTimeEventService {
     public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
 
         validate(updated);
-        checkForOverlap(updated);
         return repository.update(id, updated);
     }
 
@@ -64,8 +62,8 @@ public class OneTimeEventService {
         if (start == null  ) throw new IllegalArgumentException("Start must not be null");
         if (end   == null  ) throw new IllegalArgumentException("End must not be null");
 
-        if (start.isBefore(end)) return;
-        throw new IllegalArgumentException("Start time must be before end time");
+        if (start.isBefore(end)) checkForOverlap(event);
+        else throw new IllegalArgumentException("Start time must be before end time");
     }
 
     private void checkForOverlap(OneTimeEvent candidate) {

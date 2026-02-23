@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 /** The generic event class containing fields common to all events.<br>
  *  All events should extend this class. */
-abstract class AbstractEvent {
+public abstract class AbstractEvent {
 
     // private fields have no set method
     // and are effectively final

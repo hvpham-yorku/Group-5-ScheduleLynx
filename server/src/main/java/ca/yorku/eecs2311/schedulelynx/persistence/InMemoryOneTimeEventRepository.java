@@ -39,7 +39,7 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
   }
 
   @Override
-  public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
+  public Optional<OneTimeEvent> update(long id, OneTimeEvent update) {
 
       var savedEvent = events.get(id);
 
@@ -47,12 +47,15 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
       if (savedEvent.getId() == id)
         throw new RuntimeException("ID map key and event ID are different!");
 
-      OneTimeEvent stored =
-          new OneTimeEvent(id, updated.getTitle(), updated.getDay(),
-                         updated.getStart(), updated.getEnd());
+      var title = update.getTitle();
+      var day   = update.getDay();
+      var start = update.getStart();
+      var end   = update.getEnd();
 
-      events.put(id, stored);
-      return Optional.of(stored);
+      var updatedEvent = new OneTimeEvent(id, title, day, start, end);
+
+      events.put(id, updatedEvent);
+      return Optional.of(updatedEvent);
   }
 
   @Override

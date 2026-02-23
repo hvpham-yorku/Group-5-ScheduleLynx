@@ -15,6 +15,7 @@ public class OneTimeEventService {
     private final OneTimeEventRepository repository;
 
     public OneTimeEventService(OneTimeEventRepository repository) {
+
         this.repository = repository;
     }
 
@@ -27,13 +28,18 @@ public class OneTimeEventService {
         return repository.save(event);
     }
 
-    public List<OneTimeEvent> getAll() { return repository.findAll(); }
+    public List<OneTimeEvent> getAll() {
+
+        return repository.findAll();
+    }
 
     public Optional<OneTimeEvent> getById(long id) {
+
         return repository.findById(id);
     }
 
     public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
+
         validate(updated);
         ensureNoOverlap(updated, id);
         return repository.update(id, updated);
@@ -58,6 +64,7 @@ public class OneTimeEventService {
     }
 
     private void ensureNoOverlap(OneTimeEvent candidate, Long ignoreId) {
+
         for (OneTimeEvent existing : repository.findAll()) {
             if (existing.getId() == null)
                 continue;

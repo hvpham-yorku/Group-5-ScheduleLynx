@@ -497,6 +497,7 @@ async function addTask() {
         return;
     }
 
+    // TODO: These could be made into simple getters to reduce boilerplate code
     const title = document.getElementById('taskTitle').value.trim();
     const type = document.getElementById('taskType').value;
     const dueDate = document.getElementById('dueDate').value;

@@ -3,6 +3,7 @@ package ca.yorku.eecs2311.schedulelynx.web.dto;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
 import java.time.LocalTime;
 
+@Deprecated
 public class FixedEventResponse {
 
   private long id;

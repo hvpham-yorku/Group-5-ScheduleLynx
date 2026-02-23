@@ -3,6 +3,7 @@ package ca.yorku.eecs2311.schedulelynx.web.dto;
 import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
 import java.time.LocalDate;
 
+@Deprecated
 public class TaskResponse {
 
   private long id;

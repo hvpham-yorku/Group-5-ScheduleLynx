@@ -52,27 +52,21 @@ public class OneTimeEventService {
 
     private void validate(OneTimeEvent event) {
 
-        if (event == null)
-            throw new IllegalArgumentException("Fixed event must not be null");
+        if (event == null) throw new IllegalArgumentException("Fixed event must not be null");
 
         var title = event.getTitle();
         var day   = event.getDay();
         var start = event.getStart();
         var end   = event.getEnd();
 
-        if (title == null)
-            throw new IllegalArgumentException("Title must not be null");
-        if (title.isBlank())
-            throw new IllegalArgumentException("Title must not be blank");
-        if (day == null)
-            throw new IllegalArgumentException("Day must not be null");
-        if (start == null)
-            throw new IllegalArgumentException("Start must not be null");
-        if (end == null)
-            throw new IllegalArgumentException("End must not be null");
+        if (title == null  ) throw new IllegalArgumentException("Title must not be null");
+        if (title.isBlank()) throw new IllegalArgumentException("Title must not be blank");
+        if (day   == null  ) throw new IllegalArgumentException("Day must not be null");
+        if (start == null  ) throw new IllegalArgumentException("Start must not be null");
+        if (end   == null  ) throw new IllegalArgumentException("End must not be null");
 
-        if (!start.isBefore(end))
-            throw new IllegalArgumentException("Start time must be before end time");
+        if (start.isBefore(end)) return;
+        throw new IllegalArgumentException("Start time must be before end time");
     }
 
     private void ensureNoOverlap(OneTimeEvent candidate, Long ignoreId) {

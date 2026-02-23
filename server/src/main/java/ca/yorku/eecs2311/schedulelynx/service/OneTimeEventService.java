@@ -69,22 +69,27 @@ public class OneTimeEventService {
         throw new IllegalArgumentException("Start time must be before end time");
     }
 
-    private void ensureNoOverlap(OneTimeEvent candidate, Long ignoreId) {
+    private void ensureNoOverlap(OneTimeEvent candidate, Long ignorableID) {
 
-        for (OneTimeEvent existing : repository.getAllEvents()) {
-            if (existing.getId() == null)
-                continue;
-            if (ignoreId != null && existing.getId().equals(ignoreId))
-                continue;
-            if (existing.getDay() != candidate.getDay())
-                continue;
+        for (var existingEvent : repository.getAllEvents()) {
 
-            boolean overlaps = candidate.getStart().isBefore(existing.getEnd()) &&
-                    existing.getStart().isBefore(candidate.getEnd());
-            if (overlaps) {
+            var id  = existingEvent.getId();
+            var day = existingEvent.getDay();
+
+            if (id == null)                continue;
+            if (id.equals(ignorableID))    continue;
+            if (day != candidate.getDay()) continue;
+
+            var candStart  = candidate.getStart();
+            var candEnd    = candidate.getEnd();
+            var existStart = existingEvent.getStart();
+            var existEnd   = existingEvent.getEnd();
+
+            boolean isOverlapping = candStart.isBefore(existEnd) && existStart.isBefore(candEnd);
+
+            if (isOverlapping)
                 throw new IllegalArgumentException(
                         "Fixed event overlaps an existing event");
-            }
         }
     }
 }

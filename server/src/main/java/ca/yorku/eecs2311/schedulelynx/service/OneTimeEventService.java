@@ -54,15 +54,19 @@ public class OneTimeEventService {
 
         if (event == null)
             throw new IllegalArgumentException("Fixed event must not be null");
-        if (event.getTitle() == null || event.getTitle().isBlank())
+
+        var title = event.getTitle();
+        var day   = event.getDay();
+        var start = event.getStart();
+        var end   = event.getEnd();
+
+        if (title == null || title.isBlank())
             throw new IllegalArgumentException("Title must not be empty");
-        if (event.getDay() == null)
+        if (day == null)
             throw new IllegalArgumentException("Day must not be null");
-        if (event.getStart() == null || event.getEnd() == null)
+        if (start == null || end == null)
             throw new IllegalArgumentException("Start and end must not be null");
 
-        LocalTime start = event.getStart();
-        LocalTime end = event.getEnd();
         if (!start.isBefore(end))
             throw new IllegalArgumentException("Start time must be before end time");
     }

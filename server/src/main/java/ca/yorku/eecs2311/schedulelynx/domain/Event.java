@@ -1,0 +1,86 @@
+package ca.yorku.eecs2311.schedulelynx.domain;
+
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
+
+/** The generic event class containing fields common to all events.<br>
+ *  All events should extend this class. */
+abstract class Event {
+
+    // private fields have no set method
+    // and are effectively final
+    private long id;
+    private EventType type;
+
+    // protected fields are changeable
+    protected String name;
+    protected String desc; // description
+    protected LocalDateTime end;
+
+    Event() {}
+
+    Event(@NotBlank long id,
+          @NotNull EventType type,
+          @NotNull String name,
+          @Nullable String desc,
+          @NotNull LocalDateTime end)
+    {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.desc = (desc != null) ? desc : "";
+        this.end = end;
+    }
+
+    /** @return the event's unique numerical identifier. */
+    public long getID() {
+
+        return id;
+    }
+
+    /** @return the {@link EventType} that this event is. */
+    public EventType getType() {
+
+        return type;
+    }
+
+    /** @return the name/title of the event. */
+    public String getName() {
+
+        return name;
+    }
+
+    /** Overwrites the previous name/title of the event. */
+    public void setName(String name) {
+
+        this.name = name;
+    }
+
+    /** @return the description of the event. */
+    public String getDesc() {
+
+        return desc;
+    }
+
+    /** Overwrites the previous description of the event. */
+    public void setDesc(String desc) {
+
+        this.desc = desc;
+    }
+
+    /** @return the date and time of the end of the event. */
+    public LocalDateTime getEndDateTime() {
+
+        return end;
+    }
+
+    /** Overwrites the previous date and time of the event's end. */
+    public void setEndDateTime(LocalDateTime end) {
+
+        this.end = end;
+    }
+
+}

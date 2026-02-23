@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
 
 import java.time.LocalDateTime;
 
+/** Contains the data for exam-type events. */
 public class ExamEvent extends AbstractEvent
         implements StartableEvent, TimeableEvent {
 

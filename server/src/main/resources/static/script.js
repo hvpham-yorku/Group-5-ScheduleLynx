@@ -550,20 +550,20 @@ function addTask() {
         createdAt: new Date().toISOString()
     };
 
-    if (taskType === 'task') {
-        item.estimatedHours = estimatedHours,
-            item.startTime = null,
-            item.endTime = null,
-            item.isRecurring = false,
-            item.recurrenceType = null;
-        item.recurrenceEnd = null,
-            item.recurrenceDays = [];
+    if (type === 'task') {
+        item.estimatedHours = estimatedHours;
+        item.startTime = null;
+        item.endTime = null;
+        item.isRecurring = false;
+        item.recurrenceType = null;
+        item.recurrenceEnd = null;
+        item.recurrenceDays = [];
     } else {
-        item.estimatedHours = 0,
-            item.startTime = startTime,
-            item.endTime = endTime,
-            item.isRecurring = isRecurring,
-            item.recurrenceType = isRecurring ? recurrenceType : null;
+        item.estimatedHours = 0;
+        item.startTime = startTime;
+        item.endTime = endTime;
+        item.isRecurring = isRecurring;
+        item.recurrenceType = isRecurring ? recurrenceType : null;
         item.recurrenceEnd = isRecurring ? recurrenceEnd : null;
         item.recurrenceDays = isRecurring ? selectedDays : [];
     }

@@ -1,18 +1,18 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
-import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryOneTimeEventRepository;
-import ca.yorku.eecs2311.schedulelynx.web.dto.OneTimeEventRequest;
+import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryEventRepository;
+import ca.yorku.eecs2311.schedulelynx.web.dto.EventRequest;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class OneTimeEventServiceTest {
+class EventServiceTest {
 
-  private OneTimeEventService newService() {
-    return new OneTimeEventService(new InMemoryOneTimeEventRepository());
+  private EventService newService() {
+    return new EventService(new InMemoryEventRepository());
   }
 
   @Test
@@ -25,7 +25,7 @@ class OneTimeEventServiceTest {
     var start = LocalTime.of(10, 0);
     var end   = LocalTime.of(11, 30);
 
-    var request = new OneTimeEventRequest(title, day, start,end);
+    var request = new EventRequest(title, day, start,end);
     var event = service.create(request);
 
     assertNotNull(event.getId());
@@ -43,7 +43,7 @@ class OneTimeEventServiceTest {
     var start = LocalTime.of(10, 0);
     var end   = LocalTime.of(11, 30);
 
-    var request = new OneTimeEventRequest(title, day, start,end);
+    var request = new EventRequest(title, day, start,end);
 
     assertThrows(IllegalArgumentException.class, () -> service.create(request));
   }
@@ -58,7 +58,7 @@ class OneTimeEventServiceTest {
     var start = LocalTime.of(10, 0);
     var end   = LocalTime.of(11, 30);
 
-    var request1 = new OneTimeEventRequest(title, day, start,end);
+    var request1 = new EventRequest(title, day, start,end);
     var event = service.create(request1);
 
     title = "Lab"; // LIKE THE DOG!? but I like cats
@@ -66,7 +66,7 @@ class OneTimeEventServiceTest {
     start = LocalTime.of(11, 0);
     end   = LocalTime.of(12, 0);
 
-    var request2 = new OneTimeEventRequest(title, day, start,end);
+    var request2 = new EventRequest(title, day, start,end);
 
     assertThrows(IllegalArgumentException.class, () -> service.create(request2));
   }

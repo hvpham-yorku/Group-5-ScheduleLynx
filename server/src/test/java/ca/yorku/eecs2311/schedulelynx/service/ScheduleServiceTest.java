@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ca.yorku.eecs2311.schedulelynx.domain.AvailabilityBlock;
 import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
-import ca.yorku.eecs2311.schedulelynx.domain.OneTimeEvent;
+import ca.yorku.eecs2311.schedulelynx.domain.Event;
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
 import ca.yorku.eecs2311.schedulelynx.persistence.*;
@@ -20,16 +20,16 @@ class ScheduleServiceTest {
     TaskService taskService = new TaskService(new InMemoryTaskRepository());
     AvailabilityService availabilityService =
         new AvailabilityService(new InMemoryAvailabilityRepository());
-    OneTimeEventService oneTimeEventService =
-        new OneTimeEventService(new InMemoryOneTimeEventRepository());
+    EventService eventService =
+        new EventService(new InMemoryEventRepository());
 
     ScheduleService scheduleService = new ScheduleService(
-        taskService, availabilityService, oneTimeEventService);
+        taskService, availabilityService, eventService);
 
     availabilityService.create(new AvailabilityBlock(
         null, Weekday.MONDAY, LocalTime.of(18, 0), LocalTime.of(21, 0)));
 
-    oneTimeEventService.create(new OneTimeEvent(null, "Class", Weekday.MONDAY,
+    eventService.create(new Event(null, "Class", Weekday.MONDAY,
                                             LocalTime.of(19, 0),
                                             LocalTime.of(20, 0)));
 
@@ -51,11 +51,11 @@ class ScheduleServiceTest {
     TaskService taskService = new TaskService(new InMemoryTaskRepository());
     AvailabilityService availabilityService =
         new AvailabilityService(new InMemoryAvailabilityRepository());
-    OneTimeEventService oneTimeEventService =
-        new OneTimeEventService(new InMemoryOneTimeEventRepository());
+    EventService eventService =
+        new EventService(new InMemoryEventRepository());
 
     ScheduleService scheduleService = new ScheduleService(
-        taskService, availabilityService, oneTimeEventService);
+        taskService, availabilityService, eventService);
 
     // Week start Monday
     java.time.LocalDate weekStart = java.time.LocalDate.of(2026, 2, 2);

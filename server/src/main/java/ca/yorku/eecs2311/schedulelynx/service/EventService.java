@@ -1,42 +1,42 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
-import ca.yorku.eecs2311.schedulelynx.domain.OneTimeEvent;
-import ca.yorku.eecs2311.schedulelynx.persistence.OneTimeEventRepository;
-import ca.yorku.eecs2311.schedulelynx.web.dto.OneTimeEventRequest;
+import ca.yorku.eecs2311.schedulelynx.domain.Event;
+import ca.yorku.eecs2311.schedulelynx.persistence.EventRepository;
+import ca.yorku.eecs2311.schedulelynx.web.dto.EventRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class OneTimeEventService {
+public class EventService {
 
-    private final OneTimeEventRepository repo;
+    private final EventRepository repo;
 
-    public OneTimeEventService(OneTimeEventRepository repo) {
+    public EventService(EventRepository repo) {
 
         this.repo = repo;
     }
 
-    public OneTimeEvent create(OneTimeEventRequest req) {
+    public Event create(EventRequest req) {
 
-        var event = new OneTimeEvent(null, req.title(), req.day(),req.start(), req.end());
+        var event = new Event(null, req.title(), req.day(),req.start(), req.end());
 
         validate(event);
         return repo.save(event);
     }
 
-    public List<OneTimeEvent> getAll() {
+    public List<Event> getAll() {
 
         return repo.getAllEvents();
     }
 
-    public Optional<OneTimeEvent> getById(long id) {
+    public Optional<Event> getById(long id) {
 
         return repo.getEventByID(id);
     }
 
-    public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
+    public Optional<Event> update(long id, Event updated) {
 
         validate(updated);
         return repo.update(id, updated);
@@ -47,7 +47,7 @@ public class OneTimeEventService {
         return repo.delete(id);
     }
 
-    private void validate(OneTimeEvent event) {
+    private void validate(Event event) {
 
         if (event == null) throw new IllegalArgumentException("Fixed event must not be null");
 
@@ -66,7 +66,7 @@ public class OneTimeEventService {
         else throw new IllegalArgumentException("Start time must be before end time");
     }
 
-    private void checkForOverlap(OneTimeEvent candidate) {
+    private void checkForOverlap(Event candidate) {
 
         var ignorableID = candidate.getId();
 

@@ -2,12 +2,12 @@ package ca.yorku.eecs2311.schedulelynx.domain;
 
 import java.time.LocalTime;
 
-public class OneTimeEvent extends TimeBlock {
+public class Event extends TimeBlock {
 
     private Long id;
     private String title;
 
-    public OneTimeEvent(
+    public Event(
             Long id,
             String title,
             Weekday day,

@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 /**
  * Contains the data for Lecture-type events.
  */
-public class LectureEvent extends AbstractEvent {
+public class LectureEvent extends AbstractEvent
+        implements StartableEvent, RecurrableEvent {
 
     protected LocalDateTime start;
     protected Recurrence recurrence;
@@ -40,26 +41,25 @@ public class LectureEvent extends AbstractEvent {
         );
     }
 
-    /** @return the date and time of the start of the lecture. */
+    @Override
     public LocalDateTime getStartDateTime() {
 
         return start;
     }
 
-    /** Overwrites the previous date and time of the lecture's start. */
+    @Override
     public void setStartDateTime(LocalDateTime start) {
 
         this.start = start;
     }
 
-    /** @return the {@link Recurrence} of the lecture. */
+    @Override
     public Recurrence getRecurrence() {
 
         return recurrence;
     }
 
-    /** Overwrites the previous {@link Recurrence} of the lecture.<br>
-     *  If {@code null} provided, recurrence will be set to NONE. */
+    @Override
     public void setRecurrence(@Nullable Recurrence recurrence) {
 
         this.recurrence = (recurrence != null) ? recurrence : Recurrence.NONE;

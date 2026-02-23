@@ -15,7 +15,7 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
 
   @Override
   public OneTimeEvent save(OneTimeEvent event) {
-    
+
     OneTimeEvent stored =
         new OneTimeEvent(nextId.getAndIncrement(), event.getTitle(),
                        event.getDay(), event.getStart(), event.getEnd());
@@ -24,7 +24,7 @@ public class InMemoryOneTimeEventRepository implements OneTimeEventRepository {
   }
 
   @Override
-  public List<OneTimeEvent> findAll() {
+  public List<OneTimeEvent> getAll() {
 
     return new ArrayList<>(events);
   }

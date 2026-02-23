@@ -30,7 +30,7 @@ public class OneTimeEventService {
 
     public List<OneTimeEvent> getAll() {
 
-        return repository.findAll();
+        return repository.getAll();
     }
 
     public Optional<OneTimeEvent> getById(long id) {
@@ -65,7 +65,7 @@ public class OneTimeEventService {
 
     private void ensureNoOverlap(OneTimeEvent candidate, Long ignoreId) {
 
-        for (OneTimeEvent existing : repository.findAll()) {
+        for (OneTimeEvent existing : repository.getAll()) {
             if (existing.getId() == null)
                 continue;
             if (ignoreId != null && existing.getId().equals(ignoreId))

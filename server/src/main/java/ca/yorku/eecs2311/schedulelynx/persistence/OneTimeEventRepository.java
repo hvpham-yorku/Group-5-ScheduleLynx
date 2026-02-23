@@ -8,7 +8,7 @@ public interface OneTimeEventRepository {
 
   OneTimeEvent save(OneTimeEvent event);
 
-  List<OneTimeEvent> findAll();
+  List<OneTimeEvent> getAll();
 
   Optional<OneTimeEvent> findById(long id);
 

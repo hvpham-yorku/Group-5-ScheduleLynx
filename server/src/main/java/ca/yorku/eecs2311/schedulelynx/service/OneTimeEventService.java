@@ -23,7 +23,7 @@ public class OneTimeEventService {
         var event = new OneTimeEvent(null, req.title(), req.day(),req.start(), req.end());
 
         validate(event);
-        ensureNoOverlap(event);
+        checkForOverlap(event);
         return repository.save(event);
     }
 
@@ -40,7 +40,7 @@ public class OneTimeEventService {
     public Optional<OneTimeEvent> update(long id, OneTimeEvent updated) {
 
         validate(updated);
-        ensureNoOverlap(updated);
+        checkForOverlap(updated);
         return repository.update(id, updated);
     }
 
@@ -68,7 +68,7 @@ public class OneTimeEventService {
         throw new IllegalArgumentException("Start time must be before end time");
     }
 
-    private void ensureNoOverlap(OneTimeEvent candidate) {
+    private void checkForOverlap(OneTimeEvent candidate) {
 
         var ignorableID = candidate.getId();
 

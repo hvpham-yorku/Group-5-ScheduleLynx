@@ -1,4 +1,4 @@
-package ca.yorku.eecs2311.schedulelynx.domain;
+package ca.yorku.eecs2311.schedulelynx.domain.events;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 /** The generic event class containing fields common to all events.<br>
  *  All events should extend this class. */
-abstract class Event {
+abstract class AbstractEvent {
 
     // private fields have no set method
     // and are effectively final
@@ -20,13 +20,13 @@ abstract class Event {
     protected String desc; // description
     protected LocalDateTime end;
 
-    Event() {}
+    AbstractEvent() {}
 
-    Event(@NotBlank long id,
-          @NotNull EventType type,
-          @NotNull String name,
-          @Nullable String desc,
-          @NotNull LocalDateTime end)
+    AbstractEvent(@NotBlank long id,
+                  @NotNull EventType type,
+                  @NotNull String name,
+                  @Nullable String desc,
+                  @NotNull LocalDateTime end)
     {
         this.id = id;
         this.type = type;

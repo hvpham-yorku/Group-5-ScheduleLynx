@@ -1,4 +1,4 @@
-package ca.yorku.eecs2311.schedulelynx.domain;
+package ca.yorku.eecs2311.schedulelynx.domain.events;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
@@ -9,15 +9,15 @@ import java.time.LocalDateTime;
 /**
  * Contains the data for Lecture-type events.
  */
-public class EventLecture extends Event {
+public class LectureEvent extends AbstractEvent {
 
     protected LocalDateTime start;
     protected Recurrence recurrence;
     protected Difficulty difficulty;
 
-    public EventLecture() {}
+    public LectureEvent() {}
 
-    public EventLecture(
+    public LectureEvent(
             @NotBlank long id,
             @NotNull  EventType type,
             @NotNull  String name,

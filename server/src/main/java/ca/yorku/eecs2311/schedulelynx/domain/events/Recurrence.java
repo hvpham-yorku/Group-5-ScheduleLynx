@@ -1,4 +1,4 @@
-package ca.yorku.eecs2311.schedulelynx.domain;
+package ca.yorku.eecs2311.schedulelynx.domain.events;
 
 public enum Recurrence {
 

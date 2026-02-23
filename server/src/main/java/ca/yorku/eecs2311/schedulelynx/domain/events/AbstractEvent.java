@@ -22,12 +22,13 @@ abstract class AbstractEvent {
 
     AbstractEvent() {}
 
-    AbstractEvent(long id,
-                  @NotNull EventType type,
-                  @NotNull String name,
-                  @Nullable String desc,
-                  @NotNull LocalDateTime end,
-                  @Nullable Difficulty diff)
+    AbstractEvent(
+            long id,
+            @NotNull EventType type,
+            @NotNull String name,
+            @Nullable String desc,
+            @NotNull LocalDateTime end,
+            @Nullable Difficulty diff)
     {
         this.id = id;
         this.type = type;

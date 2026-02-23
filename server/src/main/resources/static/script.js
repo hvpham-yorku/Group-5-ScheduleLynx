@@ -1073,16 +1073,17 @@ function loadTasksFromStorage() {
 }
 
 function clearAllTasks() {
-    if (confirm('Are you sure you want to clear all tasks? This cannot be undone.')) {
-        tasks = [];
-        saveTasksToStorage();
-        updateTasksDisplay();
-        document.getElementById('timeline').innerHTML = '<p class="empty-state">Tasks will appear here once you add them and generate the schedule.</p>';
-        renderScheduleGrid();
-        document.getElementById('generateSchedule').disabled = true;
-        refreshDashboardIfVisible();
-        alert('All tasks cleared!');
-    }
+
+    if (!(confirm("Are you sure you want to clear all tasks?\nThis cannot be undone."))) return;
+
+    tasks = [];
+    saveTasksToStorage();
+    updateTasksDisplay();
+    document.getElementById('timeline').innerHTML = '<p class="empty-state">Tasks will appear here once you add them and generate the schedule.</p>';
+    renderScheduleGrid();
+    document.getElementById('generateSchedule').disabled = true;
+    refreshDashboardIfVisible();
+    alert('All tasks cleared!');
 }
 
 

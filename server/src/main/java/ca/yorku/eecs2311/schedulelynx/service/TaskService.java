@@ -20,10 +20,10 @@ public class TaskService {
 
   public Task create(TaskCreateRequest req) {
 
-    var task = new Task(null, req.getTitle(), req.getDueDate(), req.getEstimatedHours(), req.getDifficulty());
+    var data = new Task(null, req.getTitle(), req.getDueDate(), req.getEstimatedHours(), req.getDifficulty());
 
-    validate(task);
-    return repo.save(task);
+    validate(data);
+    return repo.save(data);
   }
 
   public Map<Long, Task> getAll() {

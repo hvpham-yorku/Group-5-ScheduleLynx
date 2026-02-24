@@ -20,10 +20,10 @@ public class EventService {
 
     public Event create(EventRequest req) {
 
-        var event = new Event(null, req.title(), req.day(),req.start(), req.end());
+        var data = new Event(null, req.title(), req.day(), req.start(), req.end());
 
-        validate(event);
-        return repo.save(event);
+        validate(data);
+        return repo.save(data);
     }
 
     public List<Event> getAll() {

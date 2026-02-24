@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface TaskRepository {
 
-  Task save(Task task);
+  Task save(Task data);
 
   Optional<Task> update(long id, Task updatedTask);
 

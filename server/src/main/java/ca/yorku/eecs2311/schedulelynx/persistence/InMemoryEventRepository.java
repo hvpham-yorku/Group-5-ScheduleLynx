@@ -16,10 +16,10 @@ public class InMemoryEventRepository implements EventRepository {
     private final AtomicLong nextId = new AtomicLong(1);
 
     @Override
-    public Event save(Event event) {
+    public Event save(Event data) {
 
         long id = nextId.getAndIncrement();
-        return putInRepo(id, event);
+        return putInRepo(id, data);
     }
 
     @Override

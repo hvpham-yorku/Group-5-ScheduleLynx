@@ -15,10 +15,10 @@ public class InMemoryTaskRepository implements TaskRepository {
   private final AtomicLong nextId = new AtomicLong(1);
 
   @Override
-  public Task save(Task task) {
+  public Task save(Task data) {
 
     long id = nextId.getAndIncrement();
-    return putInRepo(id, task);
+    return putInRepo(id, data);
   }
 
   @Override

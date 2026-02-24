@@ -1078,11 +1078,22 @@ async function clearAllItems() {
 
     if (!(confirm("Are you sure you want to clear all tasks?\nThis cannot be undone."))) return;
 
-    const request = "http://localhost:8080/api/tasks"
-    let response = await fetch(request, {method: 'DELETE',});
+    const taskRequest = "http://localhost:8080/api/tasks"
+    let restResponse = await fetch(taskRequest, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    console.log(restResponse);
 
-    console.log(response);
-    if (!response.ok) return;
+    const eventRequest = "http://localhost:8080/api/events"
+    let eventResponse = await fetch(eventRequest, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    console.log(eventRequest);
+
+    // TODO: separate concerns of clearing the frontend so if one fails the other is still cleared
+    if (!restResponse.ok || !eventRequest) return;
 
     tasks = [];
     saveTasksToStorage();

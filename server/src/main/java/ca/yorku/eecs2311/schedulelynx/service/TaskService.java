@@ -20,7 +20,12 @@ public class TaskService {
 
   public Task create(TaskCreateRequest req) {
 
-    var data = new Task(null, req.getTitle(), req.getDueDate(), req.getEstimatedHours(), req.getDifficulty());
+    var title   = req.getTitle();
+    var dueDate  = req.getDueDate();
+    var estHours = req.getEstimatedHours();
+    var diff     = req.getDifficulty();
+
+    var data = new Task(null, title, dueDate, estHours, diff);
 
     validate(data);
     return repo.save(data);

@@ -20,6 +20,11 @@ public class EventService {
 
     public Event create(EventRequest req) {
 
+        var title = req.title();
+        var day   = req.day();
+        var start = req.start();
+        var end   = req.end();
+
         var data = new Event(null, req.title(), req.day(), req.start(), req.end());
 
         validate(data);

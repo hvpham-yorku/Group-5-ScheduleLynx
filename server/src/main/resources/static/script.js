@@ -11,6 +11,16 @@ let currentUser = null;
 
 
 // ============================
+// Getter Functions
+// ============================
+
+/** Gets the title text currently entered into the UI for the pending calendar-item.
+ *  @return String */
+function getPendingCalendarItemTitle() {
+    return document.getElementById('pendCalndrItemTitle').value.trim();
+}
+
+// ============================
 // AUTH FUNCTIONS
 // ============================
 

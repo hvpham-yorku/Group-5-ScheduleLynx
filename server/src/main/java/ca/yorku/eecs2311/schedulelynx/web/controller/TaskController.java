@@ -66,6 +66,13 @@ public class TaskController {
         .orElseThrow(() -> new TaskNotFoundException(id));
   }
 
+  @DeleteMapping()
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteAll() {
+
+    taskService.deleteAll();
+  }
+
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable long id) {

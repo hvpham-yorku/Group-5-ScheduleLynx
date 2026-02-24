@@ -58,6 +58,12 @@ public class InMemoryTaskRepository implements TaskRepository {
   }
 
   @Override
+  public void deleteAll() {
+
+    tasks.clear();
+  }
+
+  @Override
   public boolean delete(long id) {
 
     return tasks.remove(id) != null;

@@ -39,6 +39,11 @@ public class TaskService {
     return taskRepository.update(id, task);
   }
 
+  public void deleteAll() {
+
+    taskRepository.deleteAll();
+  }
+
   public boolean delete(long id) {
 
     return taskRepository.delete(id);

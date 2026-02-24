@@ -15,6 +15,8 @@ public interface TaskRepository {
 
   Optional<Task> getById(long id);
 
+  void deleteAll();
+
   boolean delete(long id);
 
 }

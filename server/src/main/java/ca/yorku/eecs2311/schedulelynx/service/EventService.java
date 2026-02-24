@@ -25,7 +25,7 @@ public class EventService {
         var start = req.start();
         var end   = req.end();
 
-        var data = new Event(null, req.title(), req.day(), req.start(), req.end());
+        var data = new Event(null, title, day, start, end);
 
         validate(data);
         return repo.save(data);

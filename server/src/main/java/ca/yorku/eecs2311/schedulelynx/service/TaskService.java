@@ -4,7 +4,7 @@ import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.persistence.TaskRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,7 +23,7 @@ public class TaskService {
     return taskRepository.save(task);
   }
 
-  public List<Task> getAll() {
+  public Map<Long, Task> getAll() {
 
     return taskRepository.getAll();
   }

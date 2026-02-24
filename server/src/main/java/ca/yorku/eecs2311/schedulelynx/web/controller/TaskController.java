@@ -36,7 +36,7 @@ public class TaskController {
   @GetMapping
   public List<TaskResponse> getAll() {
 
-    return taskService.getAll().stream().map(this::toResponse).toList();
+    return taskService.getAll().values().stream().map(this::toResponse).toList();
   }
 
   @GetMapping("/{id}")

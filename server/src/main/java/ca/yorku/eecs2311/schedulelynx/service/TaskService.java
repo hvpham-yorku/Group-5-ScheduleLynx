@@ -51,20 +51,19 @@ public class TaskService {
 
   private void validate(Task task) {
 
-    if (task == null) {
-      throw new IllegalArgumentException("Task must not be null");
-    }
-    if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
-      throw new IllegalArgumentException("Task title must not be empty");
-    }
-    if (task.getDueDate() == null) {
-      throw new IllegalArgumentException("Task dueDate must not be null");
-    }
-    if (task.getEstimatedHours() <= 0) {
-      throw new IllegalArgumentException("Task estimatedHours must be > 0");
-    }
-    if (task.getDifficulty() == null) {
-      throw new IllegalArgumentException("Task difficulty must not be null");
-    }
+    if (task == null) throw new IllegalArgumentException("Task must not be null");
+
+    var title    = task.getTitle();
+    var dueDate  = task.getDueDate();
+    var estHours = task.getEstimatedHours();
+    var estDiff  = task.getDifficulty();
+
+    if (title == null)   throw new IllegalArgumentException("Task title must not be null");
+    if (title.isBlank()) throw new IllegalArgumentException("Task title must not be blank");
+    if (dueDate == null) throw new IllegalArgumentException("Task dueDate must not be null");
+    if (estHours <= 0)   throw new IllegalArgumentException("Task estimatedHours must be > 0");
+    if (estDiff == null) throw new IllegalArgumentException("Task difficulty must not be null");
+
   }
+
 }

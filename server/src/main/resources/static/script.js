@@ -1,9 +1,11 @@
 // ============================
 // SCHEDULE LYNX - MAIN SCRIPT
 // ============================
-// noinspection UnnecessaryLocalVariableJS
 
+// ============================
 // Global Variables
+// ============================
+
 let tasks = [];
 let currentWeekStart = getMonday(new Date());
 let selectedTaskId = null;
@@ -508,7 +510,7 @@ async function addTask() {
     }
 
     // TODO: These could be made into simple getters to reduce boilerplate code
-    const title = document.getElementById('pendCalndrItemTitle').value.trim();
+    const title = getPendingCalendarItemTitle();
     const type = document.getElementById('taskType').value;
     const dueDate = document.getElementById('dueDate').value;
 

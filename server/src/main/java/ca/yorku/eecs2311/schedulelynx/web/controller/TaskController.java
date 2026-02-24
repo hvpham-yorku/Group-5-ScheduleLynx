@@ -7,9 +7,10 @@ import ca.yorku.eecs2311.schedulelynx.web.dto.TaskCreateRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.TaskResponse;
 import ca.yorku.eecs2311.schedulelynx.web.dto.TaskUpdateRequest;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")

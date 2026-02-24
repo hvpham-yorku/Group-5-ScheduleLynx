@@ -1,11 +1,12 @@
 package ca.yorku.eecs2311.schedulelynx.persistence;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
+import org.springframework.stereotype.Repository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class InMemoryTaskRepository implements TaskRepository {

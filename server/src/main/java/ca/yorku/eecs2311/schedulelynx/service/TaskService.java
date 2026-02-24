@@ -2,9 +2,10 @@ package ca.yorku.eecs2311.schedulelynx.service;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.persistence.TaskRepository;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
 
 @Service
 public class TaskService {

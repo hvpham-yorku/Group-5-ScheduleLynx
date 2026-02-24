@@ -16,18 +16,18 @@ import java.util.List;
 @RequestMapping("/api/tasks")
 public class TaskController {
 
-  private final TaskService taskService;
+  private final TaskService service;
 
-  public TaskController(TaskService taskService) {
+  public TaskController(TaskService service) {
 
-    this.taskService = taskService;
+    this.service = service;
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public TaskResponse create(@Valid @RequestBody TaskCreateRequest request) {
 
-    Task created = taskService.create(
+    Task created = service.create(
         new Task(null, request.getTitle(), request.getDueDate(),
                  request.getEstimatedHours(), request.getDifficulty()));
     return toResponse(created);
@@ -36,13 +36,13 @@ public class TaskController {
   @GetMapping
   public List<TaskResponse> getAll() {
 
-    return taskService.getAll().values().stream().map(this::toResponse).toList();
+    return service.getAll().values().stream().map(this::toResponse).toList();
   }
 
   @GetMapping("/{id}")
   public TaskResponse getById(@PathVariable long id) {
 
-    return taskService.getById(id)
+    return service.getById(id)
         .map(this::toResponse)
         .orElseThrow(() -> new TaskNotFoundException(id));
   }
@@ -61,7 +61,7 @@ public class TaskController {
         new Task(null, request.getTitle(), request.getDueDate(),
                  request.getEstimatedHours(), request.getDifficulty());
 
-    return taskService.update(id, updated)
+    return service.update(id, updated)
         .map(this::toResponse)
         .orElseThrow(() -> new TaskNotFoundException(id));
   }
@@ -70,14 +70,14 @@ public class TaskController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteAll() {
 
-    taskService.deleteAll();
+    service.deleteAll();
   }
 
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable long id) {
 
-    boolean deleted = taskService.delete(id);
+    boolean deleted = service.delete(id);
     if (!deleted) {
       throw new TaskNotFoundException(id);
     }

@@ -13,7 +13,7 @@ let currentUser = null;
 
 
 // ============================
-// Getter Functions
+// Value Getter Functions
 // ============================
 
 /** Gets the title text currently entered into the UI for the pending calendar-item.

@@ -28,6 +28,24 @@ public class InMemoryTaskRepository implements TaskRepository {
   }
 
   @Override
+  public Optional<Task> update(long id, Task updatedTask) {
+
+
+    Task existing = tasks.get(id);
+    if (existing.getId() != null && existing.getId() == id) {
+
+      Task stored = new Task(
+              id, updatedTask.getTitle(), updatedTask.getDueDate(),
+              updatedTask.getEstimatedHours(), updatedTask.getDifficulty());
+
+      tasks.put(id, stored);
+      return Optional.of(stored);
+    }
+
+    return Optional.empty();
+  }
+
+  @Override
   public Map<Long, Task> getAll() {
 
     return Map.copyOf(tasks);
@@ -37,24 +55,6 @@ public class InMemoryTaskRepository implements TaskRepository {
   public Optional<Task> getById(long id) {
 
     return Optional.ofNullable(tasks.get(id));
-  }
-
-  @Override
-  public Optional<Task> update(long id, Task updatedTask) {
-
-
-      Task existing = tasks.get(id);
-      if (existing.getId() != null && existing.getId() == id) {
-
-        Task stored = new Task(
-            id, updatedTask.getTitle(), updatedTask.getDueDate(),
-            updatedTask.getEstimatedHours(), updatedTask.getDifficulty());
-
-        tasks.put(id, stored);
-        return Optional.of(stored);
-      }
-
-    return Optional.empty();
   }
 
   @Override

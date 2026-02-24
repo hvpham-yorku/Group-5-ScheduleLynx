@@ -61,7 +61,7 @@ public class TaskService {
     if (title == null)   throw new IllegalArgumentException("Task title must not be null");
     if (title.isBlank()) throw new IllegalArgumentException("Task title must not be blank");
     if (dueDate == null) throw new IllegalArgumentException("Task dueDate must not be null");
-    if (estHours <= 0)   throw new IllegalArgumentException("Task estimatedHours must be > 0");
+    if (estHours < 0)    throw new IllegalArgumentException("Task estimatedHours must not be negative");
     if (estDiff == null) throw new IllegalArgumentException("Task difficulty must not be null");
 
   }

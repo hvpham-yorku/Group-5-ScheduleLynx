@@ -1093,7 +1093,7 @@ async function clearAllItems() {
     console.log(eventRequest);
 
     // TODO: separate concerns of clearing the frontend so if one fails the other is still cleared
-    if (!restResponse.ok || !eventRequest) return;
+    if (!restResponse.ok || !eventResponse.ok) return;
 
     tasks = [];
     saveTasksToStorage();

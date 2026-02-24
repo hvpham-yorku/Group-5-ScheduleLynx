@@ -27,10 +27,8 @@ public class TaskController {
   @ResponseStatus(HttpStatus.CREATED)
   public TaskResponse create(@Valid @RequestBody TaskCreateRequest req) {
 
-    Task created = service.create(
-        new Task(null, req.getTitle(), req.getDueDate(),
-                 req.getEstimatedHours(), req.getDifficulty()));
-    return toResponse(created);
+    var task = service.create(req);
+    return toResponse(task);
   }
 
   @GetMapping

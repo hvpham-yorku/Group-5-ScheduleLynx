@@ -2,6 +2,7 @@ package ca.yorku.eecs2311.schedulelynx.service;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.persistence.TaskRepository;
+import ca.yorku.eecs2311.schedulelynx.web.dto.TaskCreateRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -17,7 +18,9 @@ public class TaskService {
     this.repo = repo;
   }
 
-  public Task create(Task task) {
+  public Task create(TaskCreateRequest req) {
+
+    var task = new Task(null, req.getTitle(), req.getDueDate(), req.getEstimatedHours(), req.getDifficulty());
 
     validate(task);
     return repo.save(task);
@@ -63,7 +66,6 @@ public class TaskService {
     if (dueDate == null) throw new IllegalArgumentException("Task dueDate must not be null");
     if (estHours < 0)    throw new IllegalArgumentException("Task estimatedHours must not be negative");
     if (estDiff == null) throw new IllegalArgumentException("Task difficulty must not be null");
-
   }
 
 }

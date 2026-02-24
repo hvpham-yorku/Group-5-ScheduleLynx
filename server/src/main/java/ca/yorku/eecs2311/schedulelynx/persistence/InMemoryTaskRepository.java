@@ -15,6 +15,7 @@ public class InMemoryTaskRepository implements TaskRepository {
 
   @Override
   public Task save(Task task) {
+
     Task stored =
         new Task(nextId.getAndIncrement(), task.getTitle(), task.getDueDate(),
                  task.getEstimatedHours(), task.getDifficulty());
@@ -25,11 +26,13 @@ public class InMemoryTaskRepository implements TaskRepository {
 
   @Override
   public List<Task> getAll() {
+
     return new ArrayList<>(tasks); // return a copy
   }
 
   @Override
   public Optional<Task> getById(long id) {
+
     return tasks.stream()
         .filter(t -> t.getId() != null && t.getId() == id)
         .findFirst();
@@ -37,6 +40,7 @@ public class InMemoryTaskRepository implements TaskRepository {
 
   @Override
   public Optional<Task> update(long id, Task updatedTask) {
+
     for (int i = 0; i < tasks.size(); i++) {
       Task existing = tasks.get(i);
       if (existing.getId() != null && existing.getId() == id) {
@@ -54,6 +58,7 @@ public class InMemoryTaskRepository implements TaskRepository {
 
   @Override
   public boolean delete(long id) {
+
     return tasks.removeIf(t -> t.getId() != null && t.getId() == id);
   }
 }

@@ -18,12 +18,14 @@ public class TaskController {
   private final TaskService taskService;
 
   public TaskController(TaskService taskService) {
+
     this.taskService = taskService;
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public TaskResponse create(@Valid @RequestBody TaskCreateRequest request) {
+
     Task created = taskService.create(
         new Task(null, request.getTitle(), request.getDueDate(),
                  request.getEstimatedHours(), request.getDifficulty()));
@@ -32,17 +34,20 @@ public class TaskController {
 
   @GetMapping
   public List<TaskResponse> getAll() {
+
     return taskService.getAll().stream().map(this::toResponse).toList();
   }
 
   @GetMapping("/{id}")
   public TaskResponse getById(@PathVariable long id) {
+
     return taskService.getById(id)
         .map(this::toResponse)
         .orElseThrow(() -> new TaskNotFoundException(id));
   }
 
   private TaskResponse toResponse(Task task) {
+
     return new TaskResponse(task.getId(), task.getTitle(), task.getDueDate(),
                             task.getEstimatedHours(), task.getDifficulty());
   }
@@ -50,6 +55,7 @@ public class TaskController {
   @PutMapping("/{id}")
   public TaskResponse update(@PathVariable long id,
                              @Valid @RequestBody TaskUpdateRequest request) {
+
     Task updated =
         new Task(null, request.getTitle(), request.getDueDate(),
                  request.getEstimatedHours(), request.getDifficulty());
@@ -62,6 +68,7 @@ public class TaskController {
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable long id) {
+
     boolean deleted = taskService.delete(id);
     if (!deleted) {
       throw new TaskNotFoundException(id);

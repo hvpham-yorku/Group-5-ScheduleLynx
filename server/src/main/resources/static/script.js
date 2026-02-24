@@ -829,7 +829,7 @@ function initializeScheduleDisplay() {
     });
 
     document.getElementById('generateSchedule').addEventListener('click', generateSchedule);
-    document.getElementById('clearAll').addEventListener('click', clearAllTasks);
+    document.getElementById('clearAll').addEventListener('click', clearAllItems);
 }
 
 function updateWeekDisplay() {
@@ -1074,6 +1074,7 @@ function loadTasksFromStorage() {
 }
 
 async function clearAllTasks() {
+async function clearAllItems() {
 
     if (!(confirm("Are you sure you want to clear all tasks?\nThis cannot be undone."))) return;
 

@@ -18,13 +18,7 @@ public class InMemoryTaskRepository implements TaskRepository {
   public Task save(Task task) {
 
     long id = nextId.getAndIncrement();
-
-    Task stored =
-        new Task(id, task.getTitle(), task.getDueDate(),
-                 task.getEstimatedHours(), task.getDifficulty());
-
-    tasks.put(id, stored);
-    return stored;
+    return putInRepo(id, task);
   }
 
   @Override
@@ -43,6 +37,19 @@ public class InMemoryTaskRepository implements TaskRepository {
     }
 
     return Optional.empty();
+  }
+
+  private Task putInRepo(long id, Task data) {
+
+    var title    = data.getTitle();
+    var dueDate  = data.getDueDate();
+    var estHours = data.getEstimatedHours();
+    var diff     = data.getDifficulty();
+
+    var task = new Task(id, title, dueDate, estHours, diff);
+
+    tasks.put(id, task);
+    return task;
   }
 
   @Override

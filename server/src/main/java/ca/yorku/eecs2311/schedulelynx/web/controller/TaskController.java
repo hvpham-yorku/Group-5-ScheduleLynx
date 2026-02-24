@@ -25,11 +25,11 @@ public class TaskController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public TaskResponse create(@Valid @RequestBody TaskCreateRequest request) {
+  public TaskResponse create(@Valid @RequestBody TaskCreateRequest req) {
 
     Task created = service.create(
-        new Task(null, request.getTitle(), request.getDueDate(),
-                 request.getEstimatedHours(), request.getDifficulty()));
+        new Task(null, req.getTitle(), req.getDueDate(),
+                 req.getEstimatedHours(), req.getDifficulty()));
     return toResponse(created);
   }
 
@@ -55,11 +55,11 @@ public class TaskController {
 
   @PutMapping("/{id}")
   public TaskResponse update(@PathVariable long id,
-                             @Valid @RequestBody TaskUpdateRequest request) {
+                             @Valid @RequestBody TaskUpdateRequest req) {
 
     Task updated =
-        new Task(null, request.getTitle(), request.getDueDate(),
-                 request.getEstimatedHours(), request.getDifficulty());
+        new Task(null, req.getTitle(), req.getDueDate(),
+                 req.getEstimatedHours(), req.getDifficulty());
 
     return service.update(id, updated)
         .map(this::toResponse)

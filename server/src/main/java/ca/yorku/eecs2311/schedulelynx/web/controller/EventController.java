@@ -25,9 +25,9 @@ public class EventController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
 
-    public EventResponse create(@Valid @RequestBody EventRequest request) {
+    public EventResponse create(@Valid @RequestBody EventRequest req) {
 
-        var event = service.create(request);
+        var event = service.create(req);
         return toResponse(event);
     }
 

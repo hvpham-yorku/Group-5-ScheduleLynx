@@ -25,7 +25,7 @@ class EventServiceTest {
     var start = LocalTime.of(10, 0);
     var end   = LocalTime.of(11, 30);
 
-    var request = new EventRequest(title, day, start,end);
+    var request = new EventRequest(null, title, day, start, end);
     var event = service.create(request);
 
     assertNotNull(event.getId());
@@ -43,7 +43,7 @@ class EventServiceTest {
     var start = LocalTime.of(10, 0);
     var end   = LocalTime.of(11, 30);
 
-    var request = new EventRequest(title, day, start,end);
+    var request = new EventRequest(null, title, day, start, end);
 
     assertThrows(IllegalArgumentException.class, () -> service.create(request));
   }
@@ -58,15 +58,15 @@ class EventServiceTest {
     var start = LocalTime.of(10, 0);
     var end   = LocalTime.of(11, 30);
 
-    var request1 = new EventRequest(title, day, start,end);
+    var request1 = new EventRequest(null, title, day, start, end);
     var event = service.create(request1);
 
-    title = "Lab"; // LIKE THE DOG!? but I like cats
+    title = "Lab";
     day   = Weekday.TUESDAY;
     start = LocalTime.of(11, 0);
     end   = LocalTime.of(12, 0);
 
-    var request2 = new EventRequest(title, day, start,end);
+    var request2 = new EventRequest(null, title, day, start,end);
 
     assertThrows(IllegalArgumentException.class, () -> service.create(request2));
   }

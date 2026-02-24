@@ -22,21 +22,13 @@ public class InMemoryTaskRepository implements TaskRepository {
   }
 
   @Override
-  public Optional<Task> update(long id, Task updatedTask) {
+  public Optional<Task> update(Task data) {
 
+      var savedEvent = tasks.get(data.getId());
+      if (savedEvent == null) return Optional.empty();
 
-    Task existing = tasks.get(id);
-    if (existing.getId() != null && existing.getId() == id) {
-
-      Task stored = new Task(
-              id, updatedTask.getTitle(), updatedTask.getDueDate(),
-              updatedTask.getEstimatedHours(), updatedTask.getDifficulty());
-
-      tasks.put(id, stored);
-      return Optional.of(stored);
-    }
-
-    return Optional.empty();
+      var updatedEvent = putInRepo(data.getId(), data);
+      return Optional.of(updatedEvent);
   }
 
   private Task putInRepo(long id, Task data) {
@@ -59,7 +51,7 @@ public class InMemoryTaskRepository implements TaskRepository {
   }
 
   @Override
-  public Optional<Task> getById(long id) {
+  public Optional<Task> getTask(long id) {
 
     return Optional.ofNullable(tasks.get(id));
   }

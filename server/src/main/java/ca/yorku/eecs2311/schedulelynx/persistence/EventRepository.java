@@ -8,7 +8,7 @@ public interface EventRepository {
 
   Event save(Event data);
 
-  Optional<Event> update(long id, Event updated);
+  Optional<Event> update(Event data);
 
   List<Event> getAllEvents();
 

@@ -23,15 +23,12 @@ public class InMemoryEventRepository implements EventRepository {
     }
 
     @Override
-    public Optional<Event> update(long id, Event update) {
+    public Optional<Event> update(Event data) {
 
-        var savedEvent = events.get(id);
-
+        var savedEvent = events.get(data.getId());
         if (savedEvent == null) return Optional.empty();
-        if (savedEvent.getId() == id)
-            throw new RuntimeException("ID map key and event ID are different!");
 
-        var updatedEvent = putInRepo(id, update);
+        var updatedEvent = putInRepo(data.getId(), data);
         return Optional.of(updatedEvent);
     }
 

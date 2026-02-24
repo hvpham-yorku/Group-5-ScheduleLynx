@@ -2,7 +2,7 @@ package ca.yorku.eecs2311.schedulelynx.service;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.persistence.TaskRepository;
-import ca.yorku.eecs2311.schedulelynx.web.dto.TaskCreateRequest;
+import ca.yorku.eecs2311.schedulelynx.web.dto.TaskRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -18,12 +18,12 @@ public class TaskService {
     this.repo = repo;
   }
 
-  public Task create(TaskCreateRequest req) {
+  public Task create(TaskRequest req) {
 
-    var title   = req.getTitle();
-    var dueDate  = req.getDueDate();
-    var estHours = req.getEstimatedHours();
-    var diff     = req.getDifficulty();
+    var title    = req.title();
+    var dueDate  = req.dueDate();
+    var estHours = req.estimatedHours();
+    var diff     = req.difficulty();
 
     var data = new Task(null, title, dueDate, estHours, diff);
 
@@ -31,20 +31,28 @@ public class TaskService {
     return repo.save(data);
   }
 
+  public Optional<Task> update(TaskRequest req) {
+
+    var id       = req.id();
+    var title    = req.title();
+    var dueDate  = req.dueDate();
+    var estHours = req.estimatedHours();
+    var diff     = req.difficulty();
+
+    var data = new Task(id, title, dueDate, estHours, diff);
+
+    validate(data);
+    return repo.update(data);
+  }
+
   public Map<Long, Task> getAll() {
 
     return repo.getAll();
   }
 
-  public Optional<Task> getById(long id) {
+  public Optional<Task> getTask(long id) {
 
-    return repo.getById(id);
-  }
-
-  public Optional<Task> update(long id, Task task) {
-
-    validate(task);
-    return repo.update(id, task);
+    return repo.getTask(id);
   }
 
   public void deleteAll() {

@@ -31,6 +31,20 @@ public class EventService {
         return repo.save(data);
     }
 
+    public Optional<Event> update(EventRequest req) {
+
+        var id    = req.id();
+        var title = req.title();
+        var day   = req.day();
+        var start = req.start();
+        var end   = req.end();
+
+        var data = new Event(id, title, day, start, end);
+
+        validate(data);
+        return repo.update(data);
+    }
+
     public List<Event> getAll() {
 
         return repo.getAllEvents();
@@ -39,12 +53,6 @@ public class EventService {
     public Optional<Event> getEvent(long id) {
 
         return repo.getEvent(id);
-    }
-
-    public Optional<Event> update(long id, Event updated) {
-
-        validate(updated);
-        return repo.update(id, updated);
     }
 
     public void deleteAll() {

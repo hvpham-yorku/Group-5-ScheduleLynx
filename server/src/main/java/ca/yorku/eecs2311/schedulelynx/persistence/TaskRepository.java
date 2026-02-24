@@ -9,11 +9,11 @@ public interface TaskRepository {
 
   Task save(Task data);
 
-  Optional<Task> update(long id, Task updatedTask);
+  Optional<Task> update(Task data);
 
   Map<Long, Task> getAll();
 
-  Optional<Task> getById(long id);
+  Optional<Task> getTask(long id);
 
   void deleteAll();
 

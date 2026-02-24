@@ -10,43 +10,43 @@ import java.util.Optional;
 @Service
 public class TaskService {
 
-  private final TaskRepository taskRepository;
+  private final TaskRepository repo;
 
-  public TaskService(TaskRepository taskRepository) {
+  public TaskService(TaskRepository repo) {
 
-    this.taskRepository = taskRepository;
+    this.repo = repo;
   }
 
   public Task create(Task task) {
 
     validate(task);
-    return taskRepository.save(task);
+    return repo.save(task);
   }
 
   public Map<Long, Task> getAll() {
 
-    return taskRepository.getAll();
+    return repo.getAll();
   }
 
   public Optional<Task> getById(long id) {
 
-    return taskRepository.getById(id);
+    return repo.getById(id);
   }
 
   public Optional<Task> update(long id, Task task) {
 
     validate(task);
-    return taskRepository.update(id, task);
+    return repo.update(id, task);
   }
 
   public void deleteAll() {
 
-    taskRepository.deleteAll();
+    repo.deleteAll();
   }
 
   public boolean delete(long id) {
 
-    return taskRepository.delete(id);
+    return repo.delete(id);
   }
 
   private void validate(Task task) {

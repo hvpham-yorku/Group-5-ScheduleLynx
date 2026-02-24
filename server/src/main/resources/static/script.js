@@ -1073,7 +1073,7 @@ function loadTasksFromStorage() {
     }
 }
 
-async function clearAllTasks() {
+/** Deletes all items (tasks and events) from the server. Use with caution. */
 async function clearAllItems() {
 
     if (!(confirm("Are you sure you want to clear all tasks?\nThis cannot be undone."))) return;

@@ -2,12 +2,12 @@ package ca.yorku.eecs2311.schedulelynx.service;
 
 import ca.yorku.eecs2311.schedulelynx.domain.AvailabilityBlock;
 import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
-import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
 import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryAvailabilityRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryEventRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryTaskRepository;
 import ca.yorku.eecs2311.schedulelynx.web.dto.EventRequest;
+import ca.yorku.eecs2311.schedulelynx.web.dto.TaskRequest;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -37,12 +37,16 @@ class ScheduleServiceTest {
     var start = LocalTime.of(19, 0);
     var end   = LocalTime.of(20, 0);
 
-    var evReq = new EventRequest(title, day, start, end);
-
+    var evReq = new EventRequest(null, title, day, start, end);
     eventService.create(evReq);
 
-    taskService.create(new Task(null, "Study", LocalDate.of(2026, 2, 13), 2,
-                                Difficulty.MEDIUM));
+        title = "Study";
+    var dueDat = LocalDate.of(2026, 2, 13);
+    int estHours = 2;
+    var diff = Difficulty.MEDIUM;
+
+    var tkReq = new TaskRequest(null, title, dueDat, estHours, diff);
+    taskService.create(tkReq);
 
     ScheduleService.ScheduleResult result =
         scheduleService.generateWeeklyPlan(LocalDate.of(2026, 2, 9));
@@ -76,9 +80,13 @@ class ScheduleServiceTest {
     }
 
     // Task A: 4h due Tuesday -> but cap is 3h/day, so it must use Mon + Tue
-    taskService.create(new Task(null, "Task A",
-                                java.time.LocalDate.of(2026, 2, 3), 4,
-                                Difficulty.HIGH));
+    var title    = "Task A";
+    var dueDate  = LocalDate.of(2026, 2, 3);
+    var estHours = 4;
+    var diff     = Difficulty.HIGH;
+
+    var tkReq = new TaskRequest(null, title, dueDate, estHours, diff);
+    taskService.create(tkReq);
 
     // Generate schedule
     ScheduleService.ScheduleResult result =

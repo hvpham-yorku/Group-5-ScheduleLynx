@@ -57,7 +57,7 @@ public class ScheduleService {
 
     // Sort tasks
     List<Task> tasks =
-        taskService.getAll()
+        taskService.getAll().values()
             .stream()
             .sorted(Comparator.comparing(Task::getDueDate)
                         .thenComparing(

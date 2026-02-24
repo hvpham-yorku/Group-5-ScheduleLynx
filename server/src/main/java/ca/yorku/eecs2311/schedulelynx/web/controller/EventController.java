@@ -25,26 +25,18 @@ public class EventController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
 
-    public EventResponse create(@Valid @RequestBody EventRequest request) {
+    public EventResponse create(@Valid @RequestBody EventRequest req) {
 
-        var event = service.create(request);
+        var event = service.create(req);
         return toResponse(event);
     }
 
     @PutMapping("/{id}")
-    public EventResponse update(
-            @PathVariable long id,
-            @Valid @RequestBody EventRequest req)
+    public EventResponse update(@Valid @RequestBody EventRequest req)
     {
-        var title = req.title();
-        var day   = req.day();
-        var start = req.start();
-        var end   = req.end();
 
-        var updateData = new Event(null, title, day, start, end);
-
-        service.update(id, updateData);
-        return getEvent(id);
+        service.update(req);
+        return getEvent(req.id());
     }
 
     @GetMapping

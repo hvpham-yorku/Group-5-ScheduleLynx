@@ -6,9 +6,9 @@ import java.util.Optional;
 
 public interface EventRepository {
 
-  Event save(Event event);
+  Event save(Event data);
 
-  Optional<Event> update(long id, Event updated);
+  Optional<Event> update(Event data);
 
   List<Event> getAllEvents();
 

@@ -829,7 +829,7 @@ function initializeScheduleDisplay() {
     });
 
     document.getElementById('generateSchedule').addEventListener('click', generateSchedule);
-    document.getElementById('clearAll').addEventListener('click', clearAllTasks);
+    document.getElementById('clearAll').addEventListener('click', clearAllItems);
 }
 
 function updateWeekDisplay() {
@@ -1073,15 +1073,27 @@ function loadTasksFromStorage() {
     }
 }
 
-async function clearAllTasks() {
+/** Deletes all items (tasks and events) from the server. Use with caution. */
+async function clearAllItems() {
 
     if (!(confirm("Are you sure you want to clear all tasks?\nThis cannot be undone."))) return;
 
-    const request = "http://localhost:8080/api/tasks"
-    let response = await fetch(request, {method: 'DELETE',});
+    const taskRequest = "http://localhost:8080/api/tasks"
+    let restResponse = await fetch(taskRequest, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    console.log(restResponse);
 
-    console.log(response);
-    if (!response.ok) return;
+    const eventRequest = "http://localhost:8080/api/events"
+    let eventResponse = await fetch(eventRequest, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    console.log(eventRequest);
+
+    // TODO: separate concerns of clearing the frontend so if one fails the other is still cleared
+    if (!restResponse.ok || !eventResponse.ok) return;
 
     tasks = [];
     saveTasksToStorage();

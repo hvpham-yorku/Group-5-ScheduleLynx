@@ -11,63 +11,65 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EventServiceTest {
 
-  private EventService newService() {
-    return new EventService(new InMemoryEventRepository());
-  }
+    private EventService newService() {
 
-  @Test
-  void create_assignsId_andStoresEvent() {
+        return new EventService(new InMemoryEventRepository());
+    }
 
-    var service = newService();
+    @Test
+    void create_assignsId_andStoresEvent() {
 
-    var title = "Lecture";
-    var day   = Weekday.TUESDAY;
-    var start = LocalTime.of(10, 0);
-    var end   = LocalTime.of(11, 30);
+        var service = newService();
 
-    var request = new EventRequest(title, day, start,end);
-    var event = service.create(request);
+        var title = "Lecture";
+        var day   = Weekday.TUESDAY;
+        var start = LocalTime.of(10, 0);
+        var end   = LocalTime.of(11, 30);
 
-    assertNotNull(event.getId());
-    assertEquals(1L, event.getId());
-    assertEquals(1, service.getAll().size());
-  }
+        var request = new EventRequest(null, title, day, start, end);
+        var event   = service.create(request);
 
-  @Test
-  void create_rejectsEmptyTitle() {
+        assertNotNull(event.getId());
+        assertEquals(1L, event.getId());
+        assertEquals(1, service.getAll().size());
+    }
 
-    var service = newService();
+    @Test
+    void create_rejectsEmptyTitle() {
 
-    var title = "   ";
-    var day   = Weekday.TUESDAY;
-    var start = LocalTime.of(10, 0);
-    var end   = LocalTime.of(11, 30);
+        var service = newService();
 
-    var request = new EventRequest(title, day, start,end);
+        var title = "   ";
+        var day   = Weekday.TUESDAY;
+        var start = LocalTime.of(10, 0);
+        var end   = LocalTime.of(11, 30);
 
-    assertThrows(IllegalArgumentException.class, () -> service.create(request));
-  }
+        var request = new EventRequest(null, title, day, start, end);
 
-  @Test
-  void create_rejectsOverlapSameDay() {
+        assertThrows(IllegalArgumentException.class, () -> service.create(request));
+    }
 
-    var service = newService();
+    @Test
+    void create_rejectsOverlapSameDay() {
 
-    var title = "Lecture";
-    var day   = Weekday.TUESDAY;
-    var start = LocalTime.of(10, 0);
-    var end   = LocalTime.of(11, 30);
+        var service = newService();
 
-    var request1 = new EventRequest(title, day, start,end);
-    var event = service.create(request1);
+        var title = "Lecture";
+        var day   = Weekday.TUESDAY;
+        var start = LocalTime.of(10, 0);
+        var end   = LocalTime.of(11, 30);
 
-    title = "Lab"; // LIKE THE DOG!? but I like cats
-    day   = Weekday.TUESDAY;
-    start = LocalTime.of(11, 0);
-    end   = LocalTime.of(12, 0);
+        var request1 = new EventRequest(null, title, day, start, end);
+        service.create(request1);
 
-    var request2 = new EventRequest(title, day, start,end);
+        title = "Lab";
+        day = Weekday.TUESDAY;
+        start = LocalTime.of(11, 0);
+        end = LocalTime.of(12, 0);
 
-    assertThrows(IllegalArgumentException.class, () -> service.create(request2));
-  }
+        var request2 = new EventRequest(null, title, day, start, end);
+
+        assertThrows(IllegalArgumentException.class, () -> service.create(request2));
+    }
+
 }

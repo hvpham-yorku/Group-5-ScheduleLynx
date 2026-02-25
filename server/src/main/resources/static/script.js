@@ -13,7 +13,7 @@ let currentUser = null;
 
 
 // ============================
-// Value Getter Functions
+// Field Getter Functions
 // ============================
 
 /** Returns the element functioning as the title field.*/

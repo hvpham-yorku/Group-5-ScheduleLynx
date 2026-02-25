@@ -46,6 +46,10 @@ function getPendingCalendarItemEndTimeField() {
     return document.getElementById("endTime");
 }
 
+/** */
+function getPendingCalendarItemDescriptionField() {
+    return document.getElementById("description");
+}
 
 // ============================
 // Value Getter Functions
@@ -79,6 +83,11 @@ function getPendingCalendarItemStartTime() {
 /** */
 function getPendingCalendarItemEndTime() {
     return getPendingCalendarItemEndTimeField().value;
+}
+
+/** */
+function getPendingCalendarItemDescription() {
+    return getPendingCalendarItemDescriptionField().value.trim();
 }
 
 // ============================
@@ -568,19 +577,19 @@ async function addTask() {
         return;
     }
 
-    const title = getPendingCalendarItemTitle();
-    const type = getPendingCalendarItemType();
+    const title   = getPendingCalendarItemTitle();
+    const type    = getPendingCalendarItemType();
     const dueDate = getPendingCalendarItemDueDate();
 
     const estimatedHoursInput = getPendingCalendarItemEstimatedHoursField();
     const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;
 
-    const startTime = getPendingCalendarItemStartTime();
-    const endTime = getPendingCalendarItemEndTime();
-    const description = document.getElementById('description').value.trim();
-    const isRecurring = document.getElementById('isRecurring').checked;
+    const startTime      = getPendingCalendarItemStartTime();
+    const endTime        = getPendingCalendarItemEndTime();
+    const description    = getPendingCalendarItemDescription();
+    const isRecurring    = document.getElementById('isRecurring').checked;
     const recurrenceType = document.getElementById('recurrenceType').value;
-    const recurrenceEnd = document.getElementById('recurrenceEnd').value;
+    const recurrenceEnd  = document.getElementById('recurrenceEnd').value;
 
     // Basic validation (keeps backend errors from being your first feedback)
     if (!title || !type || !dueDate) {
@@ -848,7 +857,7 @@ function editSelectedTask() {
         getPendingCalendarItemEstimatedHoursField() .value = task.estimatedHours;
         getPendingCalendarItemStartTimeField()      .value = task.startTime || '';
         getPendingCalendarItemEndTimeField()        .value = task.endTime   || '';
-        document.getElementById('description').value = task.description;
+        getPendingCalendarItemDescriptionField()    .value = task.description;
         document.getElementById('isRecurring').checked = task.isRecurring;
         document.getElementById('recurrenceType').value = task.recurrenceType;
         document.getElementById('recurrenceEnd').value = task.recurrenceEnd || '';

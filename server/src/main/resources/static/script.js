@@ -36,6 +36,10 @@ function getPendingCalendarItemEstimatedHoursField() {
     return document.getElementById("estimatedHours")
 }
 
+function getPendingCalendarItemStartTimeField() {
+    return document.getElementById("startTime");
+}
+
 
 // ============================
 // Value Getter Functions
@@ -59,6 +63,11 @@ function getPendingCalendarItemDueDate() {
 /** */
 function getPendingCalendarItemEstimatedHours() {
     return getPendingCalendarItemEstimatedHoursField().value;
+}
+
+/** */
+function getPendingCalendarItemStartTime() {
+    return getPendingCalendarItemStartTimeField().value;
 }
 
 // ============================
@@ -548,7 +557,6 @@ async function addTask() {
         return;
     }
 
-    // TODO: These could be made into simple getters to reduce boilerplate code
     const title = getPendingCalendarItemTitle();
     const type = getPendingCalendarItemType();
     const dueDate = getPendingCalendarItemDueDate();
@@ -556,7 +564,7 @@ async function addTask() {
     const estimatedHoursInput = getPendingCalendarItemEstimatedHoursField();
     const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;
 
-    const startTime = document.getElementById('startTime').value;
+    const startTime = getPendingCalendarItemStartTime();
     const endTime = document.getElementById('endTime').value;
     const description = document.getElementById('description').value.trim();
     const isRecurring = document.getElementById('isRecurring').checked;
@@ -827,7 +835,7 @@ function editSelectedTask() {
         getPendingCalendarItemTypeField()           .value = task.type;
         getPendingCalendarItemDueDateField()        .value = task.dueDate;
         getPendingCalendarItemEstimatedHoursField() .value = task.estimatedHours;
-        document.getElementById('startTime').value = task.startTime || '';
+        getPendingCalendarItemStartTimeField()      .value = task.startTime || '';
         document.getElementById('endTime').value = task.endTime || '';
         document.getElementById('description').value = task.description;
         document.getElementById('isRecurring').checked = task.isRecurring;

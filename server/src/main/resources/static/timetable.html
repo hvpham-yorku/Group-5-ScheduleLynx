@@ -29,13 +29,13 @@
             <h2>Add / Edit Task</h2>
             <form id="taskForm" class="task-form">
                 <div class="form-group">
-                    <label for="pendCalndrItemTitle">Title</label>
-                    <input id="pendCalndrItemTitle" type="text" placeholder="e.g., EECS lab" required/>
+                    <label for="calItemTitle">Title</label>
+                    <input id="calItemTitle" name="title" type="text" placeholder="e.g., EECS lab" required/>
                 </div>
 
                 <div class="form-group">
                     <label for="taskType">Type</label>
-                    <select id="taskType">
+                    <select id="taskType" name="type">
                         <option value="task">Task</option>
                         <option value="event">Event</option>
                     </select>
@@ -43,37 +43,37 @@
 
                 <div class="form-group">
                     <label for="dueDate">Date (dueDate)</label>
-                    <input id="dueDate" type="date" required/>
+                    <input id="dueDate" name="dueDate" type="date" required/>
                 </div>
 
                 <div id="startTimeGroup" class="form-group" style="display:none;">
                     <label for="startTime">Start Time</label>
-                    <input id="startTime" type="time"/>
+                    <input id="startTime" name="startTime" type="time"/>
                 </div>
 
                 <div id="endTimeGroup" class="form-group" style="display:none;">
                     <label for="endTime">End Time</label>
-                    <input id="endTime" type="time"/>
+                    <input id="endTime" name="endTime" type="time"/>
                 </div>
 
                 <div id="estimatedHoursGroup" class="form-group">
                     <label for="estimatedHours">Estimated Hours</label>
-                    <input id="estimatedHours" type="number" min="0" step="0.5" value="1" required/>
+                    <input id="estimatedHours" name="estHours" type="number" min="0" step="0.5" value="1" required/>
                 </div>
 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea id="description" placeholder="Optional details..."></textarea>
+                    <textarea id="description" name="desc" placeholder="Optional details..."></textarea>
                 </div>
 
                 <div id="recurringGroup" class="form-group">
-                    <label><input id="isRecurring" type="checkbox"/> Recurring</label>
+                    <label><input id="isRecurring" name="isRecur" type="checkbox"/> Recurring</label>
                 </div>
 
                 <div id="recurrenceOptions" style="display:none;">
                     <div class="form-group">
                         <label for="recurrenceType">Recurrence</label>
-                        <select id="recurrenceType">
+                        <select id="recurrenceType" name="recurType">
                             <option value="daily">Daily</option>
                             <option value="weekly">Weekly</option>
                             <option value="biweekly">Biweekly</option>
@@ -81,18 +81,18 @@
                     </div>
 
                     <div id="daysOfWeekGroup" class="form-group days-checkbox" style="display:none;">
-                        <label><input type="checkbox" value="Mon"/> Mon</label>
-                        <label><input type="checkbox" value="Tue"/> Tue</label>
-                        <label><input type="checkbox" value="Wed"/> Wed</label>
-                        <label><input type="checkbox" value="Thu"/> Thu</label>
-                        <label><input type="checkbox" value="Fri"/> Fri</label>
-                        <label><input type="checkbox" value="Sat"/> Sat</label>
-                        <label><input type="checkbox" value="Sun"/> Sun</label>
+                        <label><input name="isMon" type="checkbox" value="Mon"/> Mon</label>
+                        <label><input name="isTue" type="checkbox" value="Tue"/> Tue</label>
+                        <label><input name="isWed" type="checkbox" value="Wed"/> Wed</label>
+                        <label><input name="isThu" type="checkbox" value="Thu"/> Thu</label>
+                        <label><input name="isFri" type="checkbox" value="Fri"/> Fri</label>
+                        <label><input name="isSat" type="checkbox" value="Sat"/> Sat</label>
+                        <label><input name="isSun" type="checkbox" value="Sun"/> Sun</label>
                     </div>
 
                     <div class="form-group">
                         <label for="recurrenceEnd">Recurrence End Date</label>
-                        <input id="recurrenceEnd" type="date"/>
+                        <input id="recurrenceEnd" name="recurEnd" type="date"/>
                     </div>
                 </div>
 

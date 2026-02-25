@@ -800,6 +800,7 @@ async function deleteTaskListener() {
 }
 
 function editSelectedTask() {
+
     const task = tasks.find(t => t.id === selectedTaskId);
     if (task) {
         // Populate form with task data

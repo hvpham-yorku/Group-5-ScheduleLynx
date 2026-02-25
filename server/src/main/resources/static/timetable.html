@@ -7,153 +7,157 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="planner-page">
-    <!-- Navigation Bar (kept visible so user can exit planner) -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <h1>ScheduleLynx</h1>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="home.html" class="nav-link">Home</a></li>
-                <li><a href="index.html" class="nav-link">Dashboard</a></li>
-                <li><a href="timetable.html" class="nav-link active">Planner</a></li>
-                <li><a href="features.html" class="nav-link">Features</a></li>
-                <li><a href="#" onclick="logout()" class="nav-link logout-link">Logout</a></li>
-            </ul>
+<!-- Navigation Bar (kept visible so user can exit planner) -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <h1>ScheduleLynx</h1>
         </div>
-    </nav>
+        <ul class="nav-menu">
+            <li><a href="home.html" class="nav-link">Home</a></li>
+            <li><a href="index.html" class="nav-link">Dashboard</a></li>
+            <li><a href="timetable.html" class="nav-link active">Planner</a></li>
+            <li><a href="features.html" class="nav-link">Features</a></li>
+            <li><a href="#" onclick="logout()" class="nav-link logout-link">Logout</a></li>
+        </ul>
+    </div>
+</nav>
 
-    <div class="planner-container container">
-        <aside class="sidebar">
-            <section class="panel">
-                <h2>Add / Edit Task</h2>
-                <form id="taskForm" class="task-form">
-                    <div class="form-group">
-                        <label for="pendCalndrItemTitle">Title</label>
-                        <input id="pendCalndrItemTitle" type="text" placeholder="e.g., EECS lab" required />
-                    </div>
+<div class="planner-container container">
+    <aside class="sidebar">
+        <section class="panel">
+            <h2>Add / Edit Task</h2>
+            <form id="taskForm" class="task-form">
+                <div class="form-group">
+                    <label for="pendCalndrItemTitle">Title</label>
+                    <input id="pendCalndrItemTitle" type="text" placeholder="e.g., EECS lab" required/>
+                </div>
 
+                <div class="form-group">
+                    <label for="taskType">Type</label>
+                    <select id="taskType">
+                        <option value="task">Task</option>
+                        <option value="event">Event</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="dueDate">Date (dueDate)</label>
+                    <input id="dueDate" type="date" required/>
+                </div>
+
+                <div id="startTimeGroup" class="form-group" style="display:none;">
+                    <label for="startTime">Start Time</label>
+                    <input id="startTime" type="time"/>
+                </div>
+
+                <div id="endTimeGroup" class="form-group" style="display:none;">
+                    <label for="endTime">End Time</label>
+                    <input id="endTime" type="time"/>
+                </div>
+
+                <div id="estimatedHoursGroup" class="form-group">
+                    <label for="estimatedHours">Estimated Hours</label>
+                    <input id="estimatedHours" type="number" min="0" step="0.5" value="1" required/>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Optional details..."></textarea>
+                </div>
+
+                <div id="recurringGroup" class="form-group">
+                    <label><input id="isRecurring" type="checkbox"/> Recurring</label>
+                </div>
+
+                <div id="recurrenceOptions" style="display:none;">
                     <div class="form-group">
-                        <label for="taskType">Type</label>
-                        <select id="taskType">
-                            <option value="task">Task</option>
-                            <option value="event">Event</option>
+                        <label for="recurrenceType">Recurrence</label>
+                        <select id="recurrenceType">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="biweekly">Biweekly</option>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="dueDate">Date (dueDate)</label>
-                        <input id="dueDate" type="date" required />
-                    </div>
-
-                    <div id="startTimeGroup" class="form-group" style="display:none;">
-                        <label for="startTime">Start Time</label>
-                        <input id="startTime" type="time" />
-                    </div>
-
-                    <div id="endTimeGroup" class="form-group" style="display:none;">
-                        <label for="endTime">End Time</label>
-                        <input id="endTime" type="time" />
-                    </div>
-
-                    <div id="estimatedHoursGroup" class="form-group">
-                        <label for="estimatedHours">Estimated Hours</label>
-                        <input id="estimatedHours" type="number" min="0" step="0.5" value="1" required />
+                    <div id="daysOfWeekGroup" class="form-group days-checkbox" style="display:none;">
+                        <label><input type="checkbox" value="Mon"/> Mon</label>
+                        <label><input type="checkbox" value="Tue"/> Tue</label>
+                        <label><input type="checkbox" value="Wed"/> Wed</label>
+                        <label><input type="checkbox" value="Thu"/> Thu</label>
+                        <label><input type="checkbox" value="Fri"/> Fri</label>
+                        <label><input type="checkbox" value="Sat"/> Sat</label>
+                        <label><input type="checkbox" value="Sun"/> Sun</label>
                     </div>
 
                     <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" placeholder="Optional details..."></textarea>
+                        <label for="recurrenceEnd">Recurrence End Date</label>
+                        <input id="recurrenceEnd" type="date"/>
                     </div>
-
-                    <div id="recurringGroup" class="form-group">
-                        <label><input id="isRecurring" type="checkbox" /> Recurring</label>
-                    </div>
-
-                    <div id="recurrenceOptions" style="display:none;">
-                        <div class="form-group">
-                            <label for="recurrenceType">Recurrence</label>
-                            <select id="recurrenceType">
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="biweekly">Biweekly</option>
-                            </select>
-                        </div>
-
-                        <div id="daysOfWeekGroup" class="form-group days-checkbox" style="display:none;">
-                            <label><input type="checkbox" value="Mon" /> Mon</label>
-                            <label><input type="checkbox" value="Tue" /> Tue</label>
-                            <label><input type="checkbox" value="Wed" /> Wed</label>
-                            <label><input type="checkbox" value="Thu" /> Thu</label>
-                            <label><input type="checkbox" value="Fri" /> Fri</label>
-                            <label><input type="checkbox" value="Sat" /> Sat</label>
-                            <label><input type="checkbox" value="Sun" /> Sun</label>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="recurrenceEnd">Recurrence End Date</label>
-                            <input id="recurrenceEnd" type="date" />
-                        </div>
-                    </div>
-
-                    <div class="form-buttons">
-                        <button class="btn-primary" type="submit">Save Task</button>
-                        <button class="btn-secondary" id="clearForm" type="button" onclick="document.getElementById('taskForm').reset(); document.getElementById('recurrenceOptions').style.display='none'; document.getElementById('startTimeGroup').style.display='none'; document.getElementById('endTimeGroup').style.display='none';">Reset</button>
-                    </div>
-                </form>
-            </section>
-        </aside>
-
-        <main class="main-content">
-            <div class="controls">
-                <div class="control-buttons">
-                    <button class="btn-nav" id="prevWeek">◀ Prev</button>
-                    <div class="week-display" id="weekDisplay">Week</div>
-                    <button class="btn-nav" id="nextWeek">Next ▶</button>
                 </div>
-                <div class="control-actions">
-                    <button class="btn-primary" id="generateSchedule" disabled>Generate Schedule</button>
-                    <button class="btn-danger" id="clearAll">Clear All</button>
+
+                <div class="form-buttons">
+                    <button class="btn-primary" type="submit">Save Task</button>
+                    <button class="btn-secondary" id="clearForm" type="button"
+                            onclick="document.getElementById('taskForm').reset(); document.getElementById('recurrenceOptions').style.display='none'; document.getElementById('startTimeGroup').style.display='none'; document.getElementById('endTimeGroup').style.display='none';">
+                        Reset
+                    </button>
                 </div>
+            </form>
+        </section>
+    </aside>
+
+    <main class="main-content">
+        <div class="controls">
+            <div class="control-buttons">
+                <button class="btn-nav" id="prevWeek">◀ Prev</button>
+                <div class="week-display" id="weekDisplay">Week</div>
+                <button class="btn-nav" id="nextWeek">Next ▶</button>
             </div>
-
-            <section class="tasks-panel">
-                <h3>Your Tasks</h3>
-                <div id="tasksList" class="tasks-list"></div>
-            </section>
-
-            <section class="schedule-section">
-                <h3>This Week</h3>
-                <div id="scheduleGrid" class="schedule-grid"></div>
-            </section>
-
-            <section class="timeline-section">
-                <h3>Generated Timeline</h3>
-                <div id="timeline"> <p class="empty-state">Tasks will appear here once you add them and generate the schedule.</p></div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Modal for task details -->
-    <div id="taskModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div id="modalBody"></div>
-            <div class="modal-actions">
-                <button id="editTaskBtn" class="btn-primary">Edit</button>
-                <button id="deleteTaskBtn" class="btn-danger">Delete</button>
-                <button id="closeModalBtn" class="btn-secondary">Close</button>
+            <div class="control-actions">
+                <button class="btn-primary" id="generateSchedule" disabled>Generate Schedule</button>
+                <button class="btn-danger" id="clearAll">Clear All</button>
             </div>
         </div>
-    </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 ScheduleLynx. Your smart planner in sync.</p>
+        <section class="tasks-panel">
+            <h3>Your Tasks</h3>
+            <div id="tasksList" class="tasks-list"></div>
+        </section>
+
+        <section class="schedule-section">
+            <h3>This Week</h3>
+            <div id="scheduleGrid" class="schedule-grid"></div>
+        </section>
+
+        <section class="timeline-section">
+            <h3>Generated Timeline</h3>
+            <div id="timeline"><p class="empty-state">Tasks will appear here once you add them and generate the
+                schedule.</p></div>
+        </section>
+    </main>
+</div>
+
+<!-- Modal for task details -->
+<div id="taskModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div id="modalBody"></div>
+        <div class="modal-actions">
+            <button id="editTaskBtn" class="btn-primary">Edit</button>
+            <button id="deleteTaskBtn" class="btn-danger">Delete</button>
+            <button id="closeModalBtn" class="btn-secondary">Close</button>
         </div>
-    </footer>
-    
-    <script src="script.js"></script>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2026 ScheduleLynx. Your smart planner in sync.</p>
+    </div>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>

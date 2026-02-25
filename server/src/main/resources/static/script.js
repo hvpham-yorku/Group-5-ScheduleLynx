@@ -16,9 +16,14 @@ let currentUser = null;
 // Value Getter Functions
 // ============================
 
-/** Returns the element functioning as the title field */
+/** Returns the element functioning as the title field.*/
 function getPendingCalendarItemTitleField() {
     return document.getElementById("pendCalndrItemTitle");
+}
+
+/** */
+function getPendingCalendarItemTypeField() {
+    return document.getElementById("taskType");
 }
 
 
@@ -26,10 +31,14 @@ function getPendingCalendarItemTitleField() {
 // Value Getter Functions
 // ============================
 
-/** Gets the title text currently entered into the UI for the pending calendar-item.
- *  @return String */
+/** Gets the title text currently entered into the UI for the pending calendar-item.*/
 function getPendingCalendarItemTitle() {
     return getPendingCalendarItemTitleField().value.trim();
+}
+
+/** */
+function getPendingCalendarItemType() {
+    return getPendingCalendarItemTypeField().value;
 }
 
 
@@ -445,7 +454,7 @@ function updateTaskBreakdown() {
 
 function initializeFormHandlers() {
     const taskForm = document.getElementById('taskForm');
-    const taskTypeSelect = document.getElementById('taskType');
+    const taskTypeSelect = getPendingCalendarItemTypeField();
     const isRecurringCheckbox = document.getElementById('isRecurring');
     const recurrenceTypeSelect = document.getElementById('recurrenceType');
 
@@ -522,7 +531,7 @@ async function addTask() {
 
     // TODO: These could be made into simple getters to reduce boilerplate code
     const title = getPendingCalendarItemTitle();
-    const type = document.getElementById('taskType').value;
+    const type = getPendingCalendarItemType();
     const dueDate = document.getElementById('dueDate').value;
 
     const estimatedHoursInput = document.getElementById('estimatedHours');
@@ -795,7 +804,7 @@ function editSelectedTask() {
     if (task) {
         // Populate form with task data
         getPendingCalendarItemTitleField().value = task.title;
-        document.getElementById('taskType').value = task.type;
+        getPendingCalendarItemTypeField() .value = task.type;
         document.getElementById('dueDate').value = task.dueDate;
         document.getElementById('estimatedHours').value = task.estimatedHours;
         document.getElementById('startTime').value = task.startTime || '';

@@ -31,6 +31,11 @@ function getPendingCalendarItemDueDateField() {
     return document.getElementById("dueDate");
 }
 
+/** */
+function getPendingCalendarItemEstimatedHoursField() {
+    return document.getElementById("estimatedHours")
+}
+
 
 // ============================
 // Value Getter Functions
@@ -49,6 +54,11 @@ function getPendingCalendarItemType() {
 /** */
 function getPendingCalendarItemDueDate() {
     return getPendingCalendarItemDueDateField().value;
+}
+
+/** */
+function getPendingCalendarItemEstimatedHours() {
+    return getPendingCalendarItemEstimatedHoursField().value;
 }
 
 // ============================
@@ -543,7 +553,7 @@ async function addTask() {
     const type = getPendingCalendarItemType();
     const dueDate = getPendingCalendarItemDueDate();
 
-    const estimatedHoursInput = document.getElementById('estimatedHours');
+    const estimatedHoursInput = getPendingCalendarItemEstimatedHoursField();
     const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;
 
     const startTime = document.getElementById('startTime').value;
@@ -813,10 +823,10 @@ function editSelectedTask() {
     const task = tasks.find(t => t.id === selectedTaskId);
     if (task) {
         // Populate the form with task data
-        getPendingCalendarItemTitleField()  .value = task.title;
-        getPendingCalendarItemTypeField()   .value = task.type;
-        getPendingCalendarItemDueDateField().value = task.dueDate;
-        document.getElementById('estimatedHours').value = task.estimatedHours;
+        getPendingCalendarItemTitleField()          .value = task.title;
+        getPendingCalendarItemTypeField()           .value = task.type;
+        getPendingCalendarItemDueDateField()        .value = task.dueDate;
+        getPendingCalendarItemEstimatedHoursField() .value = task.estimatedHours;
         document.getElementById('startTime').value = task.startTime || '';
         document.getElementById('endTime').value = task.endTime || '';
         document.getElementById('description').value = task.description;

@@ -794,7 +794,7 @@ function editSelectedTask() {
     const task = tasks.find(t => t.id === selectedTaskId);
     if (task) {
         // Populate form with task data
-        document.getElementById('pendCalndrItemTitle').value = task.title;
+        getPendingCalendarItemTitleField().value = task.title;
         document.getElementById('taskType').value = task.type;
         document.getElementById('dueDate').value = task.dueDate;
         document.getElementById('estimatedHours').value = task.estimatedHours;
@@ -825,7 +825,7 @@ function editSelectedTask() {
         // Delete old task and scroll to form
         tasks = tasks.filter(t => t.id !== selectedTaskId);
         document.getElementById('taskModal').classList.remove('active');
-        document.getElementById('pendCalndrItemTitle').focus();
+        getPendingCalendarItemTitleField().focus();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }

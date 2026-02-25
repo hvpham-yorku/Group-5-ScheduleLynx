@@ -32,6 +32,7 @@ function getPendingCalendarItemTitle() {
     return getPendingCalendarItemTitleField().value.trim();
 }
 
+
 // ============================
 // AUTH FUNCTIONS
 // ============================

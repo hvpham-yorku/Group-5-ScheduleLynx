@@ -26,6 +26,11 @@ function getPendingCalendarItemTypeField() {
     return document.getElementById("taskType");
 }
 
+/** */
+function getPendingCalendarItemDueDateField() {
+    return document.getElementById("dueDate");
+}
+
 
 // ============================
 // Value Getter Functions
@@ -41,6 +46,10 @@ function getPendingCalendarItemType() {
     return getPendingCalendarItemTypeField().value;
 }
 
+/** */
+function getPendingCalendarItemDueDate() {
+    return getPendingCalendarItemDueDateField().value;
+}
 
 // ============================
 // AUTH FUNCTIONS
@@ -532,7 +541,7 @@ async function addTask() {
     // TODO: These could be made into simple getters to reduce boilerplate code
     const title = getPendingCalendarItemTitle();
     const type = getPendingCalendarItemType();
-    const dueDate = document.getElementById('dueDate').value;
+    const dueDate = getPendingCalendarItemDueDate();
 
     const estimatedHoursInput = document.getElementById('estimatedHours');
     const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;
@@ -803,10 +812,10 @@ function editSelectedTask() {
 
     const task = tasks.find(t => t.id === selectedTaskId);
     if (task) {
-        // Populate form with task data
-        getPendingCalendarItemTitleField().value = task.title;
-        getPendingCalendarItemTypeField() .value = task.type;
-        document.getElementById('dueDate').value = task.dueDate;
+        // Populate the form with task data
+        getPendingCalendarItemTitleField()  .value = task.title;
+        getPendingCalendarItemTypeField()   .value = task.type;
+        getPendingCalendarItemDueDateField().value = task.dueDate;
         document.getElementById('estimatedHours').value = task.estimatedHours;
         document.getElementById('startTime').value = task.startTime || '';
         document.getElementById('endTime').value = task.endTime || '';

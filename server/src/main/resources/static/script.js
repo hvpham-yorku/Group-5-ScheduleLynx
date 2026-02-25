@@ -36,8 +36,14 @@ function getPendingCalendarItemEstimatedHoursField() {
     return document.getElementById("estimatedHours")
 }
 
+/** */
 function getPendingCalendarItemStartTimeField() {
     return document.getElementById("startTime");
+}
+
+/** */
+function getPendingCalendarItemEndTimeField() {
+    return document.getElementById("endTime");
 }
 
 
@@ -68,6 +74,11 @@ function getPendingCalendarItemEstimatedHours() {
 /** */
 function getPendingCalendarItemStartTime() {
     return getPendingCalendarItemStartTimeField().value;
+}
+
+/** */
+function getPendingCalendarItemEndTime() {
+    return getPendingCalendarItemEndTimeField().value;
 }
 
 // ============================
@@ -565,7 +576,7 @@ async function addTask() {
     const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;
 
     const startTime = getPendingCalendarItemStartTime();
-    const endTime = document.getElementById('endTime').value;
+    const endTime = getPendingCalendarItemEndTime();
     const description = document.getElementById('description').value.trim();
     const isRecurring = document.getElementById('isRecurring').checked;
     const recurrenceType = document.getElementById('recurrenceType').value;
@@ -836,7 +847,7 @@ function editSelectedTask() {
         getPendingCalendarItemDueDateField()        .value = task.dueDate;
         getPendingCalendarItemEstimatedHoursField() .value = task.estimatedHours;
         getPendingCalendarItemStartTimeField()      .value = task.startTime || '';
-        document.getElementById('endTime').value = task.endTime || '';
+        getPendingCalendarItemEndTimeField()        .value = task.endTime   || '';
         document.getElementById('description').value = task.description;
         document.getElementById('isRecurring').checked = task.isRecurring;
         document.getElementById('recurrenceType').value = task.recurrenceType;

@@ -16,22 +16,19 @@ public class InMemoryEventRepository implements EventRepository {
     private final AtomicLong nextId = new AtomicLong(1);
 
     @Override
-    public Event save(Event event) {
+    public Event save(Event data) {
 
         long id = nextId.getAndIncrement();
-        return putInRepo(id, event);
+        return putInRepo(id, data);
     }
 
     @Override
-    public Optional<Event> update(long id, Event update) {
+    public Optional<Event> update(Event data) {
 
-        var savedEvent = events.get(id);
-
+        var savedEvent = events.get(data.getId());
         if (savedEvent == null) return Optional.empty();
-        if (savedEvent.getId() == id)
-            throw new RuntimeException("ID map key and event ID are different!");
 
-        var updatedEvent = putInRepo(id, update);
+        var updatedEvent = putInRepo(data.getId(), data);
         return Optional.of(updatedEvent);
     }
 
@@ -55,9 +52,15 @@ public class InMemoryEventRepository implements EventRepository {
     }
 
     @Override
-    public Optional<Event> getEventByID(long id) {
+    public Optional<Event> getEvent(long id) {
 
         return Optional.ofNullable(events.get(id));
+    }
+
+    @Override
+    public void deleteAll() {
+
+        events.clear();
     }
 
     @Override

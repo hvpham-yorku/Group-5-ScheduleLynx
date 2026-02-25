@@ -2,6 +2,7 @@ package ca.yorku.eecs2311.schedulelynx.web.controller;
 
 import ca.yorku.eecs2311.schedulelynx.domain.AvailabilityBlock;
 import ca.yorku.eecs2311.schedulelynx.service.AvailabilityService;
+import ca.yorku.eecs2311.schedulelynx.web.controller.errors.AvailabilityNotFoundException;
 import ca.yorku.eecs2311.schedulelynx.web.dto.AvailabilityRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.AvailabilityResponse;
 import jakarta.validation.Valid;

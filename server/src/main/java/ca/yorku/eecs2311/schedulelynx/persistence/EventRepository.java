@@ -6,13 +6,15 @@ import java.util.Optional;
 
 public interface EventRepository {
 
-  Event save(Event event);
+  Event save(Event data);
+
+  Optional<Event> update(Event data);
 
   List<Event> getAllEvents();
 
-  Optional<Event> getEventByID(long id);
+  Optional<Event> getEvent(long id);
 
-  Optional<Event> update(long id, Event updated);
+  void deleteAll();
 
   boolean delete(long id);
 }

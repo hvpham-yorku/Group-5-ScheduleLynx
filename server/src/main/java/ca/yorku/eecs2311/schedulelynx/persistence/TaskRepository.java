@@ -1,18 +1,21 @@
 package ca.yorku.eecs2311.schedulelynx.persistence;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
-import java.util.List;
+
+import java.util.Map;
 import java.util.Optional;
 
 public interface TaskRepository {
 
-  Task save(Task task);
+  Task save(Task data);
 
-  List<Task> getAll();
+  Optional<Task> update(Task data);
 
-  Optional<Task> getById(long id);
+  Map<Long, Task> getAll();
 
-  Optional<Task> update(long id, Task updatedTask);
+  Optional<Task> getTask(long id);
+
+  void deleteAll();
 
   boolean delete(long id);
 

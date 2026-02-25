@@ -20,10 +20,29 @@ public class EventService {
 
     public Event create(EventRequest req) {
 
-        var event = new Event(null, req.title(), req.day(),req.start(), req.end());
+        var title = req.title();
+        var day   = req.day();
+        var start = req.start();
+        var end   = req.end();
 
-        validate(event);
-        return repo.save(event);
+        var data = new Event(null, title, day, start, end);
+
+        validate(data);
+        return repo.save(data);
+    }
+
+    public Optional<Event> update(EventRequest req) {
+
+        var id    = req.id();
+        var title = req.title();
+        var day   = req.day();
+        var start = req.start();
+        var end   = req.end();
+
+        var data = new Event(id, title, day, start, end);
+
+        validate(data);
+        return repo.update(data);
     }
 
     public List<Event> getAll() {
@@ -31,15 +50,14 @@ public class EventService {
         return repo.getAllEvents();
     }
 
-    public Optional<Event> getById(long id) {
+    public Optional<Event> getEvent(long id) {
 
-        return repo.getEventByID(id);
+        return repo.getEvent(id);
     }
 
-    public Optional<Event> update(long id, Event updated) {
+    public void deleteAll() {
 
-        validate(updated);
-        return repo.update(id, updated);
+        repo.deleteAll();
     }
 
     public boolean delete(long id) {

@@ -2,12 +2,14 @@ package ca.yorku.eecs2311.schedulelynx.web.controller;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Event;
 import ca.yorku.eecs2311.schedulelynx.service.EventService;
+import ca.yorku.eecs2311.schedulelynx.web.controller.errors.EventNotFoundException;
 import ca.yorku.eecs2311.schedulelynx.web.dto.EventRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.EventResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,38 +25,43 @@ public class EventController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
 
-    public EventResponse create(@Valid @RequestBody EventRequest request) {
+    public EventResponse create(@Valid @RequestBody EventRequest req) {
 
-        var event = service.create(request);
+        var event = service.create(req);
         return toResponse(event);
+    }
+
+    @PutMapping("/{id}")
+    public EventResponse update(@Valid @RequestBody EventRequest req)
+    {
+
+        service.update(req);
+        return getEvent(req.id());
     }
 
     @GetMapping
     public List<EventResponse> getAll() {
 
-        return service.getAll().stream().map(this::toResponse).toList();
+        var eventResList = new ArrayList<EventResponse>();
+        for (var event : service.getAll())
+            eventResList.add(toResponse(event));
+
+        return eventResList;
     }
 
     @GetMapping("/{id}")
-    public EventResponse getById(@PathVariable long id) {
+    public EventResponse getEvent(@PathVariable long id) {
 
-        return service.getById(id)
-                .map(this::toResponse)
-                .orElseThrow(() -> new EventNotFoundException(id));
+        var event = service.getEvent(id);
+        if (event.isEmpty()) throw new EventNotFoundException(id);
+        return toResponse(event.get());
     }
 
-    @PutMapping("/{id}")
-    public EventResponse update(
-            @PathVariable long id,
-            @Valid @RequestBody EventRequest request)
-    {
-        Event updated =
-                new Event(null, request.title(), request.day(),
-                        request.start(), request.end());
+    @DeleteMapping()
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAll() {
 
-        return service.update(id, updated)
-                .map(this::toResponse)
-                .orElseThrow(() -> new EventNotFoundException(id));
+        service.deleteAll();
     }
 
     @DeleteMapping("/{id}")

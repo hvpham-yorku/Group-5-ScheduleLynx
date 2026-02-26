@@ -167,7 +167,7 @@
 
     // Calendar item form submission listener
     const calendarItemForm = document.getElementById("calItemForm");
-    calendarItemForm.addEventListener('submit', (e) => {
+    calendarItemForm.addEventListener("submit", (e) => {
 
         const data = new FormData(calendarItemForm);
         const dataObject = Object.fromEntries(data);
@@ -175,26 +175,27 @@
 
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('taskModal');
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const modal = document.getElementById("taskModal");
 
         if (modal) {
-            const closeBtn = document.querySelector('.close-modal');
-            const closeModalBtn = document.getElementById('closeModalBtn');
-            const deleteTaskBtn = document.getElementById('deleteTaskBtn');
-            const editTaskBtn = document.getElementById('editTaskBtn');
+            const closeBtn = document.querySelector(".close-modal");
+            const closeModalBtn = document.getElementById("closeModalBtn");
+            const deleteTaskBtn = document.getElementById("deleteTaskBtn");
+            const editTaskBtn = document.getElementById("editTaskBtn");
 
-            closeBtn.addEventListener('click', () => modal.classList.remove('active'));
-            closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
+            closeBtn.addEventListener("click", () => modal.classList.remove("active"));
+            closeModalBtn.addEventListener("click", () => modal.classList.remove("active"));
 
-            window.addEventListener('click', (e) => {
+            window.addEventListener("click", (e) => {
                 if (e.target === modal) {
-                    modal.classList.remove('active');
+                    modal.classList.remove("active");
                 }
             });
 
-            deleteTaskBtn.addEventListener('click', deleteTaskListener);
-            editTaskBtn.addEventListener('click', editSelectedTask);
+            deleteTaskBtn.addEventListener("click", deleteTaskListener);
+            editTaskBtn.addEventListener("click", editSelectedTask);
         }
     });
 

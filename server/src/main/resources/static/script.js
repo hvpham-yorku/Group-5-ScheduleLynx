@@ -669,7 +669,7 @@ function viewTaskDetails(taskId) {
 // MODAL HANDLING
 // ============================
 
-async function deleteTaskListener() {
+async function requestDeleteTask() {
 
     if (!selectedTaskId) return;
 

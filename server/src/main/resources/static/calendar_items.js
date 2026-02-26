@@ -1,4 +1,4 @@
-
+const baseURL = "http://localhost:8080";
 
 /** the date should be in the format of "YYYY-MM-DD."
  *  @return the day of the week's full name in all caps. */

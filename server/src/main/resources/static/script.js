@@ -278,6 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeScheduleDisplay();
         loadDataFromServer();
     }
+    loadDataFromServer();
 });
 
 // Initialize login form handlers

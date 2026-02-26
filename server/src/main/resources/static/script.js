@@ -102,7 +102,7 @@ function getPendingCalendarItemIsRecurring() {
 }
 
 // ============================
-// AUTH FUNCTIONS
+// Authentication Functions
 // ============================
 
 // Check if user is logged in

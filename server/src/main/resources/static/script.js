@@ -18,7 +18,7 @@ let currentUser = null;
 
 /** Returns the element functioning as the title field.*/
 function getPendingCalendarItemTitleField() {
-    return document.getElementById("pendCalndrItemTitle");
+    return document.getElementById("calItemTitle");
 }
 
 /** */

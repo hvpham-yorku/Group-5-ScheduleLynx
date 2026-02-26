@@ -978,26 +978,17 @@ function loadTasksFromStorage() {
 
 /** Deletes all items (tasks and events) from the server. Use with caution. */
 async function clearAllItems() {
-
     if (!(confirm("Are you sure you want to clear all tasks?\nThis cannot be undone."))) return;
 
-    const taskRequest = "http://localhost:8080/api/tasks"
-    let restResponse = await fetch(taskRequest, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-    });
-    console.log(restResponse);
+    // Call our clean API function
+    const success = await requestDeleteAll();
 
-    const eventRequest = "http://localhost:8080/api/events"
-    let eventResponse = await fetch(eventRequest, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-    });
-    console.log(eventRequest);
+    if (!success) {
+        alert("Failed to clear items from the server.");
+        return;
+    }
 
-    // TODO: separate concerns of clearing the frontend so if one fails the other is still cleared
-    if (!restResponse.ok || !eventResponse.ok) return;
-
+    // If successful, update the UI
     tasks = [];
     saveTasksToStorage();
     updateTasksDisplay();

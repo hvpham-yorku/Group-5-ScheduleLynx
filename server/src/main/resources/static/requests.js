@@ -104,35 +104,77 @@ async function postCalendarItem(dataObject) {
 
 export async function requestDeleteTask() {
 
-    // if (!selectedTaskId) return;
-    //
-    // const item = tasks.find(t => t.id === selectedTaskId);
-    // if (!item) return;
-    //
-    // if (!confirm("Are you sure you want to delete this task?")) return;
-    //
-    // let response;
-    // if (item.type === "event") {
-    //
-    //     const eventID = selectedTaskId;
-    //     const request = "http://localhost:8080/api/events/" + eventID;
-    //     response = await fetch(request, {method: 'DELETE',});
-    //
-    // } else if (item.type === "task") {
-    //
-    //     const taskID = selectedTaskId;
-    //     const request = "http://localhost:8080/api/tasks/" + taskID;
-    //     response = await fetch(request, {method: 'DELETE',});
-    //
-    // }
-    //
-    // console.log(response);
-    // if(!response.ok) return;
-    //
-    // tasks = tasks.filter(t => t.id !== selectedTaskId);
-    // saveTasksToStorage();
-    // updateTasksDisplay();
-    // renderScheduleGrid();
-    // refreshDashboardIfVisible();
-    // document.getElementById("taskModal").classList.remove("active");
+    if (!selectedTaskId) return;
+
+    const item = tasks.find(t => t.id === selectedTaskId);
+    if (!item) return;
+
+    if (!confirm("Are you sure you want to delete this task?")) return;
+
+    let response;
+    if (item.type === "event") {
+
+        const eventID = selectedTaskId;
+        const request = "http://localhost:8080/api/events/" + eventID;
+        response = await fetch(request, {method: 'DELETE',});
+
+    } else if (item.type === "task") {
+
+        const taskID = selectedTaskId;
+        const request = "http://localhost:8080/api/tasks/" + taskID;
+        response = await fetch(request, {method: 'DELETE',});
+
+    }
+
+    console.log(response);
+    return response.ok;
+}
+
+export async function requestDeleteAll() {
+    const taskRequest = baseURL + "/api/tasks";
+    const eventRequest = baseURL + "/api/events";
+
+    const taskResponse = await fetch(taskRequest, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    console.log("Delete tasks response:", taskResponse);
+
+    const eventResponse = await fetch(eventRequest, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    console.log("Delete events response:", eventResponse);
+
+    // Return true if both succeeded, false if either failed
+    return taskResponse.ok && eventResponse.ok;
+}
+
+
+// ================================
+// Fetch Requests
+// ================================
+
+export async function fetchEvents() {
+    const request = baseURL + "/api/events";
+    const response = await fetch(request);
+
+    console.log("fetchEvents received response:", response);
+
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    return data;
+}
+
+export async function fetchTasks() {
+    const request = baseURL + "/api/tasks";
+    const response = await fetch(request);
+
+    console.log("fetchTasks received response:", response);
+
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    return data;
 }

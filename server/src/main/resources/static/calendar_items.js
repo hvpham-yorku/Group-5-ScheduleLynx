@@ -11,6 +11,7 @@ function convertDateToWeekday(date) {
     return day.toUpperCase();
 }
 
+/** Do NOT call this directly. Call postCalendarEvent() instead. */
 async function postCalendarEvent(dataObject) {
 
     // TODO: for frontend people:
@@ -44,6 +45,7 @@ async function postCalendarEvent(dataObject) {
     // TODO
 }
 
+/** Do NOT call this directly. Call postCalendarEvent() instead. */
 async function postCalendarTask(dataObject) {
 
     const { title, dueDate, estimatedHours } = dataObject;

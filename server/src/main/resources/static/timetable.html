@@ -170,7 +170,7 @@
 
     // Calendar item form submission listener
     const calendarItemForm = document.getElementById("calItemForm");
-    calendarItemForm.addEventListener("submit", (e) => {
+    calendarItemForm.addEventListener("submit", () => {
 
         const data = new FormData(calendarItemForm);
         const dataObject = Object.fromEntries(data);

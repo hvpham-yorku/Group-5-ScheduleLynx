@@ -73,7 +73,7 @@ async function postCalendarTask(dataObject) {
     // TODO
 }
 
-async function postCalendarItem(dataObject) {
+export async function postCalendarItem(dataObject) {
 
     if (!currentUser) {
         alert("Please log-in to use this feature.");

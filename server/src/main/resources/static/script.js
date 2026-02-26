@@ -534,7 +534,7 @@ function initializeFormHandlers() {
             estimatedHoursGroup.style.display = 'block';
             recurringGroup.style.display = 'none';
             isRecurringCheckbox.checked = false;
-            recurrenceOptions.style.display = 'none';
+            // recurrenceOptions.style.display = 'none';
             daysOfWeekGroup.style.display = 'none';
         } else {
             startTimeGroup.style.display = 'flex';

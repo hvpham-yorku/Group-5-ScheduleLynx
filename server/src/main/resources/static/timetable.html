@@ -158,7 +158,21 @@
     </div>
 </footer>
 
-<script src="calendar_items.js"></script>
-<script src="script.js"        ></script>
 </body>
 </html>
+
+<script src="script.js"        ></script>
+<script src="calendar_items.js"></script>
+<script>
+
+    // Calendar item form submission listener
+    const calendarItemForm = document.getElementById("calItemForm");
+    calendarItemForm.addEventListener('submit', (e) => {
+
+        const data = new FormData(calendarItemForm);
+        const dataObject = Object.fromEntries(data);
+        postCalendarItem(dataObject);
+
+    });
+
+</script>

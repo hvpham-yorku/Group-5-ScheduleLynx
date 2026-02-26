@@ -14,7 +14,7 @@ public record TaskRequest(
         @Nullable   Long        id,
         @NotBlank   String      title,
         @NotNull    LocalDate   dueDate,
-        @Min(1)     int         estimatedHours,
+        @Min(0)     int         estimatedHours,
         @NotNull    Difficulty  difficulty
 ) {
 }

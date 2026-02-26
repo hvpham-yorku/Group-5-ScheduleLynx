@@ -4,7 +4,7 @@ const baseURL = "http://localhost:8080";
 
 
 // ================================
-// Calendar Item Creation Functions
+// Post Requests
 // ================================
 
 /** Do NOT call this directly. Call postCalendarEvent() instead. */
@@ -99,7 +99,7 @@ async function postCalendarItem(dataObject) {
 
 
 // ================================
-// Calendar Item Deletion Functions
+// Delete Requests
 // ================================
 
 export async function requestDeleteTask() {

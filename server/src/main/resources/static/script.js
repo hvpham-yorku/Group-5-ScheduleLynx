@@ -512,7 +512,7 @@ function updateTaskBreakdown() {
 // ============================
 
 function initializeFormHandlers() {
-    const taskForm             = document.getElementById('taskForm');
+    const taskForm             = document.getElementById('calItemForm');
     const taskTypeSelect       = getPendingCalendarItemTypeField();
     const isRecurringCheckbox  = getPendingCalendarItemIsRecurringField();
     const recurrenceTypeSelect = document.getElementById('recurrenceType');

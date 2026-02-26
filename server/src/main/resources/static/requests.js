@@ -142,7 +142,6 @@ export async function requestDeleteAll() {
     });
     console.log("Delete events response:", eventResponse);
 
-    // Return true if both succeeded, false if either failed
     return taskResponse.ok && eventResponse.ok;
 }
 

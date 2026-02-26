@@ -957,14 +957,6 @@ function renderTimeline(scheduledItems) {
 // STORAGE MANAGEMENT
 // ============================
 
-function saveTasksToStorage() {
-    if (currentUser) {
-        saveUserTasks(currentUser.username);
-        // update dashboard widgets if they're present
-        refreshDashboardIfVisible();
-    }
-}
-
 /** Fetches all tasks and events from the server and updates the UI */
 async function loadDataFromServer() {
 
@@ -998,7 +990,6 @@ async function clearAllItems() {
 
     // If successful, update the UI
     tasks = [];
-    saveTasksToStorage();
     updateTasksDisplay();
     document.getElementById('timeline').innerHTML = '<p class="empty-state">Tasks will appear here once you add them and generate the schedule.</p>';
     renderScheduleGrid();

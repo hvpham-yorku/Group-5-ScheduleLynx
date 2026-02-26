@@ -980,7 +980,6 @@ async function loadDataFromServer() {
 async function clearAllItems() {
     if (!(confirm("Are you sure you want to clear all tasks?\nThis cannot be undone."))) return;
 
-    // Call our clean API function
     const success = await requestDeleteAll();
 
     if (!success) {
@@ -988,13 +987,11 @@ async function clearAllItems() {
         return;
     }
 
-    // If successful, update the UI
     tasks = [];
     updateTasksDisplay();
-    document.getElementById('timeline').innerHTML = '<p class="empty-state">Tasks will appear here once you add them and generate the schedule.</p>';
+    document.getElementById('timeline').innerHTML = '<p class="empty-state">Tasks cleared.</p>';
     renderScheduleGrid();
     document.getElementById('generateSchedule').disabled = true;
-    refreshDashboardIfVisible();
     alert('All tasks cleared!');
 }
 

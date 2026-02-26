@@ -669,41 +669,6 @@ function viewTaskDetails(taskId) {
 // MODAL HANDLING
 // ============================
 
-async function requestDeleteTask() {
-
-    if (!selectedTaskId) return;
-
-    const item = tasks.find(t => t.id === selectedTaskId);
-    if (!item) return;
-
-    if (!confirm("Are you sure you want to delete this task?")) return;
-
-    let response;
-    if (item.type === "event") {
-
-        const eventID = selectedTaskId;
-        const request = "http://localhost:8080/api/events/" + eventID;
-        response = await fetch(request, {method: 'DELETE',});
-
-    } else if (item.type === "task") {
-
-        const taskID = selectedTaskId;
-        const request = "http://localhost:8080/api/tasks/" + taskID;
-        response = await fetch(request, {method: 'DELETE',});
-
-    }
-
-    console.log(response);
-    if(!response.ok) return;
-
-    tasks = tasks.filter(t => t.id !== selectedTaskId);
-    saveTasksToStorage();
-    updateTasksDisplay();
-    renderScheduleGrid();
-    refreshDashboardIfVisible();
-    document.getElementById("taskModal").classList.remove("active");
-}
-
 function editSelectedTask() {
 
     const task = tasks.find(t => t.id === selectedTaskId);

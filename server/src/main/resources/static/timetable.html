@@ -170,12 +170,13 @@
 
     // Calendar item form submission listener
     const calendarItemForm = document.getElementById("calItemForm");
-    calendarItemForm.addEventListener("submit", () => {
+    calendarItemForm.addEventListener("submit", async () => {
 
         const data = new FormData(calendarItemForm);
         const dataObject = Object.fromEntries(data);
-        if (postCalendarItem(dataObject))
-            loadDataFromServer();
+
+        const success = await postCalendarItem(dataObject);
+        if (success) await loadDataFromServer();
     });
 
     // Adds listeners when new task modals are added

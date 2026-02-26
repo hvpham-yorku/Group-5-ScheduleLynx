@@ -669,7 +669,7 @@ function viewTaskDetails(taskId) {
 // MODAL HANDLING
 // ============================
 
-function editSelectedTask() {
+export function editSelectedTask() {
 
     const task = tasks.find(t => t.id === selectedTaskId);
     if (task) {

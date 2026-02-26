@@ -165,6 +165,9 @@
 <script type="module" src="requests.js"      ></script>
 <script type="module">
 
+    import { requestDeleteTask } from "./requests.js";
+    import { editSelectedTask } from "./script.js";
+
     // Calendar item form submission listener
     const calendarItemForm = document.getElementById("calItemForm");
     calendarItemForm.addEventListener("submit", (e) => {
@@ -195,8 +198,8 @@
                 }
             });
 
-            deleteTaskBtn.addEventListener("click", requestDeleteTask);
             editTaskBtn.addEventListener("click", editSelectedTask);
+            deleteTaskBtn.addEventListener("click", requestDeleteTask);
         }
     });
 

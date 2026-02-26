@@ -11,6 +11,39 @@ function convertDateToWeekday(date) {
     return day.toUpperCase();
 }
 
+async function postCalendarEvent(dataObject) {
+
+    // TODO: for frontend people:
+    // 'dueDate' is confusing and reallllly needs to be renamed to eventDate (without changing task's 'dueDate')
+    const { title, dueDate, startTime, endTime } = dataObject;
+
+    const day = convertDateToWeekday(dueDate);
+
+    const eventData = {
+        id    : null,
+        title : title,
+        day   : day,
+        start : startTime,
+        end   : endTime
+    };
+    const eventPayload = JSON.stringify(eventData);
+
+    console.log("postCalendarEvent created payload:\n" + eventPayload);
+
+    const input = baseURL + "/api/events";
+    const response = await fetch(input, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: eventPayload
+    });
+
+    console.log("postCalendarEvent received response:");
+    console.log(response);
+
+    if (!response.ok) return;
+    // TODO
+}
+
 async function postCalendarItem(dataObject) {
 
     if (!currentUser) {

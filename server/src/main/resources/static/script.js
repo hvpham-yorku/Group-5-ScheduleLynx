@@ -959,7 +959,7 @@ function renderTimeline(scheduledItems) {
 // ============================
 
 /** Fetches all tasks and events from the server and updates the UI */
-async function loadDataFromServer() {
+export async function loadDataFromServer() {
 
     const serverTasks = await fetchTasks();
     const serverEvents = await fetchEvents();

@@ -37,8 +37,7 @@ async function postCalendarEvent(dataObject) {
     console.log("postCalendarEvent received response:");
     console.log(response);
 
-    if (!response.ok) return;
-    // TODO
+    return response.ok;
 }
 
 /** Do NOT call this directly. Call postCalendarEvent() instead. */
@@ -69,8 +68,7 @@ async function postCalendarTask(dataObject) {
     console.log("postCalendarTask received response:");
     console.log(response);
 
-    if (!response.ok) return;
-    // TODO
+    return response.ok;
 }
 
 export async function postCalendarItem(dataObject) {
@@ -82,14 +80,17 @@ export async function postCalendarItem(dataObject) {
 
     const type = dataObject.type;
 
+    let responseOK = false;
     if (type.toLowerCase() === "event")
-        await postCalendarEvent(dataObject);
+        responseOK = await postCalendarEvent(dataObject);
     else if (type.toLowerCase() === "task")
-        await postCalendarTask(dataObject);
+        responseOK = await postCalendarTask(dataObject);
     else throw Error("Invalid type: " + type);
 
     // Enable generate schedule button
     document.getElementById('generateSchedule').disabled = false;
+
+    return responseOK;
 }
 
 

@@ -166,7 +166,7 @@
 <script type="module">
 
     import { requestDeleteTask, postCalendarItem } from "./requests.js";
-    import { editSelectedTask } from "./script.js";
+    import { editSelectedTask, loadDataFromServer } from "./script.js";
 
     // Calendar item form submission listener
     const calendarItemForm = document.getElementById("calItemForm");
@@ -174,7 +174,8 @@
 
         const data = new FormData(calendarItemForm);
         const dataObject = Object.fromEntries(data);
-        postCalendarItem(dataObject);
+        if (postCalendarItem(dataObject))
+            loadDataFromServer();
     });
 
     // Adds listeners when new task modals are added

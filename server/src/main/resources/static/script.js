@@ -2,6 +2,8 @@
 // SCHEDULE LYNX - MAIN SCRIPT
 // ============================
 
+import { fetchTasks, fetchEvents, requestDeleteAll } from "./requests.js";
+
 // ============================
 // Global Variables
 // ============================
@@ -274,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (currentPage === 'timetable.html') {
         initializeFormHandlers();
         initializeScheduleDisplay();
-        loadTasksFromStorage();
+        loadDataFromServer();
     }
 });
 
@@ -963,16 +965,22 @@ function saveTasksToStorage() {
     }
 }
 
-function loadTasksFromStorage() {
-    if (currentUser) {
-        loadUserTasks(currentUser.username);
-        updateTasksDisplay();
-        renderScheduleGrid();
-        if (tasks.length > 0) {
-            document.getElementById('generateSchedule').disabled = false;
-        }
-        // refresh dashboard after loading
-        refreshDashboardIfVisible();
+/** Fetches all tasks and events from the server and updates the UI */
+async function loadDataFromServer() {
+
+    const serverTasks = await fetchTasks();
+    const serverEvents = await fetchEvents();
+
+    const formattedTasks = serverTasks.map(t => ({ ...t, type: 'task' }));
+    const formattedEvents = serverEvents.map(e => ({ ...e, type: 'event' }));
+
+    tasks = [...formattedTasks, ...formattedEvents];
+
+    updateTasksDisplay();
+    renderScheduleGrid();
+
+    if (tasks.length > 0) {
+        document.getElementById('generateSchedule').disabled = false;
     }
 }
 

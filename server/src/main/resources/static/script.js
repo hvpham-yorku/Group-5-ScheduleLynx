@@ -669,29 +669,6 @@ function viewTaskDetails(taskId) {
 // MODAL HANDLING
 // ============================
 
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('taskModal');
-    
-    if (modal) {
-        const closeBtn = document.querySelector('.close-modal');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const deleteTaskBtn = document.getElementById('deleteTaskBtn');
-        const editTaskBtn = document.getElementById('editTaskBtn');
-
-        closeBtn.addEventListener('click', () => modal.classList.remove('active'));
-        closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
-
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-            }
-        });
-
-        deleteTaskBtn.addEventListener('click', deleteTaskListener);
-        editTaskBtn.addEventListener('click', editSelectedTask);
-    }
-});
-
 async function deleteTaskListener() {
 
     if (!selectedTaskId) return;

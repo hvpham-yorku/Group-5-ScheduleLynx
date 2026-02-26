@@ -75,11 +75,6 @@ async function postCalendarTask(dataObject) {
 
 export async function postCalendarItem(dataObject) {
 
-    if (!currentUser) {
-        alert("Please log-in to use this feature.");
-        return;
-    }
-
     if (dataObject == null) {
         console.error("Cannot post new calendar object; no data was provided!")
         return;

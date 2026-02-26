@@ -44,6 +44,37 @@ async function postCalendarEvent(dataObject) {
     // TODO
 }
 
+async function postCalendarTask(dataObject) {
+
+    const { title, dueDate, estimatedHours } = dataObject;
+
+    console.log(dataObject);
+
+    const taskData = {
+        id             : null,
+        title          : title,
+        dueDate        : dueDate,
+        estimatedHours : Math.round(estimatedHours),
+        difficulty     : "MEDIUM" // TODO: Add input field to the UI
+    };
+    const taskPayload = JSON.stringify(taskData);
+
+    console.log("postCalendarTask created payload:\n" + taskPayload);
+
+    const input = baseURL + "/api/tasks";
+    const response = await fetch(input, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: taskPayload
+    });
+
+    console.log("postCalendarTask received response:");
+    console.log(response);
+
+    if (!response.ok) return;
+    // TODO
+}
+
 async function postCalendarItem(dataObject) {
 
     if (!currentUser) {

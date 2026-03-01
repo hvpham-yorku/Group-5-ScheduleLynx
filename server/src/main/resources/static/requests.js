@@ -96,29 +96,35 @@ export async function postCalendarItem(dataObject) {
 // Delete Requests
 // ================================
 
-export async function requestDeleteTask() {
+export async function requestDeleteEvent(eventID) {
 
-    if (!selectedTaskId) return;
+    if (!eventID) return;
 
-    const item = tasks.find(t => t.id === selectedTaskId);
+    const item = events.find(t => t.id === eventID);
     if (!item) return;
+    if (item.type !== "event") return;
 
     if (!confirm("Are you sure you want to delete this task?")) return;
 
-    let response;
-    if (item.type === "event") {
+    const request = "http://localhost:8080/api/events/" + eventID;
+    const response = await fetch(request, {method: 'DELETE',});
 
-        const eventID = selectedTaskId;
-        const request = "http://localhost:8080/api/events/" + eventID;
-        response = await fetch(request, {method: 'DELETE',});
+    console.log(response);
+    return response.ok;
+}
 
-    } else if (item.type === "task") {
+export async function requestDeleteTask(taskID) {
 
-        const taskID = selectedTaskId;
-        const request = "http://localhost:8080/api/tasks/" + taskID;
-        response = await fetch(request, {method: 'DELETE',});
+    if (!taskID) return;
 
-    }
+    const item = tasks.find(t => t.id === taskID);
+    if (!item) return;
+    if (item.type !== "task") return;
+
+    if (!confirm("Are you sure you want to delete this task?")) return;
+
+    const request = "http://localhost:8080/api/tasks/" + taskID;
+    const response = await fetch(request, {method: 'DELETE',});
 
     console.log(response);
     return response.ok;

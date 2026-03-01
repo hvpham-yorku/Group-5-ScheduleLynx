@@ -221,46 +221,6 @@ function saveUserTasks(username) {
 
 
 // ============================
-// UTILITY FUNCTIONS
-// ============================
-
-// Get the Monday of the current week
-function getMonday(d) {
-    d = new Date(d);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(d.setDate(diff));
-}
-
-// Format date as YYYY-MM-DD
-function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
-
-// Format date for display
-function formatDateDisplay(date) {
-    const options = { month: 'short', day: 'numeric', year: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
-}
-
-// Get day name
-function getDayName(date) {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return days[date.getDay()];
-}
-
-// Add days to a date
-function addDays(date, days) {
-    const result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result;
-}
-
-
-// ============================
 // DASHBOARD FUNCTIONS
 // ============================
 

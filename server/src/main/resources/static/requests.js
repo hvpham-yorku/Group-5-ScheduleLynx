@@ -1,4 +1,4 @@
-import {convertDateToWeekday} from "./utils.js";
+import {dateToWeekday} from "./utils.js";
 
 const baseURL = "http://localhost:8080";
 
@@ -12,7 +12,7 @@ async function postCalendarEvent(dataObject) {
 
     const { title, date, startTime, endTime } = dataObject;
 
-    const day = convertDateToWeekday(date);
+    const day = dateToWeekday(date);
 
     const eventData = {
         id    : null,

@@ -9,7 +9,6 @@ import { fetchTasks, fetchEvents, requestDeleteAll } from "./requests.js";
 // ============================
 
 let tasks = [];
-let currentWeekStart = getMonday(new Date());
 let selectedTaskId = null;
 let currentUser = null;
 

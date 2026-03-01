@@ -171,6 +171,17 @@
 
     import { requestDeleteTask, postCalendarItem } from "./requests.js";
     import { editSelectedTask, loadDataFromServer } from "./script.js";
+    import { dateToTime } from "./time.js";
+
+    // Default Dates ///////////////////////////////////////////////////////////
+
+    // For Start Time
+    const startTimeInput = document.getElementById('startTime');
+    startTimeInput.value = dateToTime(today);
+
+    // For End Time
+    const endTimeInput = document.getElementById('endTime');
+    endTimeInput.value = dateToTime(today, 60);
 
     // Calendar item form submission listener
     const calendarItemForm = document.getElementById("calItemForm");

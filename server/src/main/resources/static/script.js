@@ -206,19 +206,6 @@ function initializeLoginHandlers() {
     }
 }
 
-// Load user-specific tasks
-function loadUserTasks(username) {
-    const userTasks = localStorage.getItem(`tasks_${username}`);
-
-    if (userTasks) tasks = JSON.parse(userTasks);
-    else tasks = [];
-}
-
-// Save user-specific tasks
-function saveUserTasks(username) {
-    localStorage.setItem(`tasks_${username}`, JSON.stringify(tasks));
-}
-
 
 // ============================
 // DASHBOARD FUNCTIONS

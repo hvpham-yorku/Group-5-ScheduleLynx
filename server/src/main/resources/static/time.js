@@ -31,7 +31,7 @@ export function numbersToTime(hoursPastMidnight, plusMinutes, plusSeconds) {
     let mm = String(minutes).padStart(2, '0');
     let ss = String(seconds).padStart(2, '0');
 
-    return `${hh}:${mm}:${ss}`;
+    return `${hh}:${mm}`; // removed seconds because that's tmi
 }
 
 /**

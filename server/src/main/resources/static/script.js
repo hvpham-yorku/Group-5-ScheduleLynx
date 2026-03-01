@@ -259,11 +259,6 @@ function addDays(date, days) {
     return result;
 }
 
-// Get unique ID
-function generateId() {
-    return Date.now() + Math.random().toString(36).substr(2, 9);
-}
-
 
 // ============================
 // DASHBOARD FUNCTIONS

@@ -7,12 +7,12 @@ const baseURL = "http://localhost:8080";
 // Post Requests
 // ================================
 
-/** Do NOT call this directly. Call postCalendarEvent() instead. */
-async function postCalendarEvent(dataObject) {
+/** @param formData is a dictionary of key-value pairs. */
+export async function postEvent(formData) {
 
-    const { title, date, startTime, endTime } = dataObject;
+    let { title, date, day, startTime, endTime } = formData;
 
-    const day = dateToWeekday(date);
+    if (!day) day = dateToWeekday(date);
 
     const eventData = {
         id    : null,
@@ -38,12 +38,12 @@ async function postCalendarEvent(dataObject) {
     return response.ok;
 }
 
-/** Do NOT call this directly. Call postCalendarEvent() instead. */
-async function postCalendarTask(dataObject) {
+/** @param formData is a dictionary of key-value pairs. */
+export async function postTask(formData) {
 
-    const { title, date, estimatedHours } = dataObject;
+    const { title, date, estimatedHours } = formData;
 
-    console.log(dataObject);
+    console.log(formData);
 
     const taskData = {
         id             : null,
@@ -69,26 +69,19 @@ async function postCalendarTask(dataObject) {
     return response.ok;
 }
 
-export async function postCalendarItem(dataObject) {
 
-    if (dataObject == null) {
-        console.error("Cannot post new calendar object; no data was provided!")
-        return;
-    }
+// ================================
+// Post Requests
+// ================================
 
-    const type = dataObject.type;
+/** @param formData is a dictionary of key-value pairs. */
+export async function sendEventUpdate(formData) {
+    // TODO
+}
 
-    let responseOK = false;
-    if (type.toLowerCase() === "event")
-        responseOK = await postCalendarEvent(dataObject);
-    else if (type.toLowerCase() === "task")
-        responseOK = await postCalendarTask(dataObject);
-    else throw Error("Invalid type: " + type);
-
-    // Enable generate schedule button
-    document.getElementById('generateSchedule').disabled = false;
-
-    return responseOK;
+/** @param formData is a dictionary of key-value pairs. */
+export async function sendTaskUpdate(formData) {
+    // TODO
 }
 
 
@@ -99,10 +92,6 @@ export async function postCalendarItem(dataObject) {
 export async function requestDeleteEvent(eventID) {
 
     if (!eventID) return;
-
-    const item = events.find(t => t.id === eventID);
-    if (!item) return;
-    if (item.type !== "event") return;
 
     if (!confirm("Are you sure you want to delete this task?")) return;
 
@@ -117,10 +106,6 @@ export async function requestDeleteTask(taskID) {
 
     if (!taskID) return;
 
-    const item = tasks.find(t => t.id === taskID);
-    if (!item) return;
-    if (item.type !== "task") return;
-
     if (!confirm("Are you sure you want to delete this task?")) return;
 
     const request = "http://localhost:8080/api/tasks/" + taskID;
@@ -131,6 +116,7 @@ export async function requestDeleteTask(taskID) {
 }
 
 export async function requestDeleteAll() {
+
     const taskRequest = baseURL + "/api/tasks";
     const eventRequest = baseURL + "/api/events";
 

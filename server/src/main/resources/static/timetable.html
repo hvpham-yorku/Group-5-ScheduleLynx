@@ -26,48 +26,50 @@
 <div class="planner-container container">
     <aside class="sidebar">
         <section class="panel">
+
             <h2>Add / Edit Task</h2>
-            <form id="calItemForm" class="task-form">
-                <div class="form-group">
-                    <label for="calItemTitle">Title</label>
-                    <input id="calItemTitle" name="title" type="text" placeholder="e.g., EECS lab" required/>
+            <form id="timetableForm" class="task-form">
+
+                <div id="titleGroup" class="form-group">
+                    <label for="titleInput">Title</label>
+                    <input id="titleInput" name="title" type="text" placeholder="e.g., EECS lab" required/>
                 </div>
 
-                <div class="form-group">
-                    <label for="taskType">Type</label>
-                    <select id="taskType" name="type">
+                <div id="typeGroup" class="form-group">
+                    <label for="typeInput">Type</label>
+                    <select id="typeInput" name="type">
                         <option value="task">Task</option>
                         <option value="event">Event</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="date">Date (dueDate)</label>
-                    <input id="date" name="date" type="date" required/>
+                <div id="dateGroup" class="form-group">
+                    <label for="dateInput">Date (dueDate)</label>
+                    <input id="dateInput" name="date" type="date" required/>
                 </div>
 
                 <div id="startTimeGroup" class="form-group" style="display:none;">
-                    <label for="startTime">Start Time</label>
-                    <input id="startTime" name="startTime" type="time"/>
+                    <label for="startTimeInput">Start Time</label>
+                    <input id="startTimeInput" name="startTime" type="time"/>
                 </div>
 
                 <div id="endTimeGroup" class="form-group" style="display:none;">
-                    <label for="endTime">End Time</label>
-                    <input id="endTime" name="endTime" type="time"/>
+                    <label for="endTimeInput">End Time</label>
+                    <input id="endTimeInput" name="endTime" type="time"/>
                 </div>
 
-                <div id="estimatedHoursGroup" class="form-group">
-                    <label for="estimatedHours">Estimated Hours</label>
-                    <input id="estimatedHours" name="estHours" type="number" min="0" step="0.5" value="1" required/>
+                <div id="estHoursGroup" class="form-group">
+                    <label for="estHoursInput">Estimated Hours</label>
+                    <input id="estHoursInput" name="estHours" type="number" min="0" step="0.5" value="1" required/>
                 </div>
 
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="desc" placeholder="Optional details..."></textarea>
+                <div id="descGroup" class="form-group">
+                    <label for="descInput">Description</label>
+                    <textarea id="descInput" name="desc" placeholder="Optional details..."></textarea>
                 </div>
 
-                <div id="recurringGroup" class="form-group">
-                    <label><input id="isRecurring" name="isRecur" type="checkbox"/> Recurring</label>
+                <div id="recurGroup" class="form-group">
+                    <label><input id="isRecurInput" name="isRecur" type="checkbox"/> Recurring</label>
                 </div>
 
                 <div id="recurrenceOptions" style="display:none;">
@@ -130,7 +132,15 @@
 
         <section class="schedule-section">
             <h3>This Week</h3>
-            <div id="scheduleGrid" class="schedule-grid"></div>
+            <div id="scheduleGrid" class="schedule-grid">
+                <div class="day-column"><h4>Sun</h4><div id="sunEvents" class="event-container"></div></div>
+                <div class="day-column"><h4>Mon</h4><div id="monEvents" class="event-container"></div></div>
+                <div class="day-column"><h4>Tue</h4><div id="tueEvents" class="event-container"></div></div>
+                <div class="day-column"><h4>Wed</h4><div id="wedEvents" class="event-container"></div></div>
+                <div class="day-column"><h4>Thu</h4><div id="thuEvents" class="event-container"></div></div>
+                <div class="day-column"><h4>Fri</h4><div id="friEvents" class="event-container"></div></div>
+                <div class="day-column"><h4>Sat</h4><div id="satEvents" class="event-container"></div></div>
+            </div>
         </section>
 
         <section class="timeline-section">
@@ -147,7 +157,7 @@
         <span class="close-modal">&times;</span>
         <div id="modalBody"></div>
         <div class="modal-actions">
-            <button id="editTaskBtn" class="btn-primary">Edit</button>
+            <button id="updateTaskBtn" class="btn-primary">Update</button>
             <button id="deleteTaskBtn" class="btn-danger">Delete</button>
             <button id="closeModalBtn" class="btn-secondary">Close</button>
         </div>
@@ -164,77 +174,22 @@
 </body>
 </html>
 
-<script type="module" src="script.js"   ></script>
-<script type="module" src="requests.js" ></script>
-<script type="module" src="time.js"     ></script>
+<script type="module" src="timetable-actions.js"></script>
 <script type="module">
 
-    import { requestDeleteTask, postCalendarItem } from "./requests.js";
-    import { editSelectedTask, loadDataFromServer } from "./script.js";
-    import { dateToTime } from "./time.js";
+    import {
+        setDefaultDate,
+        setDefaultStartTime,
+        setDefaultEndTime,
+        reloadDataFromServer
+    } from "./timetable-functions.js";
 
+    // Webpage Initialization //////////////////////////////////////////////////
 
-    // Default Form Date and Times /////////////////////////////////////////////
-
-    function setDefaultDate() {
-        const today = new Date();
-        const localDate = today.toLocaleDateString('en-CA');
-        const dateInput = document.getElementById('date');
-        dateInput.value = localDate;
-    }
     setDefaultDate();
-
-    function setDefaultStartTime() {
-        const today = new Date();
-        const startTimeInput = document.getElementById('startTime');
-        startTimeInput.value = dateToTime(today);
-    }
     setDefaultStartTime();
-
-    function setDefaultEndTime() {
-        const today = new Date();
-        const endTimeInput = document.getElementById('endTime');
-        endTimeInput.value = dateToTime(today, 60);
-    }
     setDefaultEndTime();
+    reloadDataFromServer();
 
-
-    // Actions /////////////////////////////////////////////////////////////////
-
-    // Calendar item form submission listener
-    const calendarItemForm = document.getElementById("calItemForm");
-    calendarItemForm.addEventListener("submit", async () => {
-
-        const data = new FormData(calendarItemForm);
-        const dataObject = Object.fromEntries(data);
-
-        const success = await postCalendarItem(dataObject);
-        if (success) await loadDataFromServer();
-    });
-
-    // Adds listeners when new task modals are added
-    document.addEventListener("DOMContentLoaded", function() {
-
-        const modal = document.getElementById("taskModal");
-
-        if (modal) {
-            const closeBtn = document.querySelector(".close-modal");
-            const closeModalBtn = document.getElementById("closeModalBtn");
-            const deleteTaskBtn = document.getElementById("deleteTaskBtn");
-            const editTaskBtn = document.getElementById("editTaskBtn");
-
-            closeBtn.addEventListener("click", () => modal.classList.remove("active"));
-            closeModalBtn.addEventListener("click", () => modal.classList.remove("active"));
-
-            window.addEventListener("click", (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove("active");
-                }
-            });
-
-            editTaskBtn.addEventListener("click", editSelectedTask);
-            deleteTaskBtn.addEventListener("click", requestDeleteTask);
-        }
-    });
 
 </script>

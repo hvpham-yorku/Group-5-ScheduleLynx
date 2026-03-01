@@ -173,7 +173,14 @@
     import { editSelectedTask, loadDataFromServer } from "./script.js";
     import { dateToTime } from "./time.js";
 
+    const today = new Date();
+    const localDate = today.toLocaleDateString('en-CA');
+
     // Default Dates ///////////////////////////////////////////////////////////
+
+    // For Due Date
+    const dateInput = document.getElementById('dueDate');
+    dateInput.value = localDate;
 
     // For Start Time
     const startTimeInput = document.getElementById('startTime');

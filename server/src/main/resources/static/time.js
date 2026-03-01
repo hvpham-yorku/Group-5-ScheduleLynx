@@ -35,11 +35,28 @@ export function numbersToTime(hoursPastMidnight, plusMinutes, plusSeconds) {
 }
 
 /**
+ * Converts a date plus an optional offset to a time string in hh:mm:ss format.
+ * @param date the date to convert.
+ * @param offsetMinutes an optional offset in minutes.
+ * @returns {string} the time in hh:mm:ss format.
+ * @see hoursMinutesAndSecondsToTime for more information.
+ * @author Eric Hanson
+ */
+export function dateToTime(date, offsetMinutes = 0) {
+
+    let hours = date.getHours();
+    let minutes = date.getMinutes() + offsetMinutes;
+    let seconds = date.getSeconds();
+
+    return numbersToTime(hours, minutes, seconds);
+}
+
+/**
  * Converts hours and minutes past midnight to a time string in hh:mm:ss format.
  * @param hoursPastMidnight an int or float representing hours past midnight.
  * @param andMinutes an int or float representing minutes past midnight.
  * @returns {string} the time in hh:mm:ss format.
- * @see hoursMinutesAndSecondsToTime for more information.
+
  * @author Eric Hanson
  */
 export function hoursAndMinutesToTime(hoursPastMidnight, andMinutes) {

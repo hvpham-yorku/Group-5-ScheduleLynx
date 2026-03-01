@@ -2,6 +2,9 @@ package ca.yorku.eecs2311.schedulelynx.web.controller;
 
 import ca.yorku.eecs2311.schedulelynx.service.UserService;
 import ca.yorku.eecs2311.schedulelynx.web.dto.*;
+import ca.yorku.eecs2311.schedulelynx.web.dto.LoginRequest;
+import ca.yorku.eecs2311.schedulelynx.web.dto.MeResponse;
+import ca.yorku.eecs2311.schedulelynx.web.dto.RegisterRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

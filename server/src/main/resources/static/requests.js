@@ -10,11 +10,9 @@ const baseURL = "http://localhost:8080";
 /** Do NOT call this directly. Call postCalendarEvent() instead. */
 async function postCalendarEvent(dataObject) {
 
-    // TODO: for frontend people:
-    // 'dueDate' is confusing and reallllly needs to be renamed to eventDate (without changing task's 'dueDate')
-    const { title, dueDate, startTime, endTime } = dataObject;
+    const { title, date, startTime, endTime } = dataObject;
 
-    const day = convertDateToWeekday(dueDate);
+    const day = convertDateToWeekday(date);
 
     const eventData = {
         id    : null,
@@ -43,14 +41,14 @@ async function postCalendarEvent(dataObject) {
 /** Do NOT call this directly. Call postCalendarEvent() instead. */
 async function postCalendarTask(dataObject) {
 
-    const { title, dueDate, estimatedHours } = dataObject;
+    const { title, date, estimatedHours } = dataObject;
 
     console.log(dataObject);
 
     const taskData = {
         id             : null,
         title          : title,
-        dueDate        : dueDate,
+        dueDate        : date,
         estimatedHours : Math.round(estimatedHours),
         difficulty     : "MEDIUM" // TODO: Add input field to the UI
     };

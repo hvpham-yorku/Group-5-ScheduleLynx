@@ -29,8 +29,8 @@ function getPendingCalendarItemTypeField() {
 }
 
 /** */
-function getPendingCalendarItemDueDateField() {
-    return document.getElementById("dueDate");
+function getPendingCalendarItemDateField() {
+    return document.getElementById("date");
 }
 
 /** */
@@ -74,8 +74,8 @@ function getPendingCalendarItemType() {
 }
 
 /** */
-function getPendingCalendarItemDueDate() {
-    return getPendingCalendarItemDueDateField().value;
+function getPendingCalendarItemDate() {
+    return getPendingCalendarItemDateField().value;
 }
 
 /** */
@@ -679,14 +679,14 @@ export function editSelectedTask() {
         // Populate the form with task data
         getPendingCalendarItemTitleField()          .value   = task.title;
         getPendingCalendarItemTypeField()           .value   = task.type;
-        getPendingCalendarItemDueDateField()        .value   = task.dueDate;
+        getPendingCalendarItemDateField()           .value   = task.dueDate;
         getPendingCalendarItemEstimatedHoursField() .value   = task.estimatedHours;
         getPendingCalendarItemStartTimeField()      .value   = task.startTime || '';
         getPendingCalendarItemEndTimeField()        .value   = task.endTime   || '';
         getPendingCalendarItemDescriptionField()    .value   = task.description;
         getPendingCalendarItemIsRecurringField()    .checked = task.isRecurring;
-        document.getElementById('recurrenceType').value = task.recurrenceType;
-        document.getElementById('recurrenceEnd').value = task.recurrenceEnd || '';
+        document.getElementById('recurrenceType')   .value   = task.recurrenceType;
+        document.getElementById('recurrenceEnd')    .value   = task.recurrenceEnd || '';
 
         // Show/hide time fields
         if (task.type === 'class' || task.type === 'shift') {

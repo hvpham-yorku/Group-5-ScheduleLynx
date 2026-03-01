@@ -42,8 +42,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="dueDate">Date (dueDate)</label>
-                    <input id="dueDate" name="dueDate" type="date" required/>
+                    <label for="date">Date (dueDate)</label>
+                    <input id="date" name="date" type="date" required/>
                 </div>
 
                 <div id="startTimeGroup" class="form-group" style="display:none;">
@@ -179,7 +179,7 @@
     function setDefaultDate() {
         const today = new Date();
         const localDate = today.toLocaleDateString('en-CA');
-        const dateInput = document.getElementById('dueDate');
+        const dateInput = document.getElementById('date');
         dateInput.value = localDate;
     }
     setDefaultDate();

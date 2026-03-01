@@ -12,6 +12,4 @@ public record TaskResponse(
         LocalDate   dueDate,
         int         estimatedHours,
         Difficulty  difficulty
-
-) {
-}
+) {}

@@ -1,14 +1,19 @@
 package ca.yorku.eecs2311.schedulelynx.web.controller;
 
+import ca.yorku.eecs2311.schedulelynx.domain.User;
 import ca.yorku.eecs2311.schedulelynx.service.UserService;
 import ca.yorku.eecs2311.schedulelynx.web.dto.*;
 import ca.yorku.eecs2311.schedulelynx.web.dto.LoginRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.MeResponse;
 import ca.yorku.eecs2311.schedulelynx.web.dto.RegisterRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+// ...
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,12 +50,25 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public MeResponse me(HttpSession session) {
-    Object uid = session.getAttribute(SESSION_USER_ID);
-    if (uid == null)
-      throw new IllegalArgumentException("Not logged in");
-    var user = userService.findById((Long)uid).orElseThrow(
-        () -> new IllegalArgumentException("Not logged in"));
-    return new MeResponse(user.getId(), user.getUsername());
+  public MeResponse me(HttpServletRequest request) {
+    HttpSession session =
+        request.getSession(false); // IMPORTANT: false = don't create
+    if (session == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                                        "Not logged in");
+    }
+
+    Long uid = (Long)session.getAttribute(SESSION_USER_ID);
+    if (uid == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                                        "Not logged in");
+    }
+
+    User u = userService.findById(uid).orElseThrow(
+        ()
+            -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                                           "Not logged in"));
+
+    return new MeResponse(u.getId(), u.getUsername());
   }
 }

@@ -173,22 +173,30 @@
     import { editSelectedTask, loadDataFromServer } from "./script.js";
     import { dateToTime } from "./time.js";
 
-    const today = new Date();
-    const localDate = today.toLocaleDateString('en-CA');
 
-    // Default Dates ///////////////////////////////////////////////////////////
+    // Default Form Date and Times /////////////////////////////////////////////
 
-    // For Due Date
-    const dateInput = document.getElementById('dueDate');
-    dateInput.value = localDate;
+    function setDefaultDate() {
+        const today = new Date();
+        const localDate = today.toLocaleDateString('en-CA');
+        const dateInput = document.getElementById('dueDate');
+        dateInput.value = localDate;
+    }
+    setDefaultDate();
 
-    // For Start Time
-    const startTimeInput = document.getElementById('startTime');
-    startTimeInput.value = dateToTime(today);
+    function setDefaultStartTime() {
+        const today = new Date();
+        const startTimeInput = document.getElementById('startTime');
+        startTimeInput.value = dateToTime(today);
+    }
+    setDefaultStartTime();
 
-    // For End Time
-    const endTimeInput = document.getElementById('endTime');
-    endTimeInput.value = dateToTime(today, 60);
+    function setDefaultEndTime() {
+        const today = new Date();
+        const endTimeInput = document.getElementById('endTime');
+        endTimeInput.value = dateToTime(today, 60);
+    }
+    setDefaultEndTime();
 
     // Calendar item form submission listener
     const calendarItemForm = document.getElementById("calItemForm");

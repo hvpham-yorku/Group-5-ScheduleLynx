@@ -1,5 +1,6 @@
 package ca.yorku.eecs2311.schedulelynx.web.controller;
 
+import static ca.yorku.eecs2311.schedulelynx.web.controller.AuthController.SESSION_USER_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,50 +17,7 @@ class TaskControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
-    // TODO: this needs to be redone
-//  @Test
-//  void put_updatesTask() throws Exception {
-//    // 1) Create
-//    String createdJson =
-//        mockMvc
-//            .perform(post("/api/tasks")
-//                         .contentType(MediaType.APPLICATION_JSON)
-//                         .content("""
-//                        {
-//                          "title": "Old title",
-//                          "dueDate": "2026-02-13",
-//                          "estimatedHours": 6,
-//                          "difficulty": "HIGH"
-//                        }
-//                        """))
-//            .andExpect(status().isCreated())
-//            .andExpect(jsonPath("$.id").exists())
-//            .andReturn()
-//            .getResponse()
-//            .getContentAsString();
-//
-//    // First task has id 1 in a fresh repo.
-//    long id = 1L;
-//
-//    // 2) Update
-//    mockMvc
-//        .perform(put("/api/tasks/{id}", id)
-//                     .contentType(MediaType.APPLICATION_JSON)
-//                     .content("""
-//                    {
-//                      "title": "New title",
-//                      "dueDate": "2026-02-14",
-//                      "estimatedHours": 4,
-//                      "difficulty": "MEDIUM"
-//                    }
-//                    """))
-//        .andExpect(status().isOk())
-//        .andExpect(jsonPath("$.id").value(1))
-//        .andExpect(jsonPath("$.title").value("New title"))
-//        .andExpect(jsonPath("$.dueDate").value("2026-02-14"))
-//        .andExpect(jsonPath("$.estimatedHours").value(4))
-//        .andExpect(jsonPath("$.difficulty").value("MEDIUM"));
-//  }
+  private static final long USER_ID = 1L;
 
   @Test
   void delete_returnsNoContent_thenGetIsNotFound() throws Exception {
@@ -68,6 +26,7 @@ class TaskControllerTest {
     // Create one task
     mockMvc
         .perform(post("/api/tasks")
+                     .sessionAttr(SESSION_USER_ID, USER_ID)
                      .contentType(MediaType.APPLICATION_JSON)
                      .content("""
                     {
@@ -80,17 +39,23 @@ class TaskControllerTest {
         .andExpect(status().isCreated());
 
     // Delete it
-    mockMvc.perform(delete("/api/tasks/{id}", id))
+    mockMvc
+        .perform(
+            delete("/api/tasks/{id}", id).sessionAttr(SESSION_USER_ID, USER_ID))
         .andExpect(status().isNoContent());
 
     // Verify
-    mockMvc.perform(get("/api/tasks/{id}", id))
+    mockMvc
+        .perform(
+            get("/api/tasks/{id}", id).sessionAttr(SESSION_USER_ID, USER_ID))
         .andExpect(status().isNotFound());
   }
 
   @Test
   void delete_missingTask_returnsNotFound() throws Exception {
-    mockMvc.perform(delete("/api/tasks/{id}", 999))
+    mockMvc
+        .perform(delete("/api/tasks/{id}", 999)
+                     .sessionAttr(SESSION_USER_ID, USER_ID))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.error").value("NOT_FOUND"));
   }

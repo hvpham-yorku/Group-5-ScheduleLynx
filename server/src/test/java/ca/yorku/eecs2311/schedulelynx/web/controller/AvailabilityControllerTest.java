@@ -1,5 +1,6 @@
 package ca.yorku.eecs2311.schedulelynx.web.controller;
 
+import static ca.yorku.eecs2311.schedulelynx.web.controller.AuthController.SESSION_USER_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,10 +17,13 @@ class AvailabilityControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
+  private static final long USER_ID = 1L;
+
   @Test
   void postAndGetAvailability_work() throws Exception {
     mockMvc
         .perform(post("/api/availability")
+                     .sessionAttr(SESSION_USER_ID, USER_ID)
                      .contentType(MediaType.APPLICATION_JSON)
                      .content("""
                     {
@@ -32,7 +36,8 @@ class AvailabilityControllerTest {
         .andExpect(jsonPath("$.id").value(1))
         .andExpect(jsonPath("$.day").value("MONDAY"));
 
-    mockMvc.perform(get("/api/availability"))
+    mockMvc
+        .perform(get("/api/availability").sessionAttr(SESSION_USER_ID, USER_ID))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1));
   }
@@ -41,6 +46,7 @@ class AvailabilityControllerTest {
   void invalidTimeRange_returnsBadRequest() throws Exception {
     mockMvc
         .perform(post("/api/availability")
+                     .sessionAttr(SESSION_USER_ID, USER_ID)
                      .contentType(MediaType.APPLICATION_JSON)
                      .content("""
                     {

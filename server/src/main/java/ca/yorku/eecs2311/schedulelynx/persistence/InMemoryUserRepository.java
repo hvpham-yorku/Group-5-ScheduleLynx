@@ -3,8 +3,10 @@ package ca.yorku.eecs2311.schedulelynx.persistence;
 import ca.yorku.eecs2311.schedulelynx.domain.User;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
+@Profile("memory")
 @Repository
 public class InMemoryUserRepository implements UserRepository {
   private final Map<Long, User> users = new HashMap<>();

@@ -4,8 +4,10 @@ import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
+@Profile("memory")
 @Repository
 public class InMemoryTaskRepository implements TaskRepository {
 

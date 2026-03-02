@@ -242,7 +242,7 @@
 				alert("Passwords do not match!");
 				return;
 			}
-			var username = jQuery('#signupForm input[type=email]').val();
+			var username = jQuery('#signupForm input[type=text]').val();
 			var user = { username: username, loginTime: new Date().toISOString(), rememberMe: true };
 			localStorage.setItem('schedulelynxUser', JSON.stringify(user));
 			window.location.href = 'home.html';

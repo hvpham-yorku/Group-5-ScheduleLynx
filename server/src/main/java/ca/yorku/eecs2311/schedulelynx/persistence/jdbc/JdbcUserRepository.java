@@ -2,74 +2,94 @@ package ca.yorku.eecs2311.schedulelynx.persistence.jdbc;
 
 import ca.yorku.eecs2311.schedulelynx.domain.User;
 import ca.yorku.eecs2311.schedulelynx.persistence.UserRepository;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Optional;
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-@Profile("jdbc")
 @Repository
+@Profile("jdbc")
 public class JdbcUserRepository implements UserRepository {
 
-  private final JdbcTemplate jdbc;
+  private final DataSource dataSource;
 
-  public JdbcUserRepository(JdbcTemplate jdbc) { this.jdbc = jdbc; }
-
-  @Override
-  public User save(User user) {
-    // If your User has getId() returning Long
-    if (user.getId() != null) {
-      jdbc.update("UPDATE users SET username=?, password_hash=? WHERE id=?",
-                  user.getUsername(), user.getPasswordHash(), user.getId());
-      return user;
-    }
-
-    KeyHolder kh = new GeneratedKeyHolder();
-
-    jdbc.update(con -> {
-      PreparedStatement ps = con.prepareStatement(
-          "INSERT INTO users(username, password_hash) VALUES (?, ?)",
-          Statement.RETURN_GENERATED_KEYS);
-      ps.setString(1, user.getUsername());
-      ps.setString(2, user.getPasswordHash());
-      return ps;
-    }, kh);
-
-    Number key = kh.getKey();
-    Long id = (key == null) ? null : key.longValue();
-
-    // IMPORTANT: your User has no setId(), so return a NEW User
-    return new User(id, user.getUsername(), user.getPasswordHash());
+  public JdbcUserRepository(DataSource dataSource) {
+    this.dataSource = dataSource;
   }
 
   @Override
-  public Optional<User> findById(Long id) {
-    if (id == null)
-      return Optional.empty();
+  public User save(User user) {
+    // Insert + return a NEW User with generated id (no setId needed)
+    final String sql = "INSERT INTO users (username, password_hash) VALUES "
+                       + "(?, ?) RETURNING id";
 
-    return jdbc
-        .query("SELECT id, username, password_hash FROM users WHERE id=?",
-               (rs, rowNum)
-                   -> new User(rs.getLong("id"), rs.getString("username"),
-                               rs.getString("password_hash")),
-               id)
-        .stream()
-        .findFirst();
+    try (Connection c = dataSource.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+
+      ps.setString(1, user.getUsername());
+      ps.setString(2, user.getPasswordHash());
+
+      try (ResultSet rs = ps.executeQuery()) {
+        if (!rs.next()) {
+          throw new SQLException("Failed to insert user, no id returned");
+        }
+        long id = rs.getLong("id");
+        return new User(id, user.getUsername(), user.getPasswordHash());
+      }
+
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to save user", e);
+    }
   }
 
   @Override
   public Optional<User> findByUsername(String username) {
-    return jdbc
-        .query("SELECT id, username, password_hash FROM users WHERE username=?",
-               (rs, rowNum)
-                   -> new User(rs.getLong("id"), rs.getString("username"),
-                               rs.getString("password_hash")),
-               username)
-        .stream()
-        .findFirst();
+    final String sql =
+        "SELECT id, username, password_hash FROM users WHERE username = ?";
+
+    try (Connection c = dataSource.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+
+      ps.setString(1, username);
+
+      try (ResultSet rs = ps.executeQuery()) {
+        if (!rs.next())
+          return Optional.empty();
+
+        long id = rs.getLong("id");
+        String uname = rs.getString("username");
+        String hash = rs.getString("password_hash");
+        return Optional.of(new User(id, uname, hash));
+      }
+
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to find user by username", e);
+    }
+  }
+
+  @Override
+  public Optional<User> findById(Long id) {
+    final String sql =
+        "SELECT id, username, password_hash FROM users WHERE id = ?";
+
+    try (Connection c = dataSource.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+
+      ps.setLong(1, id);
+
+      try (ResultSet rs = ps.executeQuery()) {
+        if (!rs.next())
+          return Optional.empty();
+
+        long uid = rs.getLong("id");
+        String uname = rs.getString("username");
+        String hash = rs.getString("password_hash");
+        return Optional.of(new User(uid, uname, hash));
+      }
+
+    } catch (SQLException e) {
+      throw new RuntimeException("Failed to find user by id", e);
+    }
   }
 }

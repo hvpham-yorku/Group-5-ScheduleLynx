@@ -1,25 +1,19 @@
-INSERT INTO users (id, username, password_hash)
-VALUES
-  (1, 'alice', 'seed'),
-  (2, 'bob', 'seed')
-ON CONFLICT (id) DO NOTHING;
+-- username=demo, password=demo123
+-- NOTE: this hash must match whatever hashing you use in UserService.
+INSERT INTO users (username, password_hash)
+VALUES ('demo', 'demo123')
+ON CONFLICT (username) DO NOTHING;
 
--- Default tasks for alice (id=1)
-INSERT INTO tasks (id, user_id, title, due_date, estimated_hours, difficulty)
-VALUES
-  (1, 1, 'Seed Task A', '2026-03-06', 2, 'HIGH'),
-  (2, 1, 'Seed Task B', '2026-03-03', 1, 'LOW')
-ON CONFLICT (id) DO NOTHING;
+-- Seed content for demo (assumes demo has id=1 if fresh DB)
+INSERT INTO tasks (user_id, title, due_date, estimated_hours, difficulty)
+SELECT id, 'Sample Task', CURRENT_DATE + INTERVAL '3 day', 2, 'LOW'
+FROM users WHERE username='demo'
+ON CONFLICT DO NOTHING;
 
--- Default availability for alice
-INSERT INTO availability_blocks (id, user_id, day, start_time, end_time)
-VALUES
-  (1, 1, 'MONDAY', '18:00:00', '21:00:00'),
-  (2, 1, 'TUESDAY', '18:00:00', '21:00:00')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO availability (user_id, day, start_time, end_time)
+SELECT id, 'MONDAY', '18:00:00', '21:00:00'
+FROM users WHERE username='demo';
 
--- Default fixed event for alice
-INSERT INTO events (id, user_id, title, day, start_time, end_time)
-VALUES
-  (1, 1, 'Lecture', 'TUESDAY', '19:00:00', '20:00:00')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO events (user_id, title, day, start_time, end_time)
+SELECT id, 'Sample Event', 'TUESDAY', '19:00:00', '20:00:00'
+FROM users WHERE username='demo';

@@ -204,6 +204,13 @@ function loadUserTasks(username) {
     const userTasks = localStorage.getItem(`tasks_${username}`);
     if (userTasks) {
         tasks = JSON.parse(userTasks);
+        // normalize any stored deadlines in case earlier versions saved them
+        tasks.forEach(t => {
+            t.deadline = normalizeDeadlineString(t.deadline);
+            if (t.recurrenceEnd) {
+                t.recurrenceEnd = normalizeDeadlineString(t.recurrenceEnd);
+            }
+        });
     } else {
         tasks = [];
     }
@@ -224,6 +231,29 @@ function getMonday(d) {
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     return new Date(d.setDate(diff));
+}
+
+// Parse a date string (YYYY-MM-DD or ISO timestamp) as a local-date-only value.
+// Javascript's Date constructor will convert ISO strings to UTC, which can lead to
+// off-by-one-day results when your local timezone is behind UTC.  This helper
+// always returns a Date representing midnight of the given date in the local
+// timezone.
+function parseLocalDate(dateString) {
+    if (!dateString) return null;
+    // split off any time component if present
+    const datePart = dateString.split('T')[0];
+    const [year, month, day] = datePart.split('-').map(Number);
+    return new Date(year, month - 1, day);
+}
+
+// Normalize any incoming deadline string to a clean YYYY-MM-DD local representation.
+// This will strip off any accidental time component or timezone offset that might
+// have been saved previously, and ensures that all comparisons/display logic
+// work with the same format.
+function normalizeDeadlineString(dateString) {
+    if (!dateString) return dateString;
+    const d = parseLocalDate(dateString);
+    return formatDate(d);
 }
 
 // Format date as YYYY-MM-DD
@@ -292,14 +322,14 @@ function updateDashboardStats() {
     
     // Upcoming tasks (next 7 days)
     const upcoming = tasks.filter(task => {
-        const deadline = new Date(task.deadline);
+        const deadline = parseLocalDate(task.deadline);
         return deadline > today && deadline <= weekFromNow;
     });
     document.getElementById('upcomingCount').textContent = upcoming.length;
     
     // Overdue tasks
     const overdue = tasks.filter(task => {
-        const deadline = new Date(task.deadline);
+        const deadline = parseLocalDate(task.deadline);
         return deadline < today && !task.completed;
     });
     document.getElementById('overdueCount').textContent = overdue.length;
@@ -307,7 +337,7 @@ function updateDashboardStats() {
     // This week's hours
     let totalHours = 0;
     tasks.forEach(task => {
-        const deadline = new Date(task.deadline);
+        const deadline = parseLocalDate(task.deadline);
         if (deadline >= getMonday(today) && deadline <= addDays(getMonday(today), 6)) {
             totalHours += task.estimatedHours;
         }
@@ -323,10 +353,10 @@ function updateUpcomingTasks() {
     // Get upcoming tasks, sorted by deadline
     const upcoming = tasks
         .filter(task => {
-            const deadline = new Date(task.deadline);
+            const deadline = parseLocalDate(task.deadline);
             return deadline > today && deadline <= weekFromNow && !task.completed;
         })
-        .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+        .sort((a, b) => parseLocalDate(a.deadline) - parseLocalDate(b.deadline))
         .slice(0, 5); // Show top 5
     
     if (upcoming.length === 0) {
@@ -338,7 +368,7 @@ function updateUpcomingTasks() {
         <div class="task-item-dashboard ${task.type}" onclick="viewTaskDetails('${task.id}')">
             <div class="task-item-badge ${task.type}">${task.type}</div>
             <div class="task-item-title">${task.title}</div>
-            <div class="task-item-deadline">Due: ${formatDateDisplay(new Date(task.deadline))}</div>
+            <div class="task-item-deadline">Due: ${formatDateDisplay(parseLocalDate(task.deadline))}</div>
         </div>
     `).join('');
 }
@@ -494,7 +524,9 @@ function addTask() {
 
     const taskTitle = document.getElementById('taskTitle').value.trim();
     const taskType = document.getElementById('taskType').value;
-    const deadline = document.getElementById('deadline').value;
+    let deadline = document.getElementById('deadline').value;
+    // normalize before storing
+    deadline = normalizeDeadlineString(deadline);
 
     const estimatedHoursInput = document.getElementById('estimatedHours');
     const estimatedHours = estimatedHoursInput ? parseFloat(estimatedHoursInput.value) : 0;    
@@ -505,6 +537,7 @@ function addTask() {
     const isRecurring = document.getElementById('isRecurring').checked;
     const recurrenceType = document.getElementById('recurrenceType').value;
     const recurrenceEnd = document.getElementById('recurrenceEnd').value;
+    const normalizedRecurrenceEnd = normalizeDeadlineString(recurrenceEnd);
 
     if (!taskTitle || !taskType || !deadline) {
         alert('Please fill in all required fields');
@@ -564,7 +597,7 @@ function addTask() {
         item.endTime = endTime,
         item.isRecurring = isRecurring,
         item.recurrenceType = isRecurring ? recurrenceType: null;
-        item.recurrenceEnd = isRecurring ? recurrenceEnd: null;
+        item.recurrenceEnd = isRecurring ? normalizedRecurrenceEnd: null;
         item.recurrenceDays = isRecurring ? selectedDays: [];
     }
 
@@ -596,7 +629,7 @@ function updateTasksDisplay() {
         <div class="task-card ${task.type}" onclick="viewTaskDetails('${task.id}')">
             <div class="task-card-type">${task.type.charAt(0).toUpperCase() + task.type.slice(1)}</div>
             <div class="task-card-title">${task.title}</div>
-            <div class="task-card-deadline">Due: ${formatDateDisplay(new Date(task.deadline))}</div>
+            <div class="task-card-deadline">Due: ${formatDateDisplay(parseLocalDate(task.deadline))}</div>
             ${task.type === 'task'
             ? `<div class="task-card-time">${task.estimatedHours} hours</div>`
             : (task.startTime ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>` : '')
@@ -629,7 +662,7 @@ function viewTaskDetails(taskId) {
         </div>
         <div class="modal-detail">
             <span class="modal-detail-label">Deadline:</span>
-            <span class="modal-detail-value">${formatDateDisplay(new Date(task.deadline))}</span>
+            <span class="modal-detail-value">${formatDateDisplay(parseLocalDate(task.deadline))}</span>
         </div>
         <div class="modal-detail">
             <span class="modal-detail-label">Estimated Time:</span>
@@ -707,7 +740,8 @@ function editSelectedTask() {
         // Populate form with task data
         document.getElementById('taskTitle').value = task.title;
         document.getElementById('taskType').value = task.type;
-        document.getElementById('deadline').value = task.deadline;
+        // always show normalized date in the input control
+        document.getElementById('deadline').value = normalizeDeadlineString(task.deadline);
         document.getElementById('estimatedHours').value = task.estimatedHours;
         document.getElementById('startTime').value = task.startTime || '';
         document.getElementById('endTime').value = task.endTime || '';
@@ -808,14 +842,15 @@ function renderScheduleGrid() {
 }
 
 function getEventsForDay(dateStr) {
+    // dateStr is already YYYY-MM-DD from formatDate/addDays; nothing to parse
     const items = [];
 
     tasks.forEach(item => {
         // Check if task falls on this day
         if(item.type ==='event'){
             if(item.isRecurring){
-                const dayName = getDayName(new Date(dateStr)); 
-                const end = item.recurrenceEnd ? new Date(item.recurrenceEnd) : null;
+                const dayName = getDayName(parseLocalDate(dateStr)); 
+                const end = item.recurrenceEnd ? parseLocalDate(item.recurrenceEnd) : null;
 
                 const allowed = 
                     !item.recurrenceDays || item.recurrenceDays.length === 0
@@ -823,8 +858,8 @@ function getEventsForDay(dateStr) {
                         : item.recurrenceDays.includes(dayName);
 
 
-                const start = item.deadline ? new Date(item.deadline) : null;
-                const cur = new Date(dateStr);
+                const start = item.deadline ? parseLocalDate(item.deadline) : null;
+                const cur = parseLocalDate(dateStr);
 
                 if (
                     allowed &&
@@ -890,6 +925,8 @@ function generateSchedule() {
     }
 
     // Get non-recurring tasks that need scheduling
+    // make sure deadlines are normalized before scheduling
+    tasks.forEach(t => { t.deadline = normalizeDeadlineString(t.deadline); });
     const tasksToSchedule = tasks.filter(t => t.type === 'task');
     if (tasksToSchedule.length === 0) {
         alert('Add assignment, exam, or personal tasks to generate a schedule');
@@ -904,15 +941,15 @@ function generateSchedule() {
 }
 
 function distributeTasksAcrossTime(tasksToSchedule) {
-    // Sort tasks by deadline
+    // Sort tasks by normalized deadline
     const sortedTasks = tasksToSchedule.sort((a, b) => {
-        return new Date(a.deadline) - new Date(b.deadline);
+        return parseLocalDate(a.deadline) - parseLocalDate(b.deadline);
     });
 
     const scheduledItems = [];
 
     sortedTasks.forEach(task => {
-        const deadline = new Date(task.deadline);
+        const deadline = parseLocalDate(task.deadline);
         const hoursNeeded = task.estimatedHours;
         const daysAvailable = Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24));
 
@@ -971,7 +1008,7 @@ function renderTimeline(scheduledItems) {
                         <div class="timeline-task-title">${item.task.title}</div>
                         <div class="timeline-task-info">
                             Scheduled: ${item.hours} hours | 
-                            Due: ${formatDateDisplay(new Date(item.task.deadline))}
+                            Due: ${formatDateDisplay(parseLocalDate(item.task.deadline))}
                         </div>
                     </div>
                 `).join('')}

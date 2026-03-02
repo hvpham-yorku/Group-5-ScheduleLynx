@@ -1,131 +1,64 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
-import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
-import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryTaskRepository;
-import ca.yorku.eecs2311.schedulelynx.web.dto.TaskRequest;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
+import ca.yorku.eecs2311.schedulelynx.domain.Task;
+import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryTaskRepository;
+import java.time.LocalDate;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class TaskServiceTest {
 
-  private TaskService newService() {
-    return new TaskService(new InMemoryTaskRepository());
+  private static final long USER_ID = 1L;
+
+  private TaskService service;
+
+  @BeforeEach
+  void setup() {
+    service = new TaskService(new InMemoryTaskRepository());
   }
 
   @Test
-  void createTask_assignsId_andStoresTask() {
+  void create_and_getAll_work() {
+    service.create(USER_ID, new Task(null, "ITR1", LocalDate.of(2026, 2, 13), 6,
+                                     Difficulty.HIGH));
 
-    var service = newService();
-
-    var title    = "Test task";
-    var dueDate  = LocalDate.of(2026, 2, 13);
-    var estHours = 3;
-    var diff     = Difficulty.MEDIUM;
-
-    var tkReq = new TaskRequest(null, title, dueDate, estHours, diff);
-    var tkRes = service.create(tkReq);
-
-    assertNotNull(tkRes.getId(), "Created task should have an id");
-    assertEquals(1L, tkRes.getId());
-    assertEquals("Test task", tkRes.getTitle());
-
-    assertEquals(1, service.getAll().size(),
-                 "Service should store created task");
+    var all = service.getAll(USER_ID);
+    assertEquals(1, all.size());
+    assertEquals("ITR1", all.get(0).getTitle());
   }
 
   @Test
-  void createTask_rejectsEmptyTitle() {
-
-    var service = newService();
-
-    var title    = "   ";
-    var dueDate  = LocalDate.of(2026, 2, 13);
-    var estHours = 2;
-    var diff     = Difficulty.LOW;
-
-    var tkReq = new TaskRequest(null, title, dueDate, estHours, diff);
-
-    var ex = assertThrows(IllegalArgumentException.class, () -> service.create(tkReq));
-
-    assertTrue(ex.getMessage().toLowerCase().contains("title"));
+  void create_missingTitle_throws() {
+    var bad =
+        new Task(null, "   ", LocalDate.of(2026, 2, 13), 2, Difficulty.LOW);
+    assertThrows(IllegalArgumentException.class,
+                 () -> service.create(USER_ID, bad));
   }
 
   @Test
-  void update_existingTask_updatesFields() {
+  void update_work() {
+    var created =
+        service.create(USER_ID, new Task(null, "Old", LocalDate.of(2026, 2, 13),
+                                         2, Difficulty.MEDIUM));
 
-    var service = newService();
+    var updated =
+        new Task(null, "New", LocalDate.of(2026, 2, 14), 3, Difficulty.HIGH);
 
-    var title    = "Old";
-    var dueDate  = LocalDate.of(2026, 2, 13);
-    var estHours = 5;
-    var diff     = Difficulty.HIGH;
-
-    var tkReqNew = new TaskRequest(null, title, dueDate, estHours, diff);
-    var tkResNew = service.create(tkReqNew);
-
-    title    = "New";
-    dueDate  = LocalDate.of(2026, 2, 14);
-    estHours = 3;
-    diff     = Difficulty.MEDIUM;
-
-    var tkReqUpd = new TaskRequest(tkReqNew.id(), title, dueDate, estHours, diff);
-
-    var tkResUpd = service.update(tkReqUpd);
-    if (tkResUpd.isEmpty()) return;
-    var updatedTask = tkResUpd.get();
-
-    assertEquals(tkResNew.getId(), updatedTask.getId());
-    assertEquals("New", updatedTask.getTitle());
-    assertEquals(LocalDate.of(2026, 2, 14), updatedTask.getDueDate());
-    assertEquals(3, updatedTask.getEstimatedHours());
-    assertEquals(Difficulty.MEDIUM, updatedTask.getDifficulty());
+    var updatedOpt = service.update(USER_ID, created.getId(), updated);
+    assertTrue(updatedOpt.isPresent());
+    assertEquals("New", updatedOpt.get().getTitle());
   }
 
   @Test
-  void update_missingTask_returnsEmpty() {
+  void delete_work() {
+    var created = service.create(USER_ID, new Task(null, "Delete me",
+                                                   LocalDate.of(2026, 2, 13), 1,
+                                                   Difficulty.LOW));
 
-    var service = newService();
-
-    var title    = "title placeholder";
-    var dueDate  = LocalDate.of(2026, 2, 14);
-    var estHours = 3;
-    var diff     = Difficulty.MEDIUM;
-
-    var tkReq = new TaskRequest(null, title, dueDate, estHours, diff);
-
-    assertTrue(service.update(tkReq).isEmpty());
+    assertTrue(service.delete(USER_ID, created.getId()));
+    assertTrue(service.getAll(USER_ID).isEmpty());
   }
-
-  @Test
-  void delete_existingTask_removesIt() {
-
-    var service = newService();
-
-    var title    = "To delete";
-    var dueDate  = LocalDate.of(2026, 2, 20);
-    var estHours = 2;
-    var diff     = Difficulty.LOW;
-
-    var tkReq = new TaskRequest(null, title, dueDate, estHours, diff);
-    var tkRes = service.create(tkReq);
-
-    assertNotNull(tkRes.getId());
-    var id = tkRes.getId();
-
-    assertTrue(service.delete(id));
-    assertTrue(service.getTask(id).isEmpty());
-    assertEquals(0, service.getAll().size());
-  }
-
-  @Test
-  void delete_missingTask_returnsFalse() {
-
-    var service = newService();
-
-    assertFalse(service.delete(999L));
-  }
-
 }

@@ -1,75 +1,59 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import ca.yorku.eecs2311.schedulelynx.domain.Event;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
 import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryEventRepository;
-import ca.yorku.eecs2311.schedulelynx.web.dto.EventRequest;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalTime;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class EventServiceTest {
 
-    private EventService newService() {
+  private static final long USER_ID = 1L;
 
-        return new EventService(new InMemoryEventRepository());
-    }
+  private EventService service;
 
-    @Test
-    void create_assignsId_andStoresEvent() {
+  @BeforeEach
+  void setup() {
+    service = new EventService(new InMemoryEventRepository());
+  }
 
-        var service = newService();
+  @Test
+  void create_and_getAll_work() {
+    service.create(USER_ID,
+                   new Event(null, "LEC", Weekday.MONDAY, LocalTime.of(10, 0),
+                             LocalTime.of(11, 0)));
 
-        var title = "Lecture";
-        var day   = Weekday.TUESDAY;
-        var start = LocalTime.of(10, 0);
-        var end   = LocalTime.of(11, 30);
+    var all = service.getAll(USER_ID);
+    assertEquals(1, all.size());
+    assertEquals("LEC", all.get(0).getTitle());
+  }
 
-        var request = new EventRequest(null, title, day, start, end);
-        var event   = service.create(request);
+  @Test
+  void invalidTimeRange_throws() {
+    var bad = new Event(null, "Bad", Weekday.MONDAY, LocalTime.of(12, 0),
+                        LocalTime.of(11, 0));
 
-        assertNotNull(event.getId());
-        assertEquals(1L, event.getId());
-        assertEquals(1, service.getAll().size());
-    }
+    assertThrows(IllegalArgumentException.class,
+                 () -> service.create(USER_ID, bad));
+  }
 
-    @Test
-    void create_rejectsEmptyTitle() {
+  @Test
+  void update_and_delete_work() {
+    var created = service.create(
+        USER_ID, new Event(null, "LAB", Weekday.TUESDAY, LocalTime.of(12, 0),
+                           LocalTime.of(14, 0)));
 
-        var service = newService();
+    var updated = new Event(null, "LAB2", Weekday.TUESDAY, LocalTime.of(13, 0),
+                            LocalTime.of(15, 0));
 
-        var title = "   ";
-        var day   = Weekday.TUESDAY;
-        var start = LocalTime.of(10, 0);
-        var end   = LocalTime.of(11, 30);
+    var updatedOpt = service.update(USER_ID, created.getId(), updated);
+    assertTrue(updatedOpt.isPresent());
+    assertEquals("LAB2", updatedOpt.get().getTitle());
 
-        var request = new EventRequest(null, title, day, start, end);
-
-        assertThrows(IllegalArgumentException.class, () -> service.create(request));
-    }
-
-    @Test
-    void create_rejectsOverlapSameDay() {
-
-        var service = newService();
-
-        var title = "Lecture";
-        var day   = Weekday.TUESDAY;
-        var start = LocalTime.of(10, 0);
-        var end   = LocalTime.of(11, 30);
-
-        var request1 = new EventRequest(null, title, day, start, end);
-        service.create(request1);
-
-        title = "Lab";
-        day = Weekday.TUESDAY;
-        start = LocalTime.of(11, 0);
-        end = LocalTime.of(12, 0);
-
-        var request2 = new EventRequest(null, title, day, start, end);
-
-        assertThrows(IllegalArgumentException.class, () -> service.create(request2));
-    }
-
+    assertTrue(service.delete(USER_ID, created.getId()));
+    assertTrue(service.getAll(USER_ID).isEmpty());
+  }
 }

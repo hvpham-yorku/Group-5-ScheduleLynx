@@ -5,15 +5,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AvailabilityRepository {
+  AvailabilityBlock save(long userId, AvailabilityBlock block);
 
-  AvailabilityBlock save(AvailabilityBlock block);
+  List<AvailabilityBlock> findAll(long userId);
 
-  List<AvailabilityBlock> getAll();
+  Optional<AvailabilityBlock> findById(long userId, long id);
 
-  Optional<AvailabilityBlock> getById(long id);
+  Optional<AvailabilityBlock> update(long userId, long id,
+                                     AvailabilityBlock updated);
 
-  Optional<AvailabilityBlock> update(long id, AvailabilityBlock updated);
-
-  boolean delete(long id);
-
+  boolean delete(long userId, long id);
 }

@@ -5,16 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EventRepository {
+  Event save(long userId, Event event);
 
-  Event save(Event data);
+  List<Event> findAll(long userId);
 
-  Optional<Event> update(Event data);
+  Optional<Event> findById(long userId, long id);
 
-  List<Event> getAllEvents();
+  Optional<Event> update(long userId, long id, Event updated);
 
-  Optional<Event> getEvent(long id);
-
-  void deleteAll();
-
-  boolean delete(long id);
+  boolean delete(long userId, long id);
 }

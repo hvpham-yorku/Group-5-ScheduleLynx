@@ -22,7 +22,7 @@ public class ScheduleService {
     this.eventService = eventService;
   }
 
-  public ScheduleResult generateWeeklyPlan(LocalDate weekStart) {
+  public ScheduleResult generateWeeklyPlan(long userId, LocalDate weekStart) {
     if (weekStart == null) {
       throw new IllegalArgumentException("weekStart must not be null");
     }
@@ -33,15 +33,15 @@ public class ScheduleService {
     // Max scheduled task minutes per day (balance rule)
     final int maxTaskMinutesPerDay = 3 * 60; // 3 hours/day
 
-    // Build availability and fixed blocks as TimeBlocks
+    // Build availability and fixed blocks as TimeBlocks (USER-SCOPED)
     List<TimeBlock> availability =
-        availabilityService.getAll()
+        availabilityService.getAll(userId)
             .stream()
             .map(b -> new TimeBlock(b.getDay(), b.getStart(), b.getEnd()))
             .toList();
 
     List<TimeBlock> fixed =
-        eventService.getAll()
+        eventService.getAll(userId)
             .stream()
             .map(e -> new TimeBlock(e.getDay(), e.getStart(), e.getEnd()))
             .toList();
@@ -52,12 +52,13 @@ public class ScheduleService {
 
     // Track how many minutes already scheduled per day
     EnumMap<Weekday, Integer> usedMinutesPerDay = new EnumMap<>(Weekday.class);
-    for (Weekday d : Weekday.values())
+    for (Weekday d : Weekday.values()) {
       usedMinutesPerDay.put(d, 0);
+    }
 
-    // Sort tasks
+    // Sort tasks (USER-SCOPED)
     List<Task> tasks =
-        taskService.getAll().values()
+        taskService.getAll(userId)
             .stream()
             .sorted(Comparator.comparing(Task::getDueDate)
                         .thenComparing(
@@ -83,17 +84,12 @@ public class ScheduleService {
             scheduled);
       }
 
-      // Create a filtered queue of free blocks
-      Deque<TimeBlock> candidateFree = new ArrayDeque<>(
-          freeBlocks.stream()
-              .filter(tb -> tb.getDay().ordinal() <= latestDayAllowed.ordinal())
-              .toList());
-
       while (minutesRemaining > 0) {
         // Find the next usable block in the master freeBlocks list
         int idx = findNextUsableFreeBlockIndex(freeBlocks, latestDayAllowed,
                                                usedMinutesPerDay,
                                                maxTaskMinutesPerDay);
+
         if (idx == -1) {
           return ScheduleResult.infeasible(
               "Not enough free time before due date for task: " +
@@ -164,6 +160,7 @@ public class ScheduleService {
   private int findNextUsableFreeBlockIndex(
       List<TimeBlock> freeBlocks, Weekday latestAllowed,
       EnumMap<Weekday, Integer> usedMinutesPerDay, int maxPerDay) {
+
     for (int i = 0; i < freeBlocks.size(); i++) {
       TimeBlock b = freeBlocks.get(i);
       if (b.getDay().ordinal() > latestAllowed.ordinal())

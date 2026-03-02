@@ -1,0 +1,10 @@
+---
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: schedulelynx
+      POSTGRES_USER: schedulelynx
+      POSTGRES_PASSWORD: schedulelynx
+    ports:
+      - "5432:5432"

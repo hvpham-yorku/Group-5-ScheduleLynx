@@ -1,22 +1,22 @@
 CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY,
-  username TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL
+  username VARCHAR(100) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tasks (
   id BIGSERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
+  title VARCHAR(255) NOT NULL,
   due_date DATE NOT NULL,
   estimated_hours INT NOT NULL,
-  difficulty TEXT NOT NULL
+  difficulty VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS availability_blocks (
   id BIGSERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  day TEXT NOT NULL,
+  day VARCHAR(20) NOT NULL,
   start_time TIME NOT NULL,
   end_time TIME NOT NULL
 );
@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS availability_blocks (
 CREATE TABLE IF NOT EXISTS events (
   id BIGSERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  day TEXT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  day VARCHAR(20) NOT NULL,
   start_time TIME NOT NULL,
   end_time TIME NOT NULL
-);
+);;

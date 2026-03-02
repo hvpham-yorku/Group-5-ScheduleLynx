@@ -1,10 +1,11 @@
-package ca.yorku.eecs2311.schedulelynx.service;
+package ca.yorku.eecs2311.schedulelynx.unit.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryTaskRepository;
+import ca.yorku.eecs2311.schedulelynx.service.TaskService;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

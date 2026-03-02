@@ -1,4 +1,4 @@
-package ca.yorku.eecs2311.schedulelynx.web.controller;
+package ca.yorku.eecs2311.schedulelynx.unit.web.controller;
 
 import static ca.yorku.eecs2311.schedulelynx.web.controller.AuthController.SESSION_USER_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

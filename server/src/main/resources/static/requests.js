@@ -74,7 +74,13 @@ export async function postTask(formData) {
 // Post Requests
 // ================================
 
-/** @param formData is a dictionary of key-value pairs. */
+/**
+ * @param id {number} is the unique identifier for the task to be updated.
+ * @param title {string} what you wish to name the task.
+ * @param day {string} full name of the day of the week in all caps.
+ * @param startTime {string} when the event begins in HH:MM format.
+ * @param endTime {string} when the vent ends in HH:MM format.
+ */
 export async function sendEventUpdate(id, title, day, startTime, endTime) {
 
     // TODO

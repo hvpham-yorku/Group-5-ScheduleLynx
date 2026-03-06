@@ -1,4 +1,4 @@
-import {postEvent, postTask, requestDeleteEvent, sendEventUpdate} from "./requests.js";
+import {postEvent, postTask, requestDeleteEvent, sendEventUpdate} from "./api_requests.js";
 import {reloadDataFromServer, setDefaultDate, setDefaultEndTime, setDefaultStartTime} from "./timetable-functions.js";
 
 

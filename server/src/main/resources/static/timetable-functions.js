@@ -1,4 +1,4 @@
-import {fetchEvents, fetchTasks, requestDeleteAll} from "./requests.js";
+import {fetchEvents, fetchTasks, requestDeleteAll} from "./api_requests.js";
 import {dateToTime} from "./time.js";
 
 

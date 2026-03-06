@@ -2,7 +2,7 @@
 // SCHEDULE LYNX - MAIN SCRIPT
 // ============================
 
-import { fetchTasks, fetchEvents, requestDeleteAll } from "./requests.js";
+import { fetchTasks, fetchEvents, requestDeleteAll } from "./api_requests.js";
 
 // ============================
 // Global Variables

@@ -38,30 +38,32 @@ export async function postEvent(title, day, start, end) {
     return response.ok;
 }
 
-/** @param formData is a dictionary of key-value pairs. */
-export async function postTask(formData) {
+/**
+ * @param title {string} what you wish to name the task.
+ * @param date {string} the date the task should be completed by formatted as YYYY-MM-DD.
+ * @param estHours {number} the number of hours estimated to complete the task.
+ * @param difficulty {string} "LOW", "MEDIUM", or "HIGH"
+ */
+export async function postTask(title, date, estHours, difficulty = "MEDIUM") {
 
-    const { title, date, estimatedHours } = formData;
-
-    console.log(formData);
-
-    const taskData = {
-        id             : null,
+    const data = {
         title          : title,
         dueDate        : date,
-        estimatedHours : Math.round(estimatedHours),
-        difficulty     : "MEDIUM" // TODO: Add input field to the UI
+        estimatedHours : Math.round(estHours), // TODO: Change to minutes instead of hours
+        difficulty     : difficulty
     };
-    const taskPayload = JSON.stringify(taskData);
+    const payload = JSON.stringify(data);
 
-    console.log("postCalendarTask created payload:\n" + taskPayload);
+    console.log("postCalendarTask created payload:\n" + payload);
 
     const input = baseURL + "/api/tasks";
-    const response = await fetch(input, {
+    const message = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: taskPayload
-    });
+        body: payload
+    }
+
+    const response = await fetch(input, message);
 
     console.log("postCalendarTask received response:");
     console.log(response);

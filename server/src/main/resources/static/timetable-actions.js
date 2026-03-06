@@ -60,13 +60,17 @@ timetableForm.addEventListener("submit", async (event) => {
     const dataObject = Object.fromEntries(formData);    // The more you know 🌈⭐
 
     const title = titleInput.value;
-    const day = dateToWeekday(dateInput.value);
+    const date = dateInput.value;
+    const day = dateToWeekday(date);
     const start = startTimeInput.value;
     const end = endTimeInput.value;
+    const estHours = estHoursInput.value;
 
     let success = false;
-    if (dataObject.type === "event") success = await postEvent(title, day, start, end);
-    else if (dataObject.type === "task") success = await postTask(dataObject);
+    const newType = typeInput.value.toLowerCase();
+    if (newType === "event") success = await postEvent(title, day, start, end);
+    else if (newType === "task") success = await postTask(title, date, estHours);
+    else console.error("Invalid type selected!");
 
     if (!success) {
         alert("It didn't work! Please try again.\n" +

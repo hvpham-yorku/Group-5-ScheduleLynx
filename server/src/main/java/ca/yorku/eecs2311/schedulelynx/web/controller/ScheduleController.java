@@ -1,46 +1,70 @@
 package ca.yorku.eecs2311.schedulelynx.web.controller;
 
-import ca.yorku.eecs2311.schedulelynx.domain.ScheduledTaskBlock;
+import ca.yorku.eecs2311.schedulelynx.domain.ScheduleEntry;
 import ca.yorku.eecs2311.schedulelynx.service.ScheduleService;
 import ca.yorku.eecs2311.schedulelynx.web.SessionUser;
-import ca.yorku.eecs2311.schedulelynx.web.dto.ScheduleResponse;
-import ca.yorku.eecs2311.schedulelynx.web.dto.ScheduledTaskBlockResponse;
+import ca.yorku.eecs2311.schedulelynx.web.dto.GenerateScheduleRequest;
+import ca.yorku.eecs2311.schedulelynx.web.dto.GenerateScheduleResponse;
+import ca.yorku.eecs2311.schedulelynx.web.dto.ScheduleEntryResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/schedule")
 public class ScheduleController {
 
-  private final ScheduleService scheduleService;
+  private final ScheduleService service;
 
-  public ScheduleController(ScheduleService scheduleService) {
-    this.scheduleService = scheduleService;
-  }
+  public ScheduleController(ScheduleService service) { this.service = service; }
 
-  @GetMapping("/weekly")
-  public ScheduleResponse generateWeekly(@RequestParam String weekStart,
-                                         HttpServletRequest request) {
+  @GetMapping
+  public List<ScheduleEntryResponse>
+  getAll(@RequestParam(required = false) LocalDate startDate,
+         @RequestParam(required = false) LocalDate endDate,
+         HttpServletRequest request) {
     long userId = SessionUser.requireUserId(request);
 
-    java.time.LocalDate start = java.time.LocalDate.parse(weekStart);
+    List<ScheduleEntry> entries;
+    if (startDate != null && endDate != null) {
+      entries = service.getBetween(userId, startDate, endDate);
+    } else {
+      entries = service.getAll(userId);
+    }
 
-    ScheduleService.ScheduleResult result =
-        scheduleService.generateWeeklyPlan(userId, start);
-
-    List<ScheduledTaskBlockResponse> blocks =
-        result.getBlocks().stream().map(this::toResponse).toList();
-
-    return new ScheduleResponse(result.isFeasible(), result.getMessage(),
-                                blocks);
+    return entries.stream().map(this::toResponse).toList();
   }
 
-  private ScheduledTaskBlockResponse toResponse(ScheduledTaskBlock b) {
-    return new ScheduledTaskBlockResponse(b.getDay(), b.getStart(), b.getEnd(),
-                                          b.getTaskId(), b.getTaskTitle());
+  @PostMapping("/generate")
+  @ResponseStatus(HttpStatus.CREATED)
+  public GenerateScheduleResponse
+  generate(@RequestBody(required = false) GenerateScheduleRequest req,
+           HttpServletRequest request) {
+    long userId = SessionUser.requireUserId(request);
+
+    ScheduleService.ScheduleGenerationResult result =
+        service.generate(userId, req);
+
+    List<ScheduleEntryResponse> entries =
+        result.entries().stream().map(this::toResponse).toList();
+
+    return new GenerateScheduleResponse(
+        entries.size(), result.warnings().size(), result.warnings(), entries);
+  }
+
+  @DeleteMapping
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void clear(HttpServletRequest request) {
+    long userId = SessionUser.requireUserId(request);
+    service.clear(userId);
+  }
+
+  private ScheduleEntryResponse toResponse(ScheduleEntry entry) {
+    return new ScheduleEntryResponse(
+        entry.getId(), entry.getDate(), entry.getStartTime(),
+        entry.getEndTime(), entry.getPlannedHours(), entry.getTask().getId(),
+        entry.getTask().getTitle(), entry.getTask().getDueDate());
   }
 }

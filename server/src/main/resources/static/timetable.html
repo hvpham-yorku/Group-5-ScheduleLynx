@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="planner-page">
-    <!-- Navigation Bar (kept visible so user can exit planner) -->
     <nav class="navbar">
       <div class="nav-container">
         <div class="logo">
@@ -51,7 +50,7 @@
             </div>
 
             <div class="form-group">
-              <label for="dueDate">Date (dueDate)</label>
+              <label for="dueDate">Date</label>
               <input id="dueDate" type="date" required />
             </div>
 
@@ -85,16 +84,18 @@
               ></textarea>
             </div>
 
-            <div id="recurringGroup" class="form-group">
-              <label
-                ><input id="isRecurring" type="checkbox" /> Recurring</label
-              >
+            <div id="recurringGroup" class="form-group" style="display: none">
+              <label>
+                <input id="isRecurring" type="checkbox" />
+                Recurring
+              </label>
             </div>
 
             <div id="recurrenceOptions" style="display: none">
               <div class="form-group">
                 <label for="recurrenceType">Recurrence</label>
                 <select id="recurrenceType">
+                  <option value="">Select recurrence</option>
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
                   <option value="biweekly">Biweekly</option>
@@ -106,13 +107,34 @@
                 class="form-group days-checkbox"
                 style="display: none"
               >
-                <label><input type="checkbox" value="Mon" /> Mon</label>
-                <label><input type="checkbox" value="Tue" /> Tue</label>
-                <label><input type="checkbox" value="Wed" /> Wed</label>
-                <label><input type="checkbox" value="Thu" /> Thu</label>
-                <label><input type="checkbox" value="Fri" /> Fri</label>
-                <label><input type="checkbox" value="Sat" /> Sat</label>
-                <label><input type="checkbox" value="Sun" /> Sun</label>
+                <label
+                  ><input type="checkbox" name="recurrenceDays" value="Mon" />
+                  Mon</label
+                >
+                <label
+                  ><input type="checkbox" name="recurrenceDays" value="Tue" />
+                  Tue</label
+                >
+                <label
+                  ><input type="checkbox" name="recurrenceDays" value="Wed" />
+                  Wed</label
+                >
+                <label
+                  ><input type="checkbox" name="recurrenceDays" value="Thu" />
+                  Thu</label
+                >
+                <label
+                  ><input type="checkbox" name="recurrenceDays" value="Fri" />
+                  Fri</label
+                >
+                <label
+                  ><input type="checkbox" name="recurrenceDays" value="Sat" />
+                  Sat</label
+                >
+                <label
+                  ><input type="checkbox" name="recurrenceDays" value="Sun" />
+                  Sun</label
+                >
               </div>
 
               <div class="form-group">
@@ -127,7 +149,16 @@
                 class="btn-secondary"
                 id="clearForm"
                 type="button"
-                onclick="document.getElementById('taskForm').reset(); document.getElementById('recurrenceOptions').style.display='none'; document.getElementById('startTimeGroup').style.display='none'; document.getElementById('endTimeGroup').style.display='none';"
+                onclick="
+                                document.getElementById('taskForm').reset();
+                                document.getElementById('recurrenceOptions').style.display='none';
+                                document.getElementById('startTimeGroup').style.display='none';
+                                document.getElementById('endTimeGroup').style.display='none';
+                                document.getElementById('daysOfWeekGroup').style.display='none';
+                                document.getElementById('recurringGroup').style.display='none';
+                                document.getElementById('estimatedHoursGroup').style.display='block';
+                                document.querySelectorAll('input[name=&quot;recurrenceDays&quot;]').forEach(cb => cb.checked = false);
+                            "
               >
                 Reset
               </button>
@@ -173,7 +204,6 @@
       </main>
     </div>
 
-    <!-- Modal for task details -->
     <div id="taskModal" class="modal">
       <div class="modal-content">
         <span class="close-modal">&times;</span>
@@ -186,7 +216,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
       <div class="container">
         <p>&copy; 2026 ScheduleLynx. Your smart planner in sync.</p>

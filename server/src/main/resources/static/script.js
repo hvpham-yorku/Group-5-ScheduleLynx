@@ -4,6 +4,7 @@
 
 // Global Variables
 let tasks = [];
+let scheduleEntries = [];
 let currentWeekStart = getMonday(new Date());
 let selectedTaskId = null;
 let currentUser = null;
@@ -55,8 +56,7 @@ function getCurrentUser() {
   return storedUser ? JSON.parse(storedUser) : null;
 }
 
-// Legacy login handler kept for compatibility.
-// Real login should come from login.html backend flow.
+// Legacy fallback
 function handleLogin(event) {
   if (event) event.preventDefault();
 
@@ -89,8 +89,7 @@ function loginDemo() {
   handleLogin();
 }
 
-// Legacy signup handler kept for compatibility.
-// Real signup should come from login.html backend flow.
+// Legacy fallback
 function handleSignup(event) {
   if (event) event.preventDefault();
 
@@ -126,7 +125,6 @@ function handleSignup(event) {
   };
 
   localStorage.setItem("schedulelynxUser", JSON.stringify(user));
-
   alert("Account created successfully! Logging in...");
   window.location.href = "index.html";
 }
@@ -139,7 +137,7 @@ async function logout() {
       method: "POST",
     });
   } catch (err) {
-    // Ignore backend logout failure and still clear frontend state
+    // ignore backend logout error
   }
 
   localStorage.removeItem("schedulelynxUser");
@@ -226,7 +224,7 @@ function initializeLoginHandlers() {
 }
 
 // ============================
-// TASK / EVENT LOADING
+// TASK / EVENT / SCHEDULE LOADING
 // ============================
 
 async function loadUserTasks(username) {
@@ -278,13 +276,29 @@ async function loadUserTasks(username) {
   tasks = [...normalizedTasks, ...normalizedEvents];
 }
 
+async function loadScheduleEntries() {
+  const entries = await apiFetch("/api/schedule", {
+    method: "GET",
+  });
+
+  scheduleEntries = entries.map((entry) => ({
+    id: String(entry.id),
+    date: entry.date,
+    startTime: entry.startTime,
+    endTime: entry.endTime,
+    plannedHours: entry.plannedHours,
+    taskId: String(entry.taskId),
+    taskTitle: entry.taskTitle,
+    taskDueDate: entry.taskDueDate,
+  }));
+}
+
 function saveUserTasks(username) {
-  // no-op: tasks and events are stored in the backend
+  // no-op: backend is source of truth
 }
 
 function saveTasksToStorage() {
   if (currentUser) {
-    saveUserTasks(currentUser.username);
     refreshDashboardIfVisible();
   }
 }
@@ -292,8 +306,10 @@ function saveTasksToStorage() {
 async function loadTasksFromStorage() {
   if (currentUser) {
     await loadUserTasks(currentUser.username);
+    await loadScheduleEntries();
     updateTasksDisplay();
     renderScheduleGrid();
+    renderTimeline(scheduleEntries);
     const generateBtn = document.getElementById("generateSchedule");
     if (generateBtn && tasks.length > 0) {
       generateBtn.disabled = false;
@@ -419,6 +435,7 @@ async function initializeDashboard() {
 
   currentUser = getCurrentUser();
   await loadUserTasks(currentUser.username);
+  await loadScheduleEntries();
   updateDashboardStats();
   updateUpcomingTasks();
   updateWeekScheduleMini();
@@ -1051,6 +1068,8 @@ async function deleteTaskListener() {
       await apiFetch(`/api/tasks/${selectedTaskId}`, {
         method: "DELETE",
       });
+      await loadScheduleEntries();
+      renderTimeline(scheduleEntries);
     }
 
     tasks = tasks.filter((t) => t.id !== selectedTaskId);
@@ -1265,7 +1284,7 @@ function getEventsForDay(dateStr) {
   return items;
 }
 
-function generateSchedule() {
+async function generateSchedule() {
   if (tasks.length === 0) {
     alert("Please add at least one task before generating a schedule");
     return;
@@ -1277,82 +1296,80 @@ function generateSchedule() {
     return;
   }
 
-  const scheduledTasks = distributeTasksAcrossTime(tasksToSchedule);
-  renderTimeline(scheduledTasks);
-  alert("Schedule generated successfully! Check the timeline below.");
-}
+  try {
+    const result = await apiFetch("/api/schedule/generate", {
+      method: "POST",
+      body: JSON.stringify({
+        startDate: formatDate(new Date()),
+        dayStartTime: "09:00",
+        dayEndTime: "21:00",
+        maxHoursPerDay: 6,
+        maxBlockHours: 3,
+      }),
+    });
 
-function distributeTasksAcrossTime(tasksToSchedule) {
-  const sortedTasks = [...tasksToSchedule].sort((a, b) => {
-    return new Date(a.dueDate) - new Date(b.dueDate);
-  });
+    scheduleEntries = (result.entries || []).map((entry) => ({
+      id: String(entry.id),
+      date: entry.date,
+      startTime: entry.startTime,
+      endTime: entry.endTime,
+      plannedHours: entry.plannedHours,
+      taskId: String(entry.taskId),
+      taskTitle: entry.taskTitle,
+      taskDueDate: entry.taskDueDate,
+    }));
 
-  const scheduledItems = [];
+    renderTimeline(scheduleEntries);
 
-  sortedTasks.forEach((task) => {
-    const dueDate = new Date(task.dueDate);
-    const hoursNeeded = task.estimatedHours || 0;
-    const daysAvailable = Math.ceil(
-      (dueDate - new Date()) / (1000 * 60 * 60 * 24),
-    );
-
-    if (daysAvailable > 0) {
-      const hoursPerDay = Math.min(3, hoursNeeded / daysAvailable);
-
-      let currentDate = new Date();
-      let remainingHours = hoursNeeded;
-
-      while (remainingHours > 0 && currentDate < dueDate) {
-        const scheduledHours = Math.min(hoursPerDay, remainingHours);
-
-        scheduledItems.push({
-          date: formatDateDisplay(currentDate),
-          dateStr: formatDate(currentDate),
-          task: task,
-          hours: scheduledHours,
-        });
-
-        remainingHours -= scheduledHours;
-        currentDate = addDays(currentDate, 1);
-      }
+    if (result.warnings && result.warnings.length > 0) {
+      alert(
+        "Schedule generated with warnings:\n\n" + result.warnings.join("\n"),
+      );
+    } else {
+      alert("Schedule generated successfully!");
     }
-  });
-
-  return scheduledItems;
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
-function renderTimeline(scheduledItems) {
+function renderTimeline(entries) {
   const timeline = document.getElementById("timeline");
   if (!timeline) return;
 
-  if (scheduledItems.length === 0) {
+  if (!entries || entries.length === 0) {
     timeline.innerHTML = '<p class="empty-state">No tasks to schedule.</p>';
     return;
   }
 
   const groupedByDate = {};
-  scheduledItems.forEach((item) => {
-    if (!groupedByDate[item.date]) {
-      groupedByDate[item.date] = [];
+  entries.forEach((entry) => {
+    const key = entry.date;
+    if (!groupedByDate[key]) {
+      groupedByDate[key] = [];
     }
-    groupedByDate[item.date].push(item);
+    groupedByDate[key].push(entry);
   });
 
   timeline.innerHTML = Object.keys(groupedByDate)
     .sort((a, b) => new Date(a) - new Date(b))
-    .map((date) => {
-      const dateItems = groupedByDate[date];
+    .map((dateKey) => {
+      const dateItems = groupedByDate[dateKey].sort((a, b) =>
+        a.startTime.localeCompare(b.startTime),
+      );
+
       return `
         <div class="timeline-item">
-          <div class="timeline-date">${date}</div>
+          <div class="timeline-date">${formatDateDisplay(new Date(dateKey + "T12:00:00"))}</div>
           ${dateItems
             .map(
               (item) => `
-                <div class="timeline-task ${item.task.type}" onclick="viewTaskDetails('${item.task.id}')">
-                  <div class="timeline-task-title">${item.task.title}</div>
+                <div class="timeline-task task">
+                  <div class="timeline-task-title">${item.taskTitle}</div>
                   <div class="timeline-task-info">
-                    Scheduled: ${item.hours} hours |
-                    Due: ${formatDateDisplay(new Date(item.task.dueDate))}
+                    ${item.startTime} - ${item.endTime} |
+                    Planned: ${item.plannedHours} hour${item.plannedHours === 1 ? "" : "s"} |
+                    Due: ${formatDateDisplay(new Date(item.taskDueDate + "T12:00:00"))}
                   </div>
                 </div>
               `,
@@ -1371,7 +1388,7 @@ function renderTimeline(scheduledItems) {
 async function clearAllItems() {
   if (
     !confirm(
-      "Are you sure you want to clear all tasks and events?\nThis cannot be undone.",
+      "Are you sure you want to clear all tasks, events, and generated schedule?\nThis cannot be undone.",
     )
   ) {
     return;
@@ -1386,7 +1403,12 @@ async function clearAllItems() {
       method: "DELETE",
     });
 
+    await apiFetch("/api/schedule", {
+      method: "DELETE",
+    });
+
     tasks = [];
+    scheduleEntries = [];
     updateTasksDisplay();
 
     const timeline = document.getElementById("timeline");
@@ -1403,7 +1425,7 @@ async function clearAllItems() {
     }
 
     refreshDashboardIfVisible();
-    alert("All backend tasks and events cleared!");
+    alert("All backend tasks, events, and schedule entries cleared!");
   } catch (err) {
     alert(err.message);
   }

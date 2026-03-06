@@ -52,6 +52,13 @@ function clearTimetable() {
 
 async function renderEventItems(events) {
 
+    const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
+    days.forEach(day => {
+        const container = document.getElementById(day + "Events");
+        if (container) container.innerHTML = "";
+    });
+
     for (let event of events) {
 
         const columnId = event.day.toLowerCase().substring(0, 3) + "Events";
@@ -85,9 +92,7 @@ async function renderTaskItems(tasks) {
         return;
     }
 
-    if (tasks.length > 0) {
-        tasksList.innerHTML = "";
-    }
+    tasksList.innerHTML = "";
 
     for (let task of tasks) {
 

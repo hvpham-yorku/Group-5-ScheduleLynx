@@ -180,10 +180,10 @@ export async function deleteTimetable() {
 
 export function showEventModal(eventData) {
 
-    const modal = document.getElementById('eventModal');
+    const eventModal = document.getElementById('eventModal');
     const modalBody = document.getElementById('eventModalBody');
 
-    if (!modal || !modalBody) return;
+    if (!eventModal || !modalBody) return;
 
     modalBody.innerHTML = `
         <input type="hidden" id="modalEventId" value="${eventData.id}">

@@ -108,7 +108,7 @@ async function updateEvent(event) {
 
     if (event) event.preventDefault();
 
-    const modal = document.getElementById('eventModal');
+    const eventModal = document.getElementById('eventModal');
 
     const id = parseInt(document.getElementById('modalEventId').value);
     const title = document.getElementById('modalEventTitle').value;
@@ -119,7 +119,7 @@ async function updateEvent(event) {
     let success = await sendEventUpdate(id, title, day, startTime, endTime)
 
     if (success) {
-        modal.classList.remove('active');
+        eventModal.classList.remove('active');
         await reloadDataFromServer();
     } else alert("Update failed!");
 }
@@ -128,13 +128,13 @@ async function deleteEvent(event) {
 
     if (event) event.preventDefault();
 
-    const modal = document.getElementById('eventModal');
+    const eventModal = document.getElementById('eventModal');
     const id = document.getElementById('modalEventId').value;
 
     let success = await requestDeleteEvent(id);
 
     if (success) {
-        modal.classList.remove('active');
+        eventModal.classList.remove('active');
         await reloadDataFromServer();
     } else alert("Delete failed!");
 }
@@ -143,8 +143,8 @@ async function closeEventModal(event) {
 
     if (event) event.preventDefault();
 
-    const modal = document.getElementById('eventModal');
-    modal.classList.remove('active');
+    const eventModal = document.getElementById('eventModal');
+    eventModal.classList.remove('active');
 
 }
 

@@ -151,15 +151,28 @@
     </main>
 </div>
 
+<!-- Modal for event details -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div id="eventModalBody"></div>
+        <div class="modal-actions">
+            <button id="updateEventBtn" class="btn-primary">Update</button>
+            <button id="deleteEventBtn" class="btn-danger">Delete</button>
+            <button id="closeEventModalBtn" class="btn-secondary">Close</button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal for task details -->
 <div id="taskModal" class="modal">
     <div class="modal-content">
         <span class="close-modal">&times;</span>
-        <div id="modalBody"></div>
+        <div id="taskModalBody"></div>
         <div class="modal-actions">
             <button id="updateTaskBtn" class="btn-primary">Update</button>
             <button id="deleteTaskBtn" class="btn-danger">Delete</button>
-            <button id="closeModalBtn" class="btn-secondary">Close</button>
+            <button id="closeTaskModalBtn" class="btn-secondary">Close</button>
         </div>
     </div>
 </div>

@@ -108,7 +108,7 @@ async function updateEvent(event) {
 
     if (event) event.preventDefault();
 
-    const modal = document.getElementById('taskModal');
+    const modal = document.getElementById('eventModal');
 
     const id = parseInt(document.getElementById('modalEventId').value);
     const title = document.getElementById('modalEventTitle').value;
@@ -128,7 +128,7 @@ async function deleteEvent(event) {
 
     if (event) event.preventDefault();
 
-    const modal = document.getElementById('taskModal');
+    const modal = document.getElementById('eventModal');
     const id = document.getElementById('modalEventId').value;
 
     let success = await requestDeleteEvent(id);
@@ -139,5 +139,5 @@ async function deleteEvent(event) {
     } else alert("Delete failed!");
 }
 
-document.getElementById("updateTaskBtn").addEventListener("click", updateEvent);
-document.getElementById("deleteTaskBtn").addEventListener("click", deleteEvent);
+document.getElementById("updateEventBtn").addEventListener("click", updateEvent);
+document.getElementById("deleteEventBtn").addEventListener("click", deleteEvent);

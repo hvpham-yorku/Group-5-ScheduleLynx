@@ -180,8 +180,8 @@ export async function deleteTimetable() {
 
 export function showEventModal(eventData) {
 
-    const modal = document.getElementById('taskModal');
-    const modalBody = document.getElementById('modalBody');
+    const modal = document.getElementById('eventModal');
+    const modalBody = document.getElementById('eventModalBody');
 
     if (!modal || !modalBody) return;
 

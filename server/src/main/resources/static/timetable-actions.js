@@ -139,5 +139,15 @@ async function deleteEvent(event) {
     } else alert("Delete failed!");
 }
 
+async function closeEventModal(event) {
+
+    if (event) event.preventDefault();
+
+    const modal = document.getElementById('eventModal');
+    modal.classList.remove('active');
+
+}
+
 document.getElementById("updateEventBtn").addEventListener("click", updateEvent);
 document.getElementById("deleteEventBtn").addEventListener("click", deleteEvent);
+document.getElementById("closeEventModalBtn").addEventListener("click", closeEventModal);

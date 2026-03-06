@@ -71,7 +71,7 @@ export async function postTask(formData) {
 
 
 // ================================
-// Post Requests
+// Put Requests
 // ================================
 
 /**

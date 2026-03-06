@@ -13,22 +13,24 @@ const baseURL = "http://localhost:8080";
  */
 export async function postEvent(title, day, start, end) {
 
-    const eventData = {
+    const data = {
         title : title,
         day   : day,
         start : start,
         end   : end
     };
-    const eventPayload = JSON.stringify(eventData);
+    const payload = JSON.stringify(data);
 
-    console.log("postCalendarEvent created payload:\n" + eventPayload);
+    console.log("postCalendarEvent created payload:\n" + payload);
 
-    const input = baseURL + "/api/events";
-    const response = await fetch(input, {
+    const url = baseURL + "/api/events";
+    const message = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: eventPayload
-    });
+        body: payload
+    }
+
+    const response = await fetch(url, message);
 
     console.log("postCalendarEvent received response:");
     console.log(response);

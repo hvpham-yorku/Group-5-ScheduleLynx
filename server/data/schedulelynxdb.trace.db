@@ -2,3 +2,9 @@
 org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
 2026-03-05 22:29:03.571259-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-03-05 23:29:14.365163-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-03-05 23:32:40.969721-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT* FROM USERS\000d\000a[*]SELECT* FROM TASKS"; SQL statement:
+SELECT* FROM USERS
+SELECT* FROM TASKS [42000-224]

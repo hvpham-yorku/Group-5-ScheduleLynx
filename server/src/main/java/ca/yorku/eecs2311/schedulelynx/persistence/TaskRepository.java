@@ -3,15 +3,15 @@ package ca.yorku.eecs2311.schedulelynx.persistence;
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TaskRepository {
-  Task save(long userId, Task task);
+public interface TaskRepository extends JpaRepository<Task, Long> {
 
-  List<Task> findAll(long userId);
+  List<Task> findAllByOwnerIdOrderByDueDateAscIdAsc(Long ownerId);
 
-  Optional<Task> findById(long userId, long id);
+  Optional<Task> findByIdAndOwnerId(Long id, Long ownerId);
 
-  Optional<Task> update(long userId, long id, Task updatedTask);
+  long deleteByIdAndOwnerId(Long id, Long ownerId);
 
-  boolean delete(long userId, long id);
+  void deleteAllByOwnerId(Long ownerId);
 }

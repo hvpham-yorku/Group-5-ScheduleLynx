@@ -75,13 +75,26 @@ export async function postTask(formData) {
 // ================================
 
 /** @param formData is a dictionary of key-value pairs. */
-export async function sendEventUpdate(formData) {
+export async function sendEventUpdate(id, title, day, startTime, endTime) {
+
     // TODO
+
+    const payload = {
+        id:        id,
+        title:     title,
+        day:       day,
+        startTime: startTime,
+        endTime:   endTime,
+        type:      "event"
+    };
+
 }
 
 /** @param formData is a dictionary of key-value pairs. */
 export async function sendTaskUpdate(formData) {
+
     // TODO
+
 }
 
 

@@ -100,18 +100,14 @@ async function updateEvent(event) {
     if (event) event.preventDefault();
 
     const modal = document.getElementById('taskModal');
-    const id = document.getElementById('modalEventId').value;
 
-    const updatedData = {
-        id:        parseInt(id),
-        title:     document.getElementById('modalEventTitle').value,
-        day:       document.getElementById('modalEventDay')  .value,
-        startTime: document.getElementById('modalEventStart').value,
-        endTime:   document.getElementById('modalEventEnd')  .value,
-        type:      "event"
-    };
+    const id = parseInt(document.getElementById('modalEventId').value);
+    const title = document.getElementById('modalEventTitle').value;
+    const day = document.getElementById('modalEventDay').value;
+    const startTime = document.getElementById('modalEventStart').value;
+    const endTime = document.getElementById('modalEventEnd').value;
 
-    let success = await sendEventUpdate(updatedData)
+    let success = await sendEventUpdate(id, title, day, startTime, endTime)
 
     if (success) {
         modal.classList.remove('active');

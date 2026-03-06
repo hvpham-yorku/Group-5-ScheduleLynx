@@ -83,17 +83,29 @@ export async function postTask(formData) {
  */
 export async function sendEventUpdate(id, title, day, startTime, endTime) {
 
-    // TODO
-
-    const payload = {
-        id:        id,
-        title:     title,
-        day:       day,
-        startTime: startTime,
-        endTime:   endTime,
-        type:      "event"
+    const data = {
+        id:    id,
+        title: title,
+        day:   day,
+        start: startTime,
+        end:   endTime,
+        type:  "event"
     };
+    const payload = JSON.stringify(data);
 
+    console.log("sendEventUpdate created payload:\n" + payload);
+
+    const input = baseURL + "/api/events/" + id.toString();
+    const response = await fetch(input, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: payload
+    });
+
+    console.log("postCalendarTask received response:");
+    console.log(response);
+
+    return response.ok;
 }
 
 /** @param formData is a dictionary of key-value pairs. */

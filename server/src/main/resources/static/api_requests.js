@@ -152,6 +152,10 @@ export async function sendTaskUpdate(id, title, dueDate, estHours, difficulty) {
 // Delete Requests
 // ================================
 
+/**
+ * @param eventID {number} is the unique identifier for the event to be deleted.
+ * @returns {Promise<boolean>} {@code true} if the event was successfully deleted, {@code false} otherwise.
+ */
 export async function requestDeleteEvent(eventID) {
 
     if (!eventID) return;
@@ -165,6 +169,10 @@ export async function requestDeleteEvent(eventID) {
     return response.ok;
 }
 
+/**
+ * @param taskID {number} is the unique identifier for the task to be deleted.
+ * @returns {Promise<boolean>} {@code true} if the event was successfully deleted, {@code false} otherwise.
+ */
 export async function requestDeleteTask(taskID) {
 
     if (!taskID) return;
@@ -178,6 +186,9 @@ export async function requestDeleteTask(taskID) {
     return response.ok;
 }
 
+/**
+ * @returns {Promise<boolean>} {@code true} if both events and tasks were successfully deleted, {@code false} otherwise.
+ */
 export async function requestDeleteAll() {
 
     const taskRequest = baseURL + "/api/tasks";

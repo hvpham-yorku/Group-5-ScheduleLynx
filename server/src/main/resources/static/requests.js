@@ -108,11 +108,37 @@ export async function sendEventUpdate(id, title, day, startTime, endTime) {
     return response.ok;
 }
 
-/** @param formData is a dictionary of key-value pairs. */
-export async function sendTaskUpdate(formData) {
+/**
+ * @param id {number} is the unique identifier for the task to be updated.
+ * @param title {string} what you wish to name the task.
+ * @param dueDate {string} the date the task should be completed by formatted as YYYY-MM-DD.
+ * @param estHours {number} the number of hours estimated to complete the task.
+ * @param difficulty {string} "LOW", "MEDIUM", or "HIGH"
+ */
+export async function sendTaskUpdate(id, title, dueDate, estHours, difficulty) {
 
-    // TODO
+    const data = {
+        id : id,
+        title : title,
+        dueDate : dueDate,
+        estimatedHours : estHours,
+        difficulty : difficulty
+    }
+    const payload = JSON.stringify(data);
 
+    console.log("sendTaskUpdate created payload:\n" + payload);
+
+    const input = baseURL + "/api/tasks/" + id.toString();
+    const response = await fetch(input, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: payload
+    });
+
+    console.log("postCalendarTask received response:");
+    console.log(response);
+
+    return response.ok;
 }
 
 

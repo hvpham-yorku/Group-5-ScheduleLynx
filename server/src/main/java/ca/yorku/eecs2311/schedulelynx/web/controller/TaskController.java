@@ -31,6 +31,7 @@ public class TaskController {
   }
 
   @PutMapping("/{id}")
+  @ResponseStatus(HttpStatus.ACCEPTED)
   public TaskResponse update(@Valid @RequestBody TaskRequest req) {
 
     if (req == null)      throw new IllegalArgumentException("Task request cannot be null!");

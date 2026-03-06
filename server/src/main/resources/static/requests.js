@@ -95,8 +95,8 @@ export async function sendEventUpdate(id, title, day, startTime, endTime) {
 
     console.log("sendEventUpdate created payload:\n" + payload);
 
-    const input = baseURL + "/api/events/" + id.toString();
-    const response = await fetch(input, {
+    const url = baseURL + "/api/events/" + id.toString();
+    const response = await fetch(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: payload
@@ -128,8 +128,8 @@ export async function sendTaskUpdate(id, title, dueDate, estHours, difficulty) {
 
     console.log("sendTaskUpdate created payload:\n" + payload);
 
-    const input = baseURL + "/api/tasks/" + id.toString();
-    const response = await fetch(input, {
+    const url = baseURL + "/api/tasks/" + id.toString();
+    const response = await fetch(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: payload

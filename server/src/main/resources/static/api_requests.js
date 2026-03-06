@@ -1,5 +1,3 @@
-import {dateToWeekday} from "./utils.js";
-
 const baseURL = "http://localhost:8080";
 
 
@@ -7,19 +5,19 @@ const baseURL = "http://localhost:8080";
 // Post Requests
 // ================================
 
-/** @param formData is a dictionary of key-value pairs. */
-export async function postEvent(formData) {
-
-    let { title, date, day, startTime, endTime } = formData;
-
-    if (!day) day = dateToWeekday(date);
+/**
+ * @param title {string} what you wish to name the event.
+ * @param day {string} full name of the day of the week in all caps.
+ * @param start {string} when the event begins in HH:MM format.
+ * @param end {string} when the event ends in HH:MM format.
+ */
+export async function postEvent(title, day, start, end) {
 
     const eventData = {
-        id    : null,
         title : title,
         day   : day,
-        start : startTime,
-        end   : endTime
+        start : start,
+        end   : end
     };
     const eventPayload = JSON.stringify(eventData);
 

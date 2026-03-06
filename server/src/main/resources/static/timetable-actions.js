@@ -1,6 +1,6 @@
 import {postEvent, postTask, requestDeleteEvent, sendEventUpdate} from "./api_requests.js";
 import {reloadDataFromServer, setDefaultDate, setDefaultEndTime, setDefaultStartTime} from "./timetable-functions.js";
-
+import {dateToWeekday} from "./utils.js";
 
 // HTML Element References /////////////////////////////////////////////////////
 
@@ -59,8 +59,13 @@ timetableForm.addEventListener("submit", async (event) => {
     const formData = new FormData(timetableForm);       // which is why we're calling preventDefault() to stop that from happening
     const dataObject = Object.fromEntries(formData);    // The more you know 🌈⭐
 
+    const title = titleInput.value;
+    const day = dateToWeekday(dateInput.value);
+    const start = startTimeInput.value;
+    const end = endTimeInput.value;
+
     let success = false;
-    if (dataObject.type === "event") success = await postEvent(dataObject);
+    if (dataObject.type === "event") success = await postEvent(title, day, start, end);
     else if (dataObject.type === "task") success = await postTask(dataObject);
 
     if (!success) {

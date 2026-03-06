@@ -1,5 +1,5 @@
 import {fetchEvents, fetchTasks, requestDeleteAll} from "./api_requests.js";
-import {dateToTime} from "./time.js";
+import {dateToTime} from "./utils.js";
 
 
 // HTML Element References /////////////////////////////////////////////////////

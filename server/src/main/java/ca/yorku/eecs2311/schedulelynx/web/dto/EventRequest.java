@@ -1,19 +1,17 @@
 package ca.yorku.eecs2311.schedulelynx.web.dto;
 
-import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
+import ca.yorku.eecs2311.schedulelynx.domain.RecurrenceType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
-
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Set;
 
-public record EventRequest(
-
-//      Annotation  Type        Name
-        @Nullable   Long        id,
-        @NotBlank   String      title,
-        @NotNull    Weekday     day,
-        @NotNull    LocalTime   start,
-        @NotNull    LocalTime   end
-) {
-}
+public record
+EventRequest(@NotBlank String title, @NotNull LocalDate date,
+             @NotNull @JsonFormat(pattern = "HH:mm") LocalTime startTime,
+             @NotNull @JsonFormat(pattern = "HH:mm") LocalTime endTime,
+             boolean recurring, RecurrenceType recurrenceType,
+             LocalDate recurrenceEnd, Set<DayOfWeek> recurrenceDays) {}

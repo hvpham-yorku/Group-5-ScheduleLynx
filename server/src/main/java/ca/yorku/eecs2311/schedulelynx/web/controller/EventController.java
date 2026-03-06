@@ -24,7 +24,6 @@ public class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-
     public EventResponse create(@Valid @RequestBody EventRequest req) {
 
         var event = service.create(req);
@@ -32,6 +31,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public EventResponse update(@Valid @RequestBody EventRequest req)
     {
 

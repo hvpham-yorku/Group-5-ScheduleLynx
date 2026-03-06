@@ -54,10 +54,10 @@ if (!isRecurInput)      alert("Could not find isRecurInput element!");
 // Defines how the add button works
 timetableForm.addEventListener("submit", async (event) => {
 
-    event.preventDefault();                                             // apparently before modern API calls, it used to be you had
-                                                                        // to reload the whole webpage to get the updated data,
-    const formData = new FormData(timetableForm);                       // which is why we're calling preventDefault() to stop that from happening
-    const dataObject = Object.fromEntries(formData);             // The more you know 🌈⭐
+    event.preventDefault();                             // apparently before modern API calls, it used to be you had
+                                                        // to reload the whole webpage to get the updated data,
+    const formData = new FormData(timetableForm);       // which is why we're calling preventDefault() to stop that from happening
+    const dataObject = Object.fromEntries(formData);    // The more you know 🌈⭐
 
     let success = false;
     if (dataObject.type === "event") success = await postEvent(dataObject);

@@ -2,7 +2,6 @@ package ca.yorku.eecs2311.schedulelynx.web.controller;
 
 import ca.yorku.eecs2311.schedulelynx.domain.User;
 import ca.yorku.eecs2311.schedulelynx.service.UserService;
-import ca.yorku.eecs2311.schedulelynx.web.dto.*;
 import ca.yorku.eecs2311.schedulelynx.web.dto.LoginRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.MeResponse;
 import ca.yorku.eecs2311.schedulelynx.web.dto.RegisterRequest;
@@ -12,8 +11,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-// ...
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,7 +27,9 @@ public class AuthController {
   @ResponseStatus(HttpStatus.CREATED)
   public MeResponse register(@Valid @RequestBody RegisterRequest req,
                              HttpSession session) {
-    var user = userService.register(req.username(), req.password());
+    User user = userService.register(req.username(), req.email(),
+                                     req.fullName(), req.password());
+
     session.setAttribute(SESSION_USER_ID, user.getId());
     return new MeResponse(user.getId(), user.getUsername());
   }
@@ -38,7 +37,7 @@ public class AuthController {
   @PostMapping("/login")
   public MeResponse login(@Valid @RequestBody LoginRequest req,
                           HttpSession session) {
-    var user = userService.login(req.username(), req.password());
+    User user = userService.login(req.usernameOrEmail(), req.password());
     session.setAttribute(SESSION_USER_ID, user.getId());
     return new MeResponse(user.getId(), user.getUsername());
   }
@@ -51,8 +50,7 @@ public class AuthController {
 
   @GetMapping("/me")
   public MeResponse me(HttpServletRequest request) {
-    HttpSession session =
-        request.getSession(false); // IMPORTANT: false = don't create
+    HttpSession session = request.getSession(false);
     if (session == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                                         "Not logged in");

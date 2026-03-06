@@ -2,5 +2,5 @@ package ca.yorku.eecs2311.schedulelynx.web.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record LoginRequest(@NotBlank String username,
+public record LoginRequest(@NotBlank String usernameOrEmail,
                            @NotBlank String password) {}

@@ -29,7 +29,9 @@
 
 
 
-## User Story 🔗 Development Tasks
+## Development Tasks
+
+Iteration 1
 
 * As a student I want to add tasks with dueDates(such as assignments and
 studying for exams) so the system can generate my workload. <p><t>Construct a submission tool and link to backend</t></p>
@@ -43,6 +45,14 @@ availability) and have the schedule automatically update and re-balance, so
 my plan stays realistic when things change. <p><t>Construct a submission tool and link to backend</t></p>
 * As a student I want the system to detect when my workload cannot fit into my
 available time before dueDates and clearly warn me. <p><t>Construct a submission tool and link to backend</t></p>
+
+Iteration 2
+
+* Add database
+* User sessions
+* Refactored scheduling algorithm
+* Extra checks on task creation
+* Fix bugs in Iteration 1 release
 
 
 

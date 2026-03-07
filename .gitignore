@@ -1,10 +1,26 @@
-# Maven
-target/
+# OS
+.DS_Store
 
 # IDE
 .idea/
 .vscode/
 *.iml
+.classpath
+.project
+.settings/
 
-# OS
-.DS_Store
+# Maven / Java
+target/
+*.log
+
+# Spring / local runtime data
+server/data/
+*.mv.db
+*.trace.db
+
+# Local cookies / temp files
+cookies*.txt
+
+# Mac/Linux misc
+*.swp
+*.swo

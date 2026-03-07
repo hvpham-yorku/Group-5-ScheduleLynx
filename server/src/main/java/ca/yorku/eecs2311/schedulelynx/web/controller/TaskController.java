@@ -73,6 +73,13 @@ public class TaskController {
     }
   }
 
+  @DeleteMapping
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteAll(HttpServletRequest request) {
+    long userId = SessionUser.requireUserId(request);
+    service.deleteAll(userId);
+  }
+
   private TaskResponse toResponse(Task t) {
     return new TaskResponse(t.getId(), t.getTitle(), t.getDueDate(),
                             t.getEstimatedHours(), t.getDifficulty());

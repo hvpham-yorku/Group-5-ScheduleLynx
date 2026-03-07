@@ -3,7 +3,6 @@ package ca.yorku.eecs2311.schedulelynx.web.controller;
 import ca.yorku.eecs2311.schedulelynx.domain.Event;
 import ca.yorku.eecs2311.schedulelynx.service.EventService;
 import ca.yorku.eecs2311.schedulelynx.web.SessionUser;
-import ca.yorku.eecs2311.schedulelynx.web.controller.errors.EventNotFoundException;
 import ca.yorku.eecs2311.schedulelynx.web.dto.EventRequest;
 import ca.yorku.eecs2311.schedulelynx.web.dto.EventResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +10,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/events")
@@ -26,9 +26,10 @@ public class EventController {
                               HttpServletRequest request) {
     long userId = SessionUser.requireUserId(request);
 
-    Event created =
-        service.create(userId, new Event(null, req.title(), req.day(),
-                                         req.start(), req.end()));
+    Event created = service.create(
+        userId, new Event(null, req.title(), req.date(), req.startTime(),
+                          req.endTime(), req.recurring(), req.recurrenceType(),
+                          req.recurrenceEnd(), req.recurrenceDays()));
 
     return toResponse(created);
   }
@@ -44,9 +45,13 @@ public class EventController {
                                HttpServletRequest request) {
     long userId = SessionUser.requireUserId(request);
 
-    return service.getById(userId, id)
-        .map(this::toResponse)
-        .orElseThrow(() -> new EventNotFoundException(id));
+    Event event =
+        service.getById(userId, id)
+            .orElseThrow(()
+                             -> new ResponseStatusException(
+                                 HttpStatus.NOT_FOUND, "Event not found"));
+
+    return toResponse(event);
   }
 
   @PutMapping("/{id}")
@@ -56,11 +61,17 @@ public class EventController {
     long userId = SessionUser.requireUserId(request);
 
     Event updated =
-        new Event(null, req.title(), req.day(), req.start(), req.end());
+        new Event(null, req.title(), req.date(), req.startTime(), req.endTime(),
+                  req.recurring(), req.recurrenceType(), req.recurrenceEnd(),
+                  req.recurrenceDays());
 
-    return service.update(userId, id, updated)
-        .map(this::toResponse)
-        .orElseThrow(() -> new EventNotFoundException(id));
+    Event saved =
+        service.update(userId, id, updated)
+            .orElseThrow(()
+                             -> new ResponseStatusException(
+                                 HttpStatus.NOT_FOUND, "Event not found"));
+
+    return toResponse(saved);
   }
 
   @DeleteMapping("/{id}")
@@ -69,12 +80,22 @@ public class EventController {
     long userId = SessionUser.requireUserId(request);
 
     if (!service.delete(userId, id)) {
-      throw new EventNotFoundException(id);
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                        "Event not found");
     }
   }
 
-  private EventResponse toResponse(Event e) {
-    return new EventResponse(e.getId(), e.getTitle(), e.getDay(), e.getStart(),
-                             e.getEnd());
+  @DeleteMapping
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteAll(HttpServletRequest request) {
+    long userId = SessionUser.requireUserId(request);
+    service.deleteAll(userId);
+  }
+
+  private EventResponse toResponse(Event event) {
+    return new EventResponse(
+        event.getId(), event.getTitle(), event.getDate(), event.getStartTime(),
+        event.getEndTime(), event.isRecurring(), event.getRecurrenceType(),
+        event.getRecurrenceEnd(), event.getRecurrenceDays());
   }
 }

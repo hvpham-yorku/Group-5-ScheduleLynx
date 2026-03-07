@@ -1,5 +1,6 @@
 package ca.yorku.eecs2311.schedulelynx.web.controller;
 
+import static ca.yorku.eecs2311.schedulelynx.web.controller.AuthController.SESSION_USER_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,10 +17,13 @@ class EventControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
+  private static final long USER_ID = 1L;
+
   @Test
   void postAndGetFixedEvents_work() throws Exception {
     mockMvc
         .perform(post("/api/events")
+                     .sessionAttr(SESSION_USER_ID, USER_ID)
                      .contentType(MediaType.APPLICATION_JSON)
                      .content("""
                     {
@@ -33,7 +37,7 @@ class EventControllerTest {
         .andExpect(jsonPath("$.id").value(1))
         .andExpect(jsonPath("$.title").value("EECS 2311 Lecture"));
 
-    mockMvc.perform(get("/api/events"))
+    mockMvc.perform(get("/api/events").sessionAttr(SESSION_USER_ID, USER_ID))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1));
   }
@@ -42,6 +46,7 @@ class EventControllerTest {
   void missingTitle_returnsBadRequest() throws Exception {
     mockMvc
         .perform(post("/api/events")
+                     .sessionAttr(SESSION_USER_ID, USER_ID)
                      .contentType(MediaType.APPLICATION_JSON)
                      .content("""
                     {

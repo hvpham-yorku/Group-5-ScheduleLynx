@@ -62,6 +62,7 @@ function handleLogin(event) {
 
 // Demo login
 function loginDemo() {
+
     document.getElementById('username').value = 'demo';
     document.getElementById('password').value = 'demo123';
     handleLogin();
@@ -69,6 +70,7 @@ function loginDemo() {
 
 // Handle signup
 function handleSignup(event) {
+
     if (event) event.preventDefault();
 
     const name = document.getElementById('signupName').value.trim();
@@ -77,36 +79,38 @@ function handleSignup(event) {
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
-    if (!name || !email || !username || !password || !confirmPassword) {
-        alert('Please fill in all fields');
-        return;
-    }
+  if (!name || !email || !username || !password || !confirmPassword) {
+    alert("Please fill in all fields");
+    return;
+  }
 
-    if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        return;
-    }
+  if (password !== confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
 
-    if (password.length < 6) {
-        alert('Password must be at least 6 characters');
-        return;
-    }
+  if (password.length < 6) {
+    alert("Password must be at least 6 characters");
+    return;
+  }
 
-    // Check if username already exists (in real app, check against backend)
-    const existingUsers = localStorage.getItem('allUsers') ? JSON.parse(localStorage.getItem('allUsers')) : {};
-    if (existingUsers[username]) {
-        alert('Username already exists');
-        return;
-    }
+  // Check if username already exists (in real app, check against backend)
+  const existingUsers = localStorage.getItem("allUsers")
+    ? JSON.parse(localStorage.getItem("allUsers"))
+    : {};
+  if (existingUsers[username]) {
+    alert("Username already exists");
+    return;
+  }
 
-    // Create new user
-    const newUser = {
-        username: username,
-        email: email,
-        name: name,
-        password: password, // In real app, hash the password!
-        createdAt: new Date().toISOString()
-    };
+  // Create new user
+  const newUser = {
+    username: username,
+    email: email,
+    name: name,
+    password: password, // In real app, hash the password!
+    createdAt: new Date().toISOString(),
+  };
 
     // Store user credentials
     existingUsers[username] = newUser;
@@ -132,9 +136,9 @@ function handleSignup(event) {
 
 // Logout
 function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('schedulelynxUser');
-        window.location.href = 'login.html';
+    if (confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("schedulelynxUser");
+        window.location.href = "login.html";
     }
 }
 
@@ -193,16 +197,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize login form handlers
 function initializeLoginHandlers() {
-    const loginForm = document.getElementById('loginForm');
-    const signupForm = document.getElementById('signupFormElement');
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    }
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupFormElement");
 
-    if (signupForm) {
-        signupForm.addEventListener('submit', handleSignup);
-    }
+    if (loginForm) loginForm.addEventListener("submit", handleLogin);
+    if (signupForm) signupForm.addEventListener("submit", handleSignup);
 }
 
 
@@ -223,13 +223,13 @@ function initializeDashboard() {
 
 // Refresh helper: update dashboard widgets when visible
 function refreshDashboardIfVisible() {
-    // Only run if dashboard elements exist on the page
-    if (document.getElementById('totalTasksCount')) {
-        updateDashboardStats();
-        updateUpcomingTasks();
-        updateWeekScheduleMini();
-        updateTaskBreakdown();
-    }
+  // Only run if dashboard elements exist on the page
+  if (document.getElementById("totalTasksCount")) {
+    updateDashboardStats();
+    updateUpcomingTasks();
+    updateWeekScheduleMini();
+    updateTaskBreakdown();
+  }
 }
 
 function updateDashboardStats() {
@@ -518,7 +518,7 @@ function renderScheduleGrid() {
         dayColumn.innerHTML = `
             <div class="day-header">${dayName}<br>${dayDate.getDate()}</div>
             <div class="day-content">
-                ${dayEvents.length > 0
+                ${dayEvents.length > 0 
                     ? dayEvents.map(event => `
                         <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
                             <div class="schedule-event-title">${event.title}</div>
@@ -672,31 +672,35 @@ function distributeTasksAcrossTime(tasksToSchedule) {
 }
 
 function renderTimeline(scheduledItems) {
-    const timeline = document.getElementById('timeline');
+  const timeline = document.getElementById("timeline");
 
-    if (scheduledItems.length === 0) {
-        timeline.innerHTML = '<p class="empty-state">No tasks to schedule.</p>';
-        return;
+  if (scheduledItems.length === 0) {
+    timeline.innerHTML = '<p class="empty-state">No tasks to schedule.</p>';
+    return;
+  }
+
+  // Group by date
+  const groupedByDate = {};
+  scheduledItems.forEach((item) => {
+    if (!groupedByDate[item.date]) {
+      groupedByDate[item.date] = [];
     }
+    groupedByDate[item.date].push(item);
+  });
 
-    // Group by date
-    const groupedByDate = {};
-    scheduledItems.forEach(item => {
-        if (!groupedByDate[item.date]) {
-            groupedByDate[item.date] = [];
-        }
-        groupedByDate[item.date].push(item);
-    });
-
-    // Render timeline
-    timeline.innerHTML = Object.keys(groupedByDate).sort((a, b) => {
-        return new Date(a) - new Date(b);
-    }).map(date => {
-        const dateItems = groupedByDate[date];
-        return `
+  // Render timeline
+  timeline.innerHTML = Object.keys(groupedByDate)
+    .sort((a, b) => {
+      return new Date(a) - new Date(b);
+    })
+    .map((date) => {
+      const dateItems = groupedByDate[date];
+      return `
             <div class="timeline-item">
                 <div class="timeline-date">${date}</div>
-                ${dateItems.map(item => `
+                ${dateItems
+                  .map(
+                    (item) => `
                     <div class="timeline-task ${item.task.type}" onclick="viewTaskDetails('${item.task.id}')">
                         <div class="timeline-task-title">${item.task.title}</div>
                         <div class="timeline-task-info">
@@ -704,20 +708,14 @@ function renderTimeline(scheduledItems) {
                             Due: ${formatDateDisplay(new Date(item.task.dueDate))}
                         </div>
                     </div>
-                `).join('')}
+                `,
+                  )
+                  .join("")}
             </div>
         `;
-    }).join('');
+    })
+    .join("");
 }
-
-
-// ============================
-// STORAGE MANAGEMENT
-// ============================
-
-
-/** Deletes all items (tasks and events) from the server. Use with caution. */
-
 
 
 // ============================

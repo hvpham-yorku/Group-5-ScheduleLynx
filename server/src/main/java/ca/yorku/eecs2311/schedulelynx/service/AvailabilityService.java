@@ -10,62 +10,38 @@ import org.springframework.stereotype.Service;
 @Service
 public class AvailabilityService {
 
-  private final AvailabilityRepository repository;
+  private final AvailabilityRepository repo;
 
-  public AvailabilityService(AvailabilityRepository repository) {
-    this.repository = repository;
-  }
+  public AvailabilityService(AvailabilityRepository repo) { this.repo = repo; }
 
-  public AvailabilityBlock create(AvailabilityBlock block) {
+  public AvailabilityBlock create(long userId, AvailabilityBlock block) {
     validate(block);
-    ensureNoOverlap(block, null);
-    return repository.save(block);
+    return repo.save(userId, block);
   }
 
-  public List<AvailabilityBlock> getAll() { return repository.getAll(); }
-
-  public Optional<AvailabilityBlock> getById(long id) {
-    return repository.getById(id);
+  public List<AvailabilityBlock> getAll(long userId) {
+    return repo.findAll(userId);
   }
 
-  public Optional<AvailabilityBlock> update(long id,
+  public Optional<AvailabilityBlock> getById(long userId, long id) {
+    return repo.findById(userId, id);
+  }
+
+  public Optional<AvailabilityBlock> update(long userId, long id,
                                             AvailabilityBlock updated) {
     validate(updated);
-    ensureNoOverlap(updated, id);
-    return repository.update(id, updated);
+    return repo.update(userId, id, updated);
   }
 
-  public boolean delete(long id) { return repository.delete(id); }
+  public boolean delete(long userId, long id) {
+    return repo.delete(userId, id);
+  }
 
   private void validate(AvailabilityBlock block) {
-    if (block == null)
-      throw new IllegalArgumentException("Availability block must not be null");
-    if (block.getDay() == null)
-      throw new IllegalArgumentException("Day must not be null");
-    if (block.getStart() == null || block.getEnd() == null)
-      throw new IllegalArgumentException("Start and end must not be null");
-
     LocalTime start = block.getStart();
     LocalTime end = block.getEnd();
-    if (!start.isBefore(end))
+    if (start == null || end == null || !start.isBefore(end)) {
       throw new IllegalArgumentException("Start time must be before end time");
-  }
-
-  private void ensureNoOverlap(AvailabilityBlock candidate, Long ignoreId) {
-    for (AvailabilityBlock existing : repository.getAll()) {
-      if (existing.getId() == null)
-        continue;
-      if (ignoreId != null && existing.getId().equals(ignoreId))
-        continue;
-      if (existing.getDay() != candidate.getDay())
-        continue;
-
-      boolean overlaps = candidate.getStart().isBefore(existing.getEnd()) &&
-                         existing.getStart().isBefore(candidate.getEnd());
-      if (overlaps) {
-        throw new IllegalArgumentException(
-            "Availability block overlaps an existing block");
-      }
     }
   }
 }

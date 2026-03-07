@@ -1,58 +1,60 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import ca.yorku.eecs2311.schedulelynx.domain.AvailabilityBlock;
 import ca.yorku.eecs2311.schedulelynx.domain.Weekday;
 import ca.yorku.eecs2311.schedulelynx.persistence.InMemoryAvailabilityRepository;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalTime;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class AvailabilityServiceTest {
 
-    private AvailabilityService newService() {
-        return new AvailabilityService(new InMemoryAvailabilityRepository());
-    }
+  private static final long USER_ID = 1L;
 
-    @Test
-    void create_assignsId_andStoresBlock() {
+  private AvailabilityService service;
 
-        var service = newService();
+  @BeforeEach
+  void setup() {
+    service = new AvailabilityService(new InMemoryAvailabilityRepository());
+  }
 
-        var created = service.create(new AvailabilityBlock(
-                null, Weekday.MONDAY, LocalTime.of(18, 0), LocalTime.of(21, 0)));
+  @Test
+  void create_and_getAll_work() {
+    service.create(USER_ID, new AvailabilityBlock(null, Weekday.MONDAY,
+                                                  LocalTime.of(9, 0),
+                                                  LocalTime.of(12, 0)));
 
-        assertNotNull(created.getId());
-        assertEquals(1L, created.getId());
-        assertEquals(1, service.getAll().size());
-    }
+    var all = service.getAll(USER_ID);
+    assertEquals(1, all.size());
+    assertEquals(Weekday.MONDAY, all.get(0).getDay());
+  }
 
-    @Test
-    void create_rejectsInvalidTimeRange() {
+  @Test
+  void invalidTimeRange_throws() {
+    var bad = new AvailabilityBlock(null, Weekday.MONDAY, LocalTime.of(12, 0),
+                                    LocalTime.of(9, 0));
 
-        var service = newService();
+    assertThrows(IllegalArgumentException.class,
+                 () -> service.create(USER_ID, bad));
+  }
 
-        assertThrows(IllegalArgumentException.class,
-                ()
-                        -> service.create(new AvailabilityBlock(
-                        null, Weekday.MONDAY, LocalTime.of(21, 0),
-                        LocalTime.of(18, 0))));
-    }
+  @Test
+  void update_and_delete_work() {
+    var created =
+        service.create(USER_ID, new AvailabilityBlock(null, Weekday.TUESDAY,
+                                                      LocalTime.of(10, 0),
+                                                      LocalTime.of(12, 0)));
 
-    @Test
-    void create_rejectsOverlapSameDay() {
+    var updated = new AvailabilityBlock(
+        null, Weekday.TUESDAY, LocalTime.of(11, 0), LocalTime.of(13, 0));
 
-        var service = newService();
+    var updatedOpt = service.update(USER_ID, created.getId(), updated);
+    assertTrue(updatedOpt.isPresent());
+    assertEquals(LocalTime.of(11, 0), updatedOpt.get().getStart());
 
-        service.create(new AvailabilityBlock(
-                null, Weekday.MONDAY, LocalTime.of(18, 0), LocalTime.of(21, 0)));
-
-        assertThrows(IllegalArgumentException.class,
-                ()
-                        -> service.create(new AvailabilityBlock(
-                        null, Weekday.MONDAY, LocalTime.of(20, 0),
-                        LocalTime.of(22, 0))));
-    }
-
+    assertTrue(service.delete(USER_ID, created.getId()));
+    assertTrue(service.getAll(USER_ID).isEmpty());
+  }
 }

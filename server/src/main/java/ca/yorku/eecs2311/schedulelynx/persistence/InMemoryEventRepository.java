@@ -1,72 +1,61 @@
 package ca.yorku.eecs2311.schedulelynx.persistence;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Event;
-import org.springframework.stereotype.Repository;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class InMemoryEventRepository implements EventRepository {
 
-    private final Map<Long, Event> events = new HashMap<>();
-    private final AtomicLong nextId = new AtomicLong(1);
+  private final Map<Long, List<Event>> byUser = new ConcurrentHashMap<>();
+  private final AtomicLong nextId = new AtomicLong(1);
 
-    @Override
-    public Event save(Event data) {
+  @Override
+  public Event save(long userId, Event event) {
+    Event stored = new Event(nextId.getAndIncrement(), event.getTitle(),
+                             event.getDay(), event.getStart(), event.getEnd());
+    byUser.computeIfAbsent(userId, k -> new ArrayList<>()).add(stored);
+    return stored;
+  }
 
-        long id = nextId.getAndIncrement();
-        return putInRepo(id, data);
+  @Override
+  public List<Event> findAll(long userId) {
+    return new ArrayList<>(byUser.getOrDefault(userId, List.of()));
+  }
+
+  @Override
+  public Optional<Event> findById(long userId, long id) {
+    return byUser.getOrDefault(userId, List.of())
+        .stream()
+        .filter(e -> e.getId() != null && e.getId() == id)
+        .findFirst();
+  }
+
+  @Override
+  public Optional<Event> update(long userId, long id, Event updated) {
+    List<Event> events = byUser.get(userId);
+    if (events == null)
+      return Optional.empty();
+
+    for (int i = 0; i < events.size(); i++) {
+      Event existing = events.get(i);
+      if (existing.getId() != null && existing.getId() == id) {
+        Event stored = new Event(id, updated.getTitle(), updated.getDay(),
+                                 updated.getStart(), updated.getEnd());
+        events.set(i, stored);
+        return Optional.of(stored);
+      }
     }
+    return Optional.empty();
+  }
 
-    @Override
-    public Optional<Event> update(Event data) {
-
-        var savedEvent = events.get(data.getId());
-        if (savedEvent == null) return Optional.empty();
-
-        var updatedEvent = putInRepo(data.getId(), data);
-        return Optional.of(updatedEvent);
-    }
-
-    private Event putInRepo(long id, Event data) {
-
-        var title = data.getTitle();
-        var day   = data.getDay();
-        var start = data.getStart();
-        var end   = data.getEnd();
-
-        var event = new Event(id, title, day, start, end);
-
-        events.put(id, event);
-        return event;
-    }
-
-    @Override
-    public List<Event> getAllEvents() {
-
-        return List.copyOf(events.values());
-    }
-
-    @Override
-    public Optional<Event> getEvent(long id) {
-
-        return Optional.ofNullable(events.get(id));
-    }
-
-    @Override
-    public void deleteAll() {
-
-        events.clear();
-    }
-
-    @Override
-    public boolean delete(long id) {
-
-        return events.remove(id) != null;
-    }
-
+  @Override
+  public boolean delete(long userId, long id) {
+    List<Event> events = byUser.get(userId);
+    if (events == null)
+      return false;
+    return events.removeIf(e -> e.getId() != null && e.getId() == id);
+  }
 }

@@ -29,7 +29,9 @@
 
 
 
-## User Story 🔗 Development Tasks
+## Development Tasks
+
+Iteration 1
 
 * As a student I want to add tasks with dueDates(such as assignments and
 studying for exams) so the system can generate my workload. <p><t>Construct a submission tool and link to backend</t></p>
@@ -44,14 +46,23 @@ my plan stays realistic when things change. <p><t>Construct a submission tool an
 * As a student I want the system to detect when my workload cannot fit into my
 available time before dueDates and clearly warn me. <p><t>Construct a submission tool and link to backend</t></p>
 
+Iteration 2
 
+* Add database
+* User sessions
+* Refactored scheduling algorithm
+* Fix bugs in Iteration 1 release
 
+Iteration 3
+
+* Extra checks on task creation
 
 ## Estimated and Actual Development Task Times
 
 | Task                                    | Estimated Time | Actual Time | Assignee |
 |-----------------------------------------|----------------|-------------|----------|
-| scrum-32-make-variable-names-consistant | 2 hours        | 3 hours     | Eric     |
-| scrum-30-simplify-event-creation        | 4 hours        | 5.5 hours   | Eric     |
-| scrum-39-implement-event-deletion       | 1 hour         | 2.1 hours   | Eric     |
+| SCRUM-32-make-variable-names-consistant | 2 hours        | 3 hours     | Eric     |
+| SCRUM-30-simplify-event-creation        | 4 hours        | 5.5 hours   | Eric     |
+| SCRUM-39-implement-event-deletion       | 1 hour         | 2.1 hours   | Eric     |
 | SCRUM-36-post-new-events-to-backend     | 0.5 hours      | 1.2 hours   | Eric     |
+| SCRUM-29-refactor-javascript-code       | 10 hours       | 19 hours    | Eric     |

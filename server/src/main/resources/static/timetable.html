@@ -29,7 +29,7 @@
     <div class="planner-container container">
       <aside class="sidebar">
         <section class="panel">
-          <h2>Add / Edit Task</h2>
+          <h2 id="taskFormTitle">Add / Edit Task</h2>
           <form id="taskForm" class="task-form">
             <div class="form-group">
               <label for="taskTitle">Title</label>
@@ -72,7 +72,6 @@
                 min="0"
                 step="0.5"
                 value="1"
-                required
               />
             </div>
 
@@ -149,16 +148,7 @@
                 class="btn-secondary"
                 id="clearForm"
                 type="button"
-                onclick="
-                                document.getElementById('taskForm').reset();
-                                document.getElementById('recurrenceOptions').style.display='none';
-                                document.getElementById('startTimeGroup').style.display='none';
-                                document.getElementById('endTimeGroup').style.display='none';
-                                document.getElementById('daysOfWeekGroup').style.display='none';
-                                document.getElementById('recurringGroup').style.display='none';
-                                document.getElementById('estimatedHoursGroup').style.display='block';
-                                document.querySelectorAll('input[name=&quot;recurrenceDays&quot;]').forEach(cb => cb.checked = false);
-                            "
+                onclick="exitEditMode()"
               >
                 Reset
               </button>

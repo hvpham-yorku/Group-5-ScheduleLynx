@@ -426,6 +426,48 @@ function shouldShowRecurringEventOnDate(eventItem, dateStr) {
   return eventItem.dueDate === dateStr;
 }
 
+function exitEditMode() {
+  selectedTaskId = null;
+
+  const taskForm = document.getElementById("taskForm");
+  if (taskForm) taskForm.reset();
+
+  const formTitle = document.getElementById("taskFormTitle");
+  if (formTitle) {
+    formTitle.textContent = "Add / Edit Task";
+  }
+
+  const recurrenceOptions = document.getElementById("recurrenceOptions");
+  const startTimeGroup = document.getElementById("startTimeGroup");
+  const endTimeGroup = document.getElementById("endTimeGroup");
+  const daysOfWeekGroup = document.getElementById("daysOfWeekGroup");
+  const recurringGroup = document.getElementById("recurringGroup");
+  const estimatedHoursGroup = document.getElementById("estimatedHoursGroup");
+  const taskType = document.getElementById("taskType");
+
+  if (taskType) taskType.value = "task";
+  if (recurrenceOptions) recurrenceOptions.style.display = "none";
+  if (startTimeGroup) startTimeGroup.style.display = "none";
+  if (endTimeGroup) endTimeGroup.style.display = "none";
+  if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
+  if (recurringGroup) recurringGroup.style.display = "none";
+  if (estimatedHoursGroup) estimatedHoursGroup.style.display = "block";
+
+  document
+    .querySelectorAll('input[name="recurrenceDays"]')
+    .forEach((cb) => (cb.checked = false));
+
+  const titleField = document.getElementById("taskTitle");
+  if (titleField) {
+    titleField.placeholder = "e.g., EECS lab";
+  }
+
+  const submitBtn = document.querySelector('#taskForm button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.textContent = "Save Task";
+  }
+}
+
 // ============================
 // DASHBOARD FUNCTIONS
 // ============================
@@ -748,6 +790,10 @@ async function addTask() {
     }
   }
 
+  const originalItem = selectedTaskId
+    ? tasks.find((t) => t.id === selectedTaskId)
+    : null;
+
   let item = {
     id: generateId(),
     title: title,
@@ -764,128 +810,242 @@ async function addTask() {
   }
 
   try {
-    if (type === "event") {
-      const existingEvent = selectedTaskId
-        ? tasks.find((t) => t.id === selectedTaskId && t.type === "event")
-        : null;
+    if (originalItem && originalItem.type === type) {
+      if (type === "event") {
+        const payload = {
+          title: title,
+          date: dueDate,
+          startTime: startTime,
+          endTime: endTime,
+          recurring: isRecurring,
+          recurrenceType: isRecurring ? recurrenceType.toUpperCase() : null,
+          recurrenceEnd: isRecurring && recurrenceEnd ? recurrenceEnd : null,
+          recurrenceDays: isRecurring
+            ? selectedRecurrenceDays.map(shortDayToBackend)
+            : [],
+        };
 
-      const payload = {
-        title: title,
-        date: dueDate,
-        startTime: startTime,
-        endTime: endTime,
-        recurring: isRecurring,
-        recurrenceType: isRecurring ? recurrenceType.toUpperCase() : null,
-        recurrenceEnd: isRecurring && recurrenceEnd ? recurrenceEnd : null,
-        recurrenceDays: isRecurring
-          ? selectedRecurrenceDays.map(shortDayToBackend)
-          : [],
-      };
-
-      let saved;
-      if (existingEvent) {
-        saved = await apiFetch(`/api/events/${selectedTaskId}`, {
+        const saved = await apiFetch(`/api/events/${selectedTaskId}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
+
+        item = {
+          id: String(saved.id),
+          title: saved.title,
+          type: "event",
+          dueDate: saved.date,
+          description: description,
+          completed: false,
+          createdAt: new Date().toISOString(),
+          estimatedHours: 0,
+          startTime: saved.startTime,
+          endTime: saved.endTime,
+          isRecurring: !!saved.recurring,
+          recurrenceType: saved.recurrenceType
+            ? saved.recurrenceType.toLowerCase()
+            : null,
+          recurrenceEnd: saved.recurrenceEnd || null,
+          recurrenceDays: (saved.recurrenceDays || []).map(dayOfWeekToShort),
+        };
       } else {
-        saved = await apiFetch("/api/events", {
-          method: "POST",
+        const payload = {
+          title: title,
+          dueDate: dueDate,
+          estimatedHours: Math.round(estimatedHours),
+          difficulty: "MEDIUM",
+        };
+
+        const saved = await apiFetch(`/api/tasks/${selectedTaskId}`, {
+          method: "PUT",
           body: JSON.stringify(payload),
+        });
+
+        item = {
+          id: String(saved.id),
+          title: saved.title,
+          type: "task",
+          dueDate: saved.dueDate,
+          description: description,
+          completed: false,
+          createdAt: new Date().toISOString(),
+          estimatedHours: saved.estimatedHours,
+          startTime: null,
+          endTime: null,
+          isRecurring: false,
+          recurrenceType: null,
+          recurrenceEnd: null,
+          recurrenceDays: [],
+          difficulty: saved.difficulty,
+        };
+      }
+
+      tasks = tasks.filter((t) => t.id !== selectedTaskId);
+      tasks.push(item);
+    } else if (originalItem && originalItem.type !== type) {
+      if (originalItem.type === "task") {
+        await apiFetch(`/api/tasks/${selectedTaskId}`, {
+          method: "DELETE",
+        });
+      } else {
+        await apiFetch(`/api/events/${selectedTaskId}`, {
+          method: "DELETE",
         });
       }
 
-      item = {
-        id: String(saved.id),
-        title: saved.title,
-        type: "event",
-        dueDate: saved.date,
-        description: description,
-        completed: false,
-        createdAt: new Date().toISOString(),
-        estimatedHours: 0,
-        startTime: saved.startTime,
-        endTime: saved.endTime,
-        isRecurring: !!saved.recurring,
-        recurrenceType: saved.recurrenceType
-          ? saved.recurrenceType.toLowerCase()
-          : null,
-        recurrenceEnd: saved.recurrenceEnd || null,
-        recurrenceDays: (saved.recurrenceDays || []).map(dayOfWeekToShort),
-      };
+      if (type === "event") {
+        const payload = {
+          title: title,
+          date: dueDate,
+          startTime: startTime,
+          endTime: endTime,
+          recurring: isRecurring,
+          recurrenceType: isRecurring ? recurrenceType.toUpperCase() : null,
+          recurrenceEnd: isRecurring && recurrenceEnd ? recurrenceEnd : null,
+          recurrenceDays: isRecurring
+            ? selectedRecurrenceDays.map(shortDayToBackend)
+            : [],
+        };
 
-      if (existingEvent) {
-        tasks = tasks.filter((t) => t.id !== selectedTaskId);
+        const saved = await apiFetch("/api/events", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+
+        item = {
+          id: String(saved.id),
+          title: saved.title,
+          type: "event",
+          dueDate: saved.date,
+          description: description,
+          completed: false,
+          createdAt: new Date().toISOString(),
+          estimatedHours: 0,
+          startTime: saved.startTime,
+          endTime: saved.endTime,
+          isRecurring: !!saved.recurring,
+          recurrenceType: saved.recurrenceType
+            ? saved.recurrenceType.toLowerCase()
+            : null,
+          recurrenceEnd: saved.recurrenceEnd || null,
+          recurrenceDays: (saved.recurrenceDays || []).map(dayOfWeekToShort),
+        };
+      } else {
+        const payload = {
+          title: title,
+          dueDate: dueDate,
+          estimatedHours: Math.round(estimatedHours),
+          difficulty: "MEDIUM",
+        };
+
+        const saved = await apiFetch("/api/tasks", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+
+        item = {
+          id: String(saved.id),
+          title: saved.title,
+          type: "task",
+          dueDate: saved.dueDate,
+          description: description,
+          completed: false,
+          createdAt: new Date().toISOString(),
+          estimatedHours: saved.estimatedHours,
+          startTime: null,
+          endTime: null,
+          isRecurring: false,
+          recurrenceType: null,
+          recurrenceEnd: null,
+          recurrenceDays: [],
+          difficulty: saved.difficulty,
+        };
       }
 
+      tasks = tasks.filter((t) => t.id !== selectedTaskId);
       tasks.push(item);
     } else {
-      const existingTask = selectedTaskId
-        ? tasks.find((t) => t.id === selectedTaskId && t.type === "task")
-        : null;
+      if (type === "event") {
+        const payload = {
+          title: title,
+          date: dueDate,
+          startTime: startTime,
+          endTime: endTime,
+          recurring: isRecurring,
+          recurrenceType: isRecurring ? recurrenceType.toUpperCase() : null,
+          recurrenceEnd: isRecurring && recurrenceEnd ? recurrenceEnd : null,
+          recurrenceDays: isRecurring
+            ? selectedRecurrenceDays.map(shortDayToBackend)
+            : [],
+        };
 
-      const payload = {
-        title: title,
-        dueDate: dueDate,
-        estimatedHours: Math.round(estimatedHours),
-        difficulty: "MEDIUM",
-      };
-
-      let saved;
-      if (existingTask) {
-        saved = await apiFetch(`/api/tasks/${selectedTaskId}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
-      } else {
-        saved = await apiFetch("/api/tasks", {
+        const saved = await apiFetch("/api/events", {
           method: "POST",
           body: JSON.stringify(payload),
         });
-      }
 
-      item = {
-        id: String(saved.id),
-        title: saved.title,
-        type: "task",
-        dueDate: saved.dueDate,
-        description: description,
-        completed: false,
-        createdAt: new Date().toISOString(),
-        estimatedHours: saved.estimatedHours,
-        startTime: null,
-        endTime: null,
-        isRecurring: false,
-        recurrenceType: null,
-        recurrenceEnd: null,
-        recurrenceDays: [],
-        difficulty: saved.difficulty,
-      };
+        item = {
+          id: String(saved.id),
+          title: saved.title,
+          type: "event",
+          dueDate: saved.date,
+          description: description,
+          completed: false,
+          createdAt: new Date().toISOString(),
+          estimatedHours: 0,
+          startTime: saved.startTime,
+          endTime: saved.endTime,
+          isRecurring: !!saved.recurring,
+          recurrenceType: saved.recurrenceType
+            ? saved.recurrenceType.toLowerCase()
+            : null,
+          recurrenceEnd: saved.recurrenceEnd || null,
+          recurrenceDays: (saved.recurrenceDays || []).map(dayOfWeekToShort),
+        };
+      } else {
+        const payload = {
+          title: title,
+          dueDate: dueDate,
+          estimatedHours: Math.round(estimatedHours),
+          difficulty: "MEDIUM",
+        };
 
-      if (existingTask) {
-        tasks = tasks.filter((t) => t.id !== selectedTaskId);
+        const saved = await apiFetch("/api/tasks", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+
+        item = {
+          id: String(saved.id),
+          title: saved.title,
+          type: "task",
+          dueDate: saved.dueDate,
+          description: description,
+          completed: false,
+          createdAt: new Date().toISOString(),
+          estimatedHours: saved.estimatedHours,
+          startTime: null,
+          endTime: null,
+          isRecurring: false,
+          recurrenceType: null,
+          recurrenceEnd: null,
+          recurrenceDays: [],
+          difficulty: saved.difficulty,
+        };
       }
 
       tasks.push(item);
     }
 
-    selectedTaskId = null;
+    await loadUserTasks(currentUser.username);
+    await loadScheduleEntries();
+
     updateTasksDisplay();
     renderScheduleGrid();
+    renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
 
-    const taskForm = document.getElementById("taskForm");
-    if (taskForm) taskForm.reset();
-
-    const recurrenceOptions = document.getElementById("recurrenceOptions");
-    const startTimeGroup = document.getElementById("startTimeGroup");
-    const endTimeGroup = document.getElementById("endTimeGroup");
-    const daysOfWeekGroup = document.getElementById("daysOfWeekGroup");
-
-    if (recurrenceOptions) recurrenceOptions.style.display = "none";
-    if (startTimeGroup) startTimeGroup.style.display = "none";
-    if (endTimeGroup) endTimeGroup.style.display = "none";
-    if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
+    exitEditMode();
   } catch (err) {
     alert(err.message);
   }
@@ -1068,19 +1228,20 @@ async function deleteTaskListener() {
       await apiFetch(`/api/tasks/${selectedTaskId}`, {
         method: "DELETE",
       });
-      await loadScheduleEntries();
-      renderTimeline(scheduleEntries);
     }
 
-    tasks = tasks.filter((t) => t.id !== selectedTaskId);
+    await loadUserTasks(currentUser.username);
+    await loadScheduleEntries();
+
     updateTasksDisplay();
     renderScheduleGrid();
+    renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
 
     const modal = document.getElementById("taskModal");
     if (modal) modal.classList.remove("active");
 
-    selectedTaskId = null;
+    exitEditMode();
   } catch (err) {
     alert(err.message);
   }
@@ -1088,8 +1249,12 @@ async function deleteTaskListener() {
 
 function editSelectedTask() {
   const task = tasks.find((t) => t.id === selectedTaskId);
-  if (!task) return;
+  if (!task) {
+    alert("Could not find the selected item to edit.");
+    return;
+  }
 
+  const formTitle = document.getElementById("taskFormTitle");
   const taskTitle = document.getElementById("taskTitle");
   const taskType = document.getElementById("taskType");
   const dueDate = document.getElementById("dueDate");
@@ -1100,6 +1265,17 @@ function editSelectedTask() {
   const isRecurring = document.getElementById("isRecurring");
   const recurrenceType = document.getElementById("recurrenceType");
   const recurrenceEnd = document.getElementById("recurrenceEnd");
+
+  const startTimeGroup = document.getElementById("startTimeGroup");
+  const endTimeGroup = document.getElementById("endTimeGroup");
+  const estimatedHoursGroup = document.getElementById("estimatedHoursGroup");
+  const recurringGroup = document.getElementById("recurringGroup");
+  const recurrenceOptions = document.getElementById("recurrenceOptions");
+  const daysOfWeekGroup = document.getElementById("daysOfWeekGroup");
+
+  if (formTitle) {
+    formTitle.textContent = `Editing: ${task.title}`;
+  }
 
   if (taskTitle) taskTitle.value = task.title;
   if (taskType) taskType.value = task.type;
@@ -1116,39 +1292,46 @@ function editSelectedTask() {
     cb.checked = task.recurrenceDays?.includes(cb.value) || false;
   });
 
-  const startTimeGroup = document.getElementById("startTimeGroup");
-  const endTimeGroup = document.getElementById("endTimeGroup");
-  const recurringGroup = document.getElementById("recurringGroup");
-  const recurrenceOptions = document.getElementById("recurrenceOptions");
-  const daysOfWeekGroup = document.getElementById("daysOfWeekGroup");
-  const estimatedHoursGroup = document.getElementById("estimatedHoursGroup");
-
   if (task.type === "event") {
     if (startTimeGroup) startTimeGroup.style.display = "flex";
     if (endTimeGroup) endTimeGroup.style.display = "flex";
-    if (recurringGroup) recurringGroup.style.display = "block";
     if (estimatedHoursGroup) estimatedHoursGroup.style.display = "none";
-    if (recurrenceOptions)
-      recurrenceOptions.style.display = task.isRecurring ? "block" : "none";
+    if (recurringGroup) recurringGroup.style.display = "block";
 
-    const showDays =
-      task.recurrenceType === "weekly" || task.recurrenceType === "biweekly";
-    if (daysOfWeekGroup)
-      daysOfWeekGroup.style.display = showDays ? "flex" : "none";
+    if (task.isRecurring) {
+      if (recurrenceOptions) recurrenceOptions.style.display = "block";
+      const showDays =
+        task.recurrenceType === "weekly" || task.recurrenceType === "biweekly";
+      if (daysOfWeekGroup) {
+        daysOfWeekGroup.style.display = showDays ? "flex" : "none";
+      }
+    } else {
+      if (recurrenceOptions) recurrenceOptions.style.display = "none";
+      if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
+    }
   } else {
     if (startTimeGroup) startTimeGroup.style.display = "none";
     if (endTimeGroup) endTimeGroup.style.display = "none";
+    if (estimatedHoursGroup) estimatedHoursGroup.style.display = "block";
     if (recurringGroup) recurringGroup.style.display = "none";
     if (recurrenceOptions) recurrenceOptions.style.display = "none";
     if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
-    if (estimatedHoursGroup) estimatedHoursGroup.style.display = "block";
+  }
+
+  const submitBtn = document.querySelector('#taskForm button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.textContent = "Update Item";
+  }
+
+  if (taskTitle) {
+    taskTitle.placeholder = `Editing: ${task.title}`;
   }
 
   const modal = document.getElementById("taskModal");
   if (modal) modal.classList.remove("active");
 
-  if (taskTitle) taskTitle.focus();
   window.scrollTo({ top: 0, behavior: "smooth" });
+  if (taskTitle) taskTitle.focus();
 }
 
 // ============================
@@ -1395,15 +1578,15 @@ async function clearAllItems() {
   }
 
   try {
+    await apiFetch("/api/schedule", {
+      method: "DELETE",
+    });
+
     await apiFetch("/api/tasks", {
       method: "DELETE",
     });
 
     await apiFetch("/api/events", {
-      method: "DELETE",
-    });
-
-    await apiFetch("/api/schedule", {
       method: "DELETE",
     });
 
@@ -1425,6 +1608,7 @@ async function clearAllItems() {
     }
 
     refreshDashboardIfVisible();
+    exitEditMode();
     alert("All backend tasks, events, and schedule entries cleared!");
   } catch (err) {
     alert(err.message);

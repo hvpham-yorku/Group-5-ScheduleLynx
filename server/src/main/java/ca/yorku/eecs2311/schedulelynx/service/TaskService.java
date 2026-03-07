@@ -2,22 +2,27 @@ package ca.yorku.eecs2311.schedulelynx.service;
 
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.domain.User;
+import ca.yorku.eecs2311.schedulelynx.persistence.ScheduleEntryRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.TaskRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TaskService {
 
   private final TaskRepository taskRepository;
   private final UserRepository userRepository;
+  private final ScheduleEntryRepository scheduleEntryRepository;
 
   public TaskService(TaskRepository taskRepository,
-                     UserRepository userRepository) {
+                     UserRepository userRepository,
+                     ScheduleEntryRepository scheduleEntryRepository) {
     this.taskRepository = taskRepository;
     this.userRepository = userRepository;
+    this.scheduleEntryRepository = scheduleEntryRepository;
   }
 
   public Task create(long userId, Task task) {
@@ -52,11 +57,21 @@ public class TaskService {
     });
   }
 
+  @Transactional
   public boolean delete(long userId, long id) {
-    return taskRepository.deleteByIdAndOwnerId(id, userId) > 0;
+    Optional<Task> taskOpt = taskRepository.findByIdAndOwnerId(id, userId);
+    if (taskOpt.isEmpty()) {
+      return false;
+    }
+
+    scheduleEntryRepository.deleteAllByTaskId(id);
+    taskRepository.delete(taskOpt.get());
+    return true;
   }
 
+  @Transactional
   public void deleteAll(long userId) {
+    scheduleEntryRepository.deleteAllByTaskOwnerId(userId);
     taskRepository.deleteAllByOwnerId(userId);
   }
 

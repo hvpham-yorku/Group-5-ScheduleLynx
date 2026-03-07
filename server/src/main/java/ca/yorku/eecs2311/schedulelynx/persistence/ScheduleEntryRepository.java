@@ -16,4 +16,8 @@ public interface ScheduleEntryRepository
       Long ownerId, LocalDate startDate, LocalDate endDate);
 
   void deleteAllByOwnerId(Long ownerId);
+
+  void deleteAllByTaskId(Long taskId);
+
+  void deleteAllByTaskOwnerId(Long ownerId);
 }

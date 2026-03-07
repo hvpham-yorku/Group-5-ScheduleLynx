@@ -8,6 +8,7 @@ import ca.yorku.eecs2311.schedulelynx.persistence.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EventService {
@@ -58,10 +59,12 @@ public class EventService {
     });
   }
 
+  @Transactional
   public boolean delete(long userId, long id) {
     return eventRepository.deleteByIdAndOwnerId(id, userId) > 0;
   }
 
+  @Transactional
   public void deleteAll(long userId) {
     eventRepository.deleteAllByOwnerId(userId);
   }

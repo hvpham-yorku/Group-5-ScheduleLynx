@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ScheduleService {
@@ -52,10 +53,12 @@ public class ScheduleService {
             userId, startDate, endDate);
   }
 
+  @Transactional
   public void clear(long userId) {
     scheduleEntryRepository.deleteAllByOwnerId(userId);
   }
 
+  @Transactional
   public ScheduleGenerationResult generate(long userId,
                                            GenerateScheduleRequest request) {
     User owner = userRepository.findById(userId).orElseThrow(

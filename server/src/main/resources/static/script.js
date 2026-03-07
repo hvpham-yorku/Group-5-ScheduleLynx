@@ -1546,13 +1546,25 @@ async function generateSchedule() {
     renderTimeline(scheduleEntries);
     hideScheduleNotice();
 
-    if (result.warnings && result.warnings.length > 0) {
-      alert(
-        "Schedule generated with warnings:\n\n" + result.warnings.join("\n"),
-      );
+    let message = "";
+
+    if (result.status === "FEASIBLE") {
+      message = "Schedule is fully feasible.";
+    } else if (result.status === "PARTIALLY_FEASIBLE") {
+      message =
+        "Schedule is partially feasible.\n\nSome work was scheduled, but some tasks could not be fully placed before their deadlines.\n\n";
+      if (result.warnings && result.warnings.length > 0) {
+        message += result.warnings.join("\n");
+      }
     } else {
-      alert("Schedule generated successfully!");
+      message =
+        "Schedule is infeasible.\n\nThe system could not fit all required work before the deadlines.\n\n";
+      if (result.warnings && result.warnings.length > 0) {
+        message += result.warnings.join("\n");
+      }
     }
+
+    alert(message);
   } catch (err) {
     alert(err.message);
   }

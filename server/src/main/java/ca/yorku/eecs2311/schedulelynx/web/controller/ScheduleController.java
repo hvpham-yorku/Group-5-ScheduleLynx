@@ -50,8 +50,23 @@ public class ScheduleController {
     List<ScheduleEntryResponse> entries =
         result.entries().stream().map(this::toResponse).toList();
 
-    return new GenerateScheduleResponse(
-        entries.size(), result.warnings().size(), result.warnings(), entries);
+    int unscheduledTaskCount = result.warnings().size();
+    boolean feasible = result.warnings().isEmpty();
+    boolean partiallyFeasible =
+        !result.warnings().isEmpty() && !entries.isEmpty();
+
+    String status;
+    if (feasible) {
+      status = "FEASIBLE";
+    } else if (partiallyFeasible) {
+      status = "PARTIALLY_FEASIBLE";
+    } else {
+      status = "INFEASIBLE";
+    }
+
+    return new GenerateScheduleResponse(feasible, partiallyFeasible, status,
+                                        entries.size(), unscheduledTaskCount,
+                                        result.warnings(), entries);
   }
 
   @DeleteMapping

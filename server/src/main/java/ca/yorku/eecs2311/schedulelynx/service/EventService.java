@@ -38,7 +38,6 @@ public class EventService {
 
     Event saved = eventRepository.save(event);
 
-    // Any event change makes old generated schedule stale
     scheduleEntryRepository.deleteAllByOwnerId(userId);
 
     return saved;
@@ -69,7 +68,6 @@ public class EventService {
 
       Event saved = eventRepository.save(existing);
 
-      // Any event change makes old generated schedule stale
       scheduleEntryRepository.deleteAllByOwnerId(userId);
 
       return saved;
@@ -81,7 +79,6 @@ public class EventService {
     boolean deleted = eventRepository.deleteByIdAndOwnerId(id, userId) > 0;
 
     if (deleted) {
-      // Any event change makes old generated schedule stale
       scheduleEntryRepository.deleteAllByOwnerId(userId);
     }
 
@@ -92,7 +89,6 @@ public class EventService {
   public void deleteAll(long userId) {
     eventRepository.deleteAllByOwnerId(userId);
 
-    // Any event change makes old generated schedule stale
     scheduleEntryRepository.deleteAllByOwnerId(userId);
   }
 

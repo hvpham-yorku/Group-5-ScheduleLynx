@@ -37,7 +37,6 @@ public class TaskService {
 
     Task saved = taskRepository.save(task);
 
-    // Any task change makes old generated schedule stale
     scheduleEntryRepository.deleteAllByOwnerId(userId);
 
     return saved;
@@ -63,7 +62,6 @@ public class TaskService {
 
       Task saved = taskRepository.save(existing);
 
-      // Any task change makes old generated schedule stale
       scheduleEntryRepository.deleteAllByOwnerId(userId);
 
       return saved;
@@ -80,7 +78,6 @@ public class TaskService {
     scheduleEntryRepository.deleteAllByTaskId(id);
     taskRepository.delete(taskOpt.get());
 
-    // Any task change makes old generated schedule stale
     scheduleEntryRepository.deleteAllByOwnerId(userId);
 
     return true;
@@ -91,7 +88,6 @@ public class TaskService {
     scheduleEntryRepository.deleteAllByTaskOwnerId(userId);
     taskRepository.deleteAllByOwnerId(userId);
 
-    // Keep it explicit
     scheduleEntryRepository.deleteAllByOwnerId(userId);
   }
 

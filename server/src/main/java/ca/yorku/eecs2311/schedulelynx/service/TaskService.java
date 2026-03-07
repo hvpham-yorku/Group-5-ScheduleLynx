@@ -18,7 +18,9 @@ public class TaskService {
     return repo.save(userId, task);
   }
 
-  public List<Task> getAll(long userId) { return repo.findAll(userId); }
+  public List<Task> getAll(long userId) {
+    return repo.findAll(userId);
+  }
 
   public Optional<Task> getById(long userId, long id) {
     return repo.findById(userId, id);

@@ -12,82 +12,69 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
 
     private final TaskService service;
 
-    public TaskController(TaskService service) {
-        this.service = service;
-    }
+    public TaskController(TaskService service) { this.service = service; }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TaskResponse create(@Valid @RequestBody TaskRequest req,
-                         HttpServletRequest request) {
-
-        long userID = SessionUser.requireUserId(request);
-
-        var task = service.create(userID, req);
-        return toResponse(task);
-    }
-
-    @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public TaskResponse update(@Valid @RequestBody TaskRequest req,
-                           HttpServletRequest request) {
-
+                               HttpServletRequest request) {
         long userId = SessionUser.requireUserId(request);
 
-        if (req == null)      throw new IllegalArgumentException("Task request cannot be null!");
-        if (req.id() == null) throw new IllegalArgumentException("Task request ID must not be null!");
+        Task created = service.create(
+                userId, new Task(null, req.title(), req.dueDate(), req.estimatedHours(),
+                        req.difficulty()));
 
-        var task = service.update(req);
-
-        if (task.isEmpty()) throw new TaskNotFoundException(req.id());
-
-        return toResponse(task.get(request));
+        return toResponse(created);
     }
 
     @GetMapping
     public List<TaskResponse> getAll(HttpServletRequest request) {
-
-        return service.getAll().values().stream().map(this::toResponse).toList();
+        long userId = SessionUser.requireUserId(request);
+        return service.getAll(userId).stream().map(this::toResponse).toList();
     }
 
     @GetMapping("/{id}")
-    public TaskResponse getTask(@PathVariable long id, HttpServletRequest request) {
+    public TaskResponse getById(@PathVariable long id,
+                                HttpServletRequest request) {
+        long userId = SessionUser.requireUserId(request);
 
-        return service.getTask(id)
-            .map(this::toResponse)
-            .orElseThrow(() -> new TaskNotFoundException(id));
+        return service.getById(userId, id)
+                .map(this::toResponse)
+                .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
-    @DeleteMapping()
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAll(HttpServletRequest request) {
+    @PutMapping("/{id}")
+    public TaskResponse update(@PathVariable long id,
+                               @Valid @RequestBody TaskRequest req,
+                               HttpServletRequest request) {
+        long userId = SessionUser.requireUserId(request);
 
-        service.deleteAll();
+        Task updated = new Task(null, req.title(), req.dueDate(),
+                req.estimatedHours(), req.difficulty());
+
+        return service.update(userId, id, updated)
+                .map(this::toResponse)
+                .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable long id,
-                       HttpServletRequest request) {
+    public void delete(@PathVariable long id, HttpServletRequest request) {
+        long userId = SessionUser.requireUserId(request);
 
-   long userId = SessionUser.requireUserId(request);
-
-    boolean deleted = service.delete(id);
-    if (!deleted) throw new TaskNotFoundException(id);
-
+        if (!service.delete(userId, id)) {
+            throw new TaskNotFoundException(id);
+        }
     }
 
-    private TaskResponse toResponse(Task task) {
-
-        return new TaskResponse(task.getId(), task.getTitle(), task.getDueDate(),
-                                task.getEstimatedHours(), task.getDifficulty());
+    private TaskResponse toResponse(Task t) {
+        return new TaskResponse(t.getId(), t.getTitle(), t.getDueDate(),
+                t.getEstimatedHours(), t.getDifficulty());
     }
 }

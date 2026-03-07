@@ -107,9 +107,7 @@ async function renderTaskItems(tasks) {
             </div>
         `;
 
-        taskItem.onclick = () => {
-            console.log("Clicked Task Object:", task);
-        };
+        taskItem.onclick = () => showTaskModal(task);
 
         tasksList.appendChild(taskItem);
     }
@@ -208,5 +206,38 @@ export function showEventModal(eventData) {
         </div>
     `;
 
-    modal.classList.add('active');
+    eventModal.classList.add('active');
+}
+
+export function showTaskModal(taskData) {
+
+    const taskModal = document.getElementById('taskModal');
+    const modalBody = document.getElementById('taskModalBody');
+
+    if (!taskModal || !modalBody) return;
+
+    modalBody.innerHTML = `
+        <input type="hidden" id="modalTaskId" value="${taskData.id}">
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="modalTaskTitle" value="${taskData.title}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Due Date</label>
+            <input type="date" id="modalTaskDueDate" value="${taskData.dueDate}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Estimated Hours</label>
+            <input type="number" id="modalTaskEstHours" value="${taskData.estimatedHours}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Difficulty</label>
+            <select id="modalTaskDiff" class="form-control">
+                ${['LOW', 'MEDIUM', 'HIGH']
+        .map(d => `<option value="${d}" ${taskData.difficulty === d ? 'selected' : ''}>${d}</option>`).join('')}
+            </select>
+        </div>
+    `;
+
+    taskModal.classList.add('active');
 }

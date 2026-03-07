@@ -1,4 +1,11 @@
-import {postEvent, postTask, requestDeleteEvent, sendEventUpdate} from "./api_requests.js";
+import {
+    postEvent,
+    postTask,
+    requestDeleteEvent,
+    requestDeleteTask,
+    sendEventUpdate,
+    sendTaskUpdate
+} from "./api_requests.js";
 import {reloadDataFromServer, setDefaultDate, setDefaultEndTime, setDefaultStartTime} from "./timetable-functions.js";
 import {dateToWeekday} from "./utils.js";
 
@@ -151,3 +158,51 @@ async function closeEventModal(event) {
 document.getElementById("updateEventBtn").addEventListener("click", updateEvent);
 document.getElementById("deleteEventBtn").addEventListener("click", deleteEvent);
 document.getElementById("closeEventModalBtn").addEventListener("click", closeEventModal);
+
+async function updateTask(event) {
+
+    if (event) event.preventDefault();
+
+    const taskModal = document.getElementById('taskModal');
+
+    const id = document.getElementById('modalTaskId').value;
+    const title = document.getElementById('modalTaskTitle').value;
+    const dueDate = document.getElementById('modalTaskDueDate').value;
+    const estHours = document.getElementById('modalTaskEstHours').value;
+    const diff = document.getElementById('modalTaskDiff').value;
+
+    const success = sendTaskUpdate(id, title, dueDate, estHours, diff);
+
+    if (success) {
+        taskModal.classList.remove('active');
+        await reloadDataFromServer();
+    } else alert("Update Task failed!");
+}
+
+async function deleteTask(event) {
+
+    if (event) event.preventDefault();
+
+    const taskModal = document.getElementById('taskModal');
+    const id = document.getElementById('modalTaskId').value;
+
+    const success = await requestDeleteTask(id);
+
+    if (success) {
+        taskModal.classList.remove('active');
+        await reloadDataFromServer();
+    } else alert("Delete Task failed!");
+}
+
+async function closeTaskModal(event) {
+
+    if (event) event.preventDefault();
+
+    const taskModal = document.getElementById('taskModal');
+    taskModal.classList.remove('active');
+
+}
+
+document.getElementById("updateTaskBtn").addEventListener("click", updateTask);
+document.getElementById("deleteTaskBtn").addEventListener("click", deleteTask);
+document.getElementById("closeTaskModalBtn").addEventListener("click", closeTaskModal);

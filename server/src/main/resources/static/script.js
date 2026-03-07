@@ -310,6 +310,11 @@ async function loadTasksFromStorage() {
     updateTasksDisplay();
     renderScheduleGrid();
     renderTimeline(scheduleEntries);
+
+    if (scheduleEntries.length > 0) {
+      hideScheduleNotice();
+    }
+
     const generateBtn = document.getElementById("generateSchedule");
     if (generateBtn && tasks.length > 0) {
       generateBtn.disabled = false;
@@ -424,6 +429,26 @@ function shouldShowRecurringEventOnDate(eventItem, dateStr) {
   }
 
   return eventItem.dueDate === dateStr;
+}
+
+function showScheduleNotice(message) {
+  const notice = document.getElementById("scheduleNotice");
+  const text = document.getElementById("scheduleNoticeText");
+
+  if (text) {
+    text.textContent = message;
+  }
+
+  if (notice) {
+    notice.style.display = "block";
+  }
+}
+
+function hideScheduleNotice() {
+  const notice = document.getElementById("scheduleNotice");
+  if (notice) {
+    notice.style.display = "none";
+  }
 }
 
 function exitEditMode() {
@@ -1045,6 +1070,14 @@ async function addTask() {
     renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
 
+    if (scheduleEntries.length === 0) {
+      showScheduleNotice(
+        "Schedule cleared because your tasks or events changed. Please generate again.",
+      );
+    } else {
+      hideScheduleNotice();
+    }
+
     exitEditMode();
   } catch (err) {
     alert(err.message);
@@ -1237,6 +1270,14 @@ async function deleteTaskListener() {
     renderScheduleGrid();
     renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
+
+    if (scheduleEntries.length === 0) {
+      showScheduleNotice(
+        "Schedule cleared because your tasks or events changed. Please generate again.",
+      );
+    } else {
+      hideScheduleNotice();
+    }
 
     const modal = document.getElementById("taskModal");
     if (modal) modal.classList.remove("active");
@@ -1503,6 +1544,7 @@ async function generateSchedule() {
     }));
 
     renderTimeline(scheduleEntries);
+    hideScheduleNotice();
 
     if (result.warnings && result.warnings.length > 0) {
       alert(
@@ -1608,6 +1650,7 @@ async function clearAllItems() {
     }
 
     refreshDashboardIfVisible();
+    hideScheduleNotice();
     exitEditMode();
     alert("All backend tasks, events, and schedule entries cleared!");
   } catch (err) {

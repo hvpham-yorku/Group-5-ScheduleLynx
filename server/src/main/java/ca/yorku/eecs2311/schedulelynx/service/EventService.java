@@ -4,6 +4,7 @@ import ca.yorku.eecs2311.schedulelynx.domain.Event;
 import ca.yorku.eecs2311.schedulelynx.domain.RecurrenceType;
 import ca.yorku.eecs2311.schedulelynx.domain.User;
 import ca.yorku.eecs2311.schedulelynx.persistence.EventRepository;
+import ca.yorku.eecs2311.schedulelynx.persistence.ScheduleEntryRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -15,13 +16,17 @@ public class EventService {
 
   private final EventRepository eventRepository;
   private final UserRepository userRepository;
+  private final ScheduleEntryRepository scheduleEntryRepository;
 
   public EventService(EventRepository eventRepository,
-                      UserRepository userRepository) {
+                      UserRepository userRepository,
+                      ScheduleEntryRepository scheduleEntryRepository) {
     this.eventRepository = eventRepository;
     this.userRepository = userRepository;
+    this.scheduleEntryRepository = scheduleEntryRepository;
   }
 
+  @Transactional
   public Event create(long userId, Event event) {
     validate(event);
 
@@ -31,7 +36,12 @@ public class EventService {
     event.setId(null);
     event.setOwner(owner);
 
-    return eventRepository.save(event);
+    Event saved = eventRepository.save(event);
+
+    // Any event change makes old generated schedule stale
+    scheduleEntryRepository.deleteAllByOwnerId(userId);
+
+    return saved;
   }
 
   public List<Event> getAll(long userId) {
@@ -43,6 +53,7 @@ public class EventService {
     return eventRepository.findByIdAndOwnerId(id, userId);
   }
 
+  @Transactional
   public Optional<Event> update(long userId, long id, Event updated) {
     validate(updated);
 
@@ -55,18 +66,34 @@ public class EventService {
       existing.setRecurrenceType(updated.getRecurrenceType());
       existing.setRecurrenceEnd(updated.getRecurrenceEnd());
       existing.setRecurrenceDays(updated.getRecurrenceDays());
-      return eventRepository.save(existing);
+
+      Event saved = eventRepository.save(existing);
+
+      // Any event change makes old generated schedule stale
+      scheduleEntryRepository.deleteAllByOwnerId(userId);
+
+      return saved;
     });
   }
 
   @Transactional
   public boolean delete(long userId, long id) {
-    return eventRepository.deleteByIdAndOwnerId(id, userId) > 0;
+    boolean deleted = eventRepository.deleteByIdAndOwnerId(id, userId) > 0;
+
+    if (deleted) {
+      // Any event change makes old generated schedule stale
+      scheduleEntryRepository.deleteAllByOwnerId(userId);
+    }
+
+    return deleted;
   }
 
   @Transactional
   public void deleteAll(long userId) {
     eventRepository.deleteAllByOwnerId(userId);
+
+    // Any event change makes old generated schedule stale
+    scheduleEntryRepository.deleteAllByOwnerId(userId);
   }
 
   private void validate(Event event) {

@@ -25,6 +25,7 @@ public class TaskService {
     this.scheduleEntryRepository = scheduleEntryRepository;
   }
 
+  @Transactional
   public Task create(long userId, Task task) {
     validate(task);
 
@@ -34,7 +35,12 @@ public class TaskService {
     task.setId(null);
     task.setOwner(owner);
 
-    return taskRepository.save(task);
+    Task saved = taskRepository.save(task);
+
+    // Any task change makes old generated schedule stale
+    scheduleEntryRepository.deleteAllByOwnerId(userId);
+
+    return saved;
   }
 
   public List<Task> getAll(long userId) {
@@ -45,6 +51,7 @@ public class TaskService {
     return taskRepository.findByIdAndOwnerId(id, userId);
   }
 
+  @Transactional
   public Optional<Task> update(long userId, long id, Task updated) {
     validate(updated);
 
@@ -53,7 +60,13 @@ public class TaskService {
       existing.setDueDate(updated.getDueDate());
       existing.setEstimatedHours(updated.getEstimatedHours());
       existing.setDifficulty(updated.getDifficulty());
-      return taskRepository.save(existing);
+
+      Task saved = taskRepository.save(existing);
+
+      // Any task change makes old generated schedule stale
+      scheduleEntryRepository.deleteAllByOwnerId(userId);
+
+      return saved;
     });
   }
 
@@ -66,6 +79,10 @@ public class TaskService {
 
     scheduleEntryRepository.deleteAllByTaskId(id);
     taskRepository.delete(taskOpt.get());
+
+    // Any task change makes old generated schedule stale
+    scheduleEntryRepository.deleteAllByOwnerId(userId);
+
     return true;
   }
 
@@ -73,6 +90,9 @@ public class TaskService {
   public void deleteAll(long userId) {
     scheduleEntryRepository.deleteAllByTaskOwnerId(userId);
     taskRepository.deleteAllByOwnerId(userId);
+
+    // Keep it explicit
+    scheduleEntryRepository.deleteAllByOwnerId(userId);
   }
 
   private void validate(Task task) {

@@ -185,6 +185,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  const authLink = document.getElementById("authLink");
+
+if (authLink) {
+  if (isLoggedIn()) {
+    authLink.textContent = "Logout";
+    authLink.href = "#";
+    authLink.onclick = function (e) {
+      e.preventDefault();
+      logout();
+    };
+  } else {
+    authLink.textContent = "Login";
+    authLink.href = "login.html";
+    authLink.onclick = null;
+  }
+}
+
   if (currentPage === "login.html") {
     initializeLoginHandlers();
   } else if (currentPage === "index.html") {

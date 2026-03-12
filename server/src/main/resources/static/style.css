@@ -499,6 +499,29 @@ body.login-page {
     transition: all 0.3s ease;
 }
 
+#difficultyGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+#difficulty {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--light-border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background-color: white;
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+
+#difficulty:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -1789,20 +1812,30 @@ body.timetable-page {
   color: rgba(232,238,252,0.75);
 }
 
-.timetable-page .task-form input{
+.timetable-page .task-form input
+.timetable-page .task-form input,
+.timetable-page .task-form select,
+.timetable-page .task-form textarea {
   width: 100%;
-  height: 44px;                
-  padding: 0 14px;             /* horizontal padding only */
+  height: 44px;
+  padding: 0 14px;
   border-radius: 14px;
-
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(0,0,0,0.25);
   color: #e8eefc;
-
   font-size: 14px;
-  line-height: 1;              
+  line-height: 1;
   outline: none;
+  font-family: inherit;
 }
+
+.timetable-page .task-form textarea {
+  min-height: 90px;
+  height: auto;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
 
 
 .timetable-page .task-form .btn{
@@ -1810,9 +1843,12 @@ body.timetable-page {
     justify-content: center;
 }
 
-.timetable-page .task-form input:focus{
+.timetable-page .task-form input:focus,
+.timetable-page .task-form select:focus,
+.timetable-page .task-form textarea:focus {
   border-color: rgba(255,255,255,0.28);
 }
+
 
 @media (max-width: 900px){
   .timetable-page .task-form{

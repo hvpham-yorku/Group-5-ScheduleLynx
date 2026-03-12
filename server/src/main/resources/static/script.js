@@ -185,6 +185,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  const authLink = document.getElementById("authLink");
+
+  if (authLink) {
+    if (isLoggedIn()) {
+      authLink.textContent = "Logout";
+      authLink.href = "#";
+      authLink.onclick = function (e) {
+        e.preventDefault();
+        logout();
+      };
+    } else {
+      authLink.textContent = "Login";
+      authLink.href = "login.html";
+      authLink.onclick = null;
+    }
+  }
+  
   if (currentPage === "login.html") {
     initializeLoginHandlers();
   } else if (currentPage === "index.html") {
@@ -469,7 +486,10 @@ function exitEditMode() {
   const recurringGroup = document.getElementById("recurringGroup");
   const estimatedHoursGroup = document.getElementById("estimatedHoursGroup");
   const taskType = document.getElementById("taskType");
+  const difficultyField = document.getElementById("difficulty");
+  const difficultyGroup = document.getElementById("difficultyGroup");
 
+  if (difficultyField) difficultyField.value = "MEDIUM";
   if (taskType) taskType.value = "task";
   if (recurrenceOptions) recurrenceOptions.style.display = "none";
   if (startTimeGroup) startTimeGroup.style.display = "none";
@@ -477,7 +497,7 @@ function exitEditMode() {
   if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
   if (recurringGroup) recurringGroup.style.display = "none";
   if (estimatedHoursGroup) estimatedHoursGroup.style.display = "block";
-
+  if (difficultyGroup) difficultyGroup.style.display = "block";
   document
     .querySelectorAll('input[name="recurrenceDays"]')
     .forEach((cb) => (cb.checked = false));
@@ -692,6 +712,7 @@ function initializeFormHandlers() {
     const recurrenceOptions = document.getElementById("recurrenceOptions");
     const daysOfWeekGroup = document.getElementById("daysOfWeekGroup");
     const recurringCheckbox = document.getElementById("isRecurring");
+    const difficultyGroup = document.getElementById("difficultyGroup");
 
     if (
       !startTimeGroup ||
@@ -713,11 +734,13 @@ function initializeFormHandlers() {
       recurringCheckbox.checked = false;
       recurrenceOptions.style.display = "none";
       daysOfWeekGroup.style.display = "none";
+      if (difficultyGroup) difficultyGroup.style.display = "block";
     } else {
       startTimeGroup.style.display = "flex";
       endTimeGroup.style.display = "flex";
       estimatedHoursGroup.style.display = "none";
       recurringGroup.style.display = "block";
+      if (difficultyGroup) difficultyGroup.style.display = "none";
       recurrenceOptions.style.display = recurringCheckbox.checked
         ? "block"
         : "none";
@@ -764,6 +787,7 @@ async function addTask() {
   const title = document.getElementById("taskTitle")?.value.trim();
   const type = document.getElementById("taskType")?.value;
   const dueDate = document.getElementById("dueDate")?.value;
+  const difficulty = document.getElementById("difficulty")?.value || "MEDIUM";
 
   const estimatedHoursInput = document.getElementById("estimatedHours");
   const estimatedHours = estimatedHoursInput
@@ -878,7 +902,7 @@ async function addTask() {
           title: title,
           dueDate: dueDate,
           estimatedHours: Math.round(estimatedHours),
-          difficulty: "MEDIUM",
+          difficulty: difficulty,
         };
 
         const saved = await apiFetch(`/api/tasks/${selectedTaskId}`, {
@@ -960,7 +984,7 @@ async function addTask() {
           title: title,
           dueDate: dueDate,
           estimatedHours: Math.round(estimatedHours),
-          difficulty: "MEDIUM",
+          difficulty: difficulty,
         };
 
         const saved = await apiFetch("/api/tasks", {
@@ -1032,7 +1056,7 @@ async function addTask() {
           title: title,
           dueDate: dueDate,
           estimatedHours: Math.round(estimatedHours),
-          difficulty: "MEDIUM",
+          difficulty: difficulty,
         };
 
         const saved = await apiFetch("/api/tasks", {
@@ -1105,14 +1129,17 @@ function updateTasksDisplay() {
           <div class="task-card-type">${task.type.charAt(0).toUpperCase() + task.type.slice(1)}</div>
           <div class="task-card-title">${task.title}</div>
           <div class="task-card-dueDate">Due: ${formatDateDisplay(new Date(task.dueDate))}</div>
-          ${
-            task.type === "task"
-              ? `<div class="task-card-time">${task.estimatedHours} hours</div>`
-              : task.startTime
-                ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
-                : ""
-          }
-          ${task.isRecurring ? `<div class="task-card-time">Recurring: ${task.recurrenceType}</div>` : ""}
+          ${task.type === "task"
+          ? `
+      <div class="task-card-time">${task.estimatedHours} hours</div>
+      <div class="task-card-time">Difficulty: ${task.difficulty || "MEDIUM"}</div>
+    `
+          : task.startTime
+            ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
+            : ""
+        }
+        ${task.isRecurring ? `<div class="task-card-time">Recurring: ${task.recurrenceType}</div>` : ""}
+
         </div>
       `,
     )
@@ -1130,11 +1157,10 @@ function viewTaskDetails(taskId) {
   if (!modal || !modalBody) return;
 
   const recurrenceText = task.isRecurring
-    ? `${task.recurrenceType.charAt(0).toUpperCase() + task.recurrenceType.slice(1)}${
-        task.recurrenceDays && task.recurrenceDays.length > 0
-          ? ` (${task.recurrenceDays.join(", ")})`
-          : ""
-      }`
+    ? `${task.recurrenceType.charAt(0).toUpperCase() + task.recurrenceType.slice(1)}${task.recurrenceDays && task.recurrenceDays.length > 0
+      ? ` (${task.recurrenceDays.join(", ")})`
+      : ""
+    }`
     : "No";
 
   modalBody.innerHTML = `
@@ -1154,49 +1180,54 @@ function viewTaskDetails(taskId) {
       <span class="modal-detail-label">Estimated Time:</span>
       <span class="modal-detail-value">${task.estimatedHours || 0} hours</span>
     </div>
-    ${
-      task.startTime
-        ? `
+    ${task.type === "task"
+      ? `
+    <div class="modal-detail">
+      <span class="modal-detail-label">Difficulty:</span>
+      <span class="modal-detail-value">${task.difficulty || "MEDIUM"}</span>
+    </div>
+    `
+      : ""
+    }
+    ${task.startTime
+      ? `
     <div class="modal-detail">
       <span class="modal-detail-label">Start Time:</span>
       <span class="modal-detail-value">${task.startTime}</span>
     </div>
     `
-        : ""
+      : ""
     }
-    ${
-      task.endTime
-        ? `
+    ${task.endTime
+      ? `
     <div class="modal-detail">
       <span class="modal-detail-label">End Time:</span>
       <span class="modal-detail-value">${task.endTime}</span>
     </div>
     `
-        : ""
+      : ""
     }
     <div class="modal-detail">
       <span class="modal-detail-label">Recurring:</span>
       <span class="modal-detail-value">${recurrenceText}</span>
     </div>
-    ${
-      task.recurrenceEnd
-        ? `
+    ${task.recurrenceEnd
+      ? `
     <div class="modal-detail">
       <span class="modal-detail-label">Recurs Until:</span>
       <span class="modal-detail-value">${formatDateDisplay(new Date(task.recurrenceEnd))}</span>
     </div>
     `
-        : ""
+      : ""
     }
-    ${
-      task.description
-        ? `
+    ${task.description
+      ? `
     <div class="modal-detail">
       <span class="modal-detail-label">Description:</span>
       <span class="modal-detail-value">${task.description}</span>
     </div>
     `
-        : ""
+      : ""
     }
   `;
 
@@ -1306,6 +1337,8 @@ function editSelectedTask() {
   const isRecurring = document.getElementById("isRecurring");
   const recurrenceType = document.getElementById("recurrenceType");
   const recurrenceEnd = document.getElementById("recurrenceEnd");
+  const difficultyField = document.getElementById("difficulty");
+  const difficultyGroup = document.getElementById("difficultyGroup");
 
   const startTimeGroup = document.getElementById("startTimeGroup");
   const endTimeGroup = document.getElementById("endTimeGroup");
@@ -1328,12 +1361,15 @@ function editSelectedTask() {
   if (isRecurring) isRecurring.checked = !!task.isRecurring;
   if (recurrenceType) recurrenceType.value = task.recurrenceType || "";
   if (recurrenceEnd) recurrenceEnd.value = task.recurrenceEnd || "";
+  if (difficultyField) difficultyField.value = task.difficulty || "MEDIUM";
+
 
   document.querySelectorAll('input[name="recurrenceDays"]').forEach((cb) => {
     cb.checked = task.recurrenceDays?.includes(cb.value) || false;
   });
 
   if (task.type === "event") {
+    if (difficultyGroup) difficultyGroup.style.display = "none";
     if (startTimeGroup) startTimeGroup.style.display = "flex";
     if (endTimeGroup) endTimeGroup.style.display = "flex";
     if (estimatedHoursGroup) estimatedHoursGroup.style.display = "none";
@@ -1351,6 +1387,7 @@ function editSelectedTask() {
       if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
     }
   } else {
+    if (difficultyGroup) difficultyGroup.style.display = "block";
     if (startTimeGroup) startTimeGroup.style.display = "none";
     if (endTimeGroup) endTimeGroup.style.display = "none";
     if (estimatedHoursGroup) estimatedHoursGroup.style.display = "block";
@@ -1439,24 +1476,22 @@ function renderScheduleGrid() {
     dayColumn.innerHTML = `
       <div class="day-header">${dayName}<br>${dayDate.getDate()}</div>
       <div class="day-content">
-        ${
-          dayEvents.length > 0
-            ? dayEvents
-                .map(
-                  (event) => `
+        ${dayEvents.length > 0
+        ? dayEvents
+          .map(
+            (event) => `
                     <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
                       <div class="schedule-event-title">${event.title}</div>
-                      ${
-                        event.startTime
-                          ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>`
-                          : `<div class="schedule-event-time">${event.label || "Due"}</div>`
-                      }
+                      ${event.startTime
+                ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>`
+                : `<div class="schedule-event-time">${event.label || "Due"}</div>`
+              }
                     </div>
                   `,
-                )
-                .join("")
-            : '<p class="empty-state">No events</p>'
-        }
+          )
+          .join("")
+        : '<p class="empty-state">No events</p>'
+      }
       </div>
     `;
 
@@ -1599,8 +1634,8 @@ function renderTimeline(entries) {
         <div class="timeline-item">
           <div class="timeline-date">${formatDateDisplay(new Date(dateKey + "T12:00:00"))}</div>
           ${dateItems
-            .map(
-              (item) => `
+          .map(
+            (item) => `
                 <div class="timeline-task task">
                   <div class="timeline-task-title">${item.taskTitle}</div>
                   <div class="timeline-task-info">
@@ -1610,8 +1645,8 @@ function renderTimeline(entries) {
                   </div>
                 </div>
               `,
-            )
-            .join("")}
+          )
+          .join("")}
         </div>
       `;
     })

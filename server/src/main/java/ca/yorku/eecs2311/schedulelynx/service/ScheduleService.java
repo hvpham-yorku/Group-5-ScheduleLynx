@@ -1,14 +1,17 @@
 package ca.yorku.eecs2311.schedulelynx.service;
 
+import ca.yorku.eecs2311.schedulelynx.domain.Difficulty;
 import ca.yorku.eecs2311.schedulelynx.domain.Event;
 import ca.yorku.eecs2311.schedulelynx.domain.RecurrenceType;
 import ca.yorku.eecs2311.schedulelynx.domain.ScheduleEntry;
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.domain.User;
+import ca.yorku.eecs2311.schedulelynx.domain.UserSchedulePreferences;
 import ca.yorku.eecs2311.schedulelynx.persistence.EventRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.ScheduleEntryRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.TaskRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.UserRepository;
+import ca.yorku.eecs2311.schedulelynx.persistence.UserSchedulePreferencesRepository;
 import ca.yorku.eecs2311.schedulelynx.web.dto.GenerateScheduleRequest;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -21,24 +24,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ScheduleService {
 
-  private static final LocalTime DEFAULT_DAY_START = LocalTime.of(9, 0);
-  private static final LocalTime DEFAULT_DAY_END = LocalTime.of(21, 0);
-  private static final int DEFAULT_MAX_HOURS_PER_DAY = 6;
-  private static final int DEFAULT_MAX_BLOCK_HOURS = 3;
+  private static final LocalTime DEFAULT_TASK_START = LocalTime.of(9, 0);
+  private static final LocalTime DEFAULT_TASK_END = LocalTime.of(21, 0);
+  private static final int DEFAULT_TASK_MAX_HOURS_PER_DAY = 3;
+  private static final int DEFAULT_TASK_MIN_BLOCK_HOURS = 1;
+  private static final int DEFAULT_TASK_MAX_BLOCK_HOURS = 3;
 
   private final ScheduleEntryRepository scheduleEntryRepository;
   private final TaskRepository taskRepository;
   private final EventRepository eventRepository;
   private final UserRepository userRepository;
+  private final UserSchedulePreferencesRepository preferencesRepository;
 
-  public ScheduleService(ScheduleEntryRepository scheduleEntryRepository,
-                         TaskRepository taskRepository,
-                         EventRepository eventRepository,
-                         UserRepository userRepository) {
+  public ScheduleService(
+      ScheduleEntryRepository scheduleEntryRepository,
+      TaskRepository taskRepository, EventRepository eventRepository,
+      UserRepository userRepository,
+      UserSchedulePreferencesRepository preferencesRepository) {
     this.scheduleEntryRepository = scheduleEntryRepository;
     this.taskRepository = taskRepository;
     this.eventRepository = eventRepository;
     this.userRepository = userRepository;
+    this.preferencesRepository = preferencesRepository;
   }
 
   public List<ScheduleEntry> getAll(long userId) {
@@ -64,45 +71,42 @@ public class ScheduleService {
     User owner = userRepository.findById(userId).orElseThrow(
         () -> new IllegalArgumentException("User not found"));
 
+    UserSchedulePreferences prefs =
+        preferencesRepository.findByOwnerId(userId).orElseGet(() -> {
+          UserSchedulePreferences p = new UserSchedulePreferences(owner);
+          return preferencesRepository.save(p);
+        });
+
     LocalDate startDate = request != null && request.startDate() != null
                               ? request.startDate()
                               : LocalDate.now();
-    LocalTime dayStart = request != null && request.dayStartTime() != null
-                             ? request.dayStartTime()
-                             : DEFAULT_DAY_START;
-    LocalTime dayEnd = request != null && request.dayEndTime() != null
-                           ? request.dayEndTime()
-                           : DEFAULT_DAY_END;
-    int maxHoursPerDay = request != null && request.maxHoursPerDay() != null
-                             ? request.maxHoursPerDay()
-                             : DEFAULT_MAX_HOURS_PER_DAY;
-    int maxBlockHours = request != null && request.maxBlockHours() != null
-                            ? request.maxBlockHours()
-                            : DEFAULT_MAX_BLOCK_HOURS;
 
-    if (!dayEnd.isAfter(dayStart)) {
-      throw new IllegalArgumentException(
-          "Day end time must be after day start time");
-    }
-    if (maxHoursPerDay <= 0) {
-      throw new IllegalArgumentException(
-          "maxHoursPerDay must be greater than 0");
-    }
-    if (maxBlockHours <= 0) {
-      throw new IllegalArgumentException(
-          "maxBlockHours must be greater than 0");
-    }
+    boolean allowWeekendScheduling =
+        prefs.getAllowWeekendScheduling() == null ||
+        prefs.getAllowWeekendScheduling();
+
+    LocalTime quietHoursStart = prefs.getQuietHoursStart();
+    LocalTime quietHoursEnd = prefs.getQuietHoursEnd();
 
     scheduleEntryRepository.deleteAllByOwnerId(userId);
 
-    List<Task> tasks =
-        taskRepository.findAllByOwnerIdOrderByDueDateAscIdAsc(userId);
+    List<Task> tasks = new ArrayList<>(
+        taskRepository.findAllByOwnerIdOrderByDueDateAscIdAsc(userId));
     List<Event> events =
         eventRepository.findAllByOwnerIdOrderByDateAscStartTimeAscIdAsc(userId);
 
     if (tasks.isEmpty()) {
-      return new ScheduleGenerationResult(List.of(), List.of());
+      return new ScheduleGenerationResult(ScheduleStatus.FEASIBLE, List.of(),
+                                          List.of());
     }
+
+    tasks.sort(
+        Comparator.comparing(Task::getDueDate)
+            .thenComparing((Task t)
+                               -> difficultyRank(t.getDifficulty()),
+                           Comparator.reverseOrder())
+            .thenComparing(Task::getEstimatedHours, Comparator.reverseOrder())
+            .thenComparing(Task::getId));
 
     LocalDate maxDueDate = tasks.stream()
                                .map(Task::getDueDate)
@@ -110,53 +114,106 @@ public class ScheduleService {
                                .orElse(startDate);
 
     Map<LocalDate, List<BusyWindow>> busyByDate = new HashMap<>();
-    Map<LocalDate, Integer> scheduledHoursByDate = new HashMap<>();
+    Map<Long, Map<LocalDate, Integer>> taskHoursByDate = new HashMap<>();
+    List<String> warnings = new ArrayList<>();
 
     for (LocalDate date = startDate; !date.isAfter(maxDueDate);
          date = date.plusDays(1)) {
       busyByDate.put(date, new ArrayList<>());
-      scheduledHoursByDate.put(date, 0);
     }
 
     for (Event event : events) {
       for (LocalDate date = startDate; !date.isAfter(maxDueDate);
            date = date.plusDays(1)) {
         if (occursOn(event, date)) {
-          busyByDate.computeIfAbsent(date, d -> new ArrayList<>())
-              .add(new BusyWindow(event.getStartTime(), event.getEndTime()));
+          busyByDate.get(date).add(
+              new BusyWindow(event.getStartTime(), event.getEndTime()));
+        }
+      }
+    }
+
+    if (quietHoursStart != null && quietHoursEnd != null &&
+        !quietHoursStart.equals(quietHoursEnd)) {
+      for (LocalDate date = startDate; !date.isAfter(maxDueDate);
+           date = date.plusDays(1)) {
+        if (quietHoursStart.isBefore(quietHoursEnd)) {
+          busyByDate.get(date).add(
+              new BusyWindow(quietHoursStart, quietHoursEnd));
+        } else {
+          busyByDate.get(date).add(
+              new BusyWindow(LocalTime.MIN, quietHoursEnd));
+          busyByDate.get(date).add(
+              new BusyWindow(quietHoursStart, LocalTime.MAX));
         }
       }
     }
 
     List<ScheduleEntry> createdEntries = new ArrayList<>();
-    List<String> warnings = new ArrayList<>();
+    int unscheduledTaskCount = 0;
 
     for (Task task : tasks) {
       int remainingHours = task.getEstimatedHours();
+
+      LocalTime preferredStart = task.getPreferredStartTime() != null
+                                     ? task.getPreferredStartTime()
+                                     : DEFAULT_TASK_START;
+      LocalTime preferredEnd = task.getPreferredEndTime() != null
+                                   ? task.getPreferredEndTime()
+                                   : DEFAULT_TASK_END;
+      int maxHoursPerDay = task.getMaxHoursPerDay() != null
+                               ? task.getMaxHoursPerDay()
+                               : DEFAULT_TASK_MAX_HOURS_PER_DAY;
+      int minBlockHours = task.getMinBlockHours() != null
+                              ? task.getMinBlockHours()
+                              : DEFAULT_TASK_MIN_BLOCK_HOURS;
+      int maxBlockHours = task.getMaxBlockHours() != null
+                              ? task.getMaxBlockHours()
+                              : DEFAULT_TASK_MAX_BLOCK_HOURS;
+
+      if (!preferredEnd.isAfter(preferredStart)) {
+        warnings.add("Task \"" + task.getTitle() +
+                     "\" has invalid preferred hours and was skipped.");
+        unscheduledTaskCount++;
+        continue;
+      }
+
       LocalDate date = startDate;
 
       while (remainingHours > 0 && !date.isAfter(task.getDueDate())) {
-        busyByDate.computeIfAbsent(date, d -> new ArrayList<>());
-        scheduledHoursByDate.putIfAbsent(date, 0);
+        if (!allowWeekendScheduling && isWeekend(date)) {
+          date = date.plusDays(1);
+          continue;
+        }
 
-        int alreadyScheduledToday = scheduledHoursByDate.get(date);
-        int remainingCapacityToday = maxHoursPerDay - alreadyScheduledToday;
+        taskHoursByDate.putIfAbsent(task.getId(), new HashMap<>());
+        int alreadyScheduledForTaskToday =
+            taskHoursByDate.get(task.getId()).getOrDefault(date, 0);
+
+        int remainingCapacityToday =
+            maxHoursPerDay - alreadyScheduledForTaskToday;
 
         if (remainingCapacityToday > 0) {
           int desiredBlockHours = Math.min(
               Math.min(remainingHours, maxBlockHours), remainingCapacityToday);
 
-          Slot slot = findAvailableSlot(busyByDate.get(date), dayStart, dayEnd,
-                                        desiredBlockHours);
+          Slot slot = null;
 
-          if (slot == null && desiredBlockHours > 1) {
-            for (int smaller = desiredBlockHours - 1; smaller >= 1; smaller--) {
-              slot = findAvailableSlot(busyByDate.get(date), dayStart, dayEnd,
-                                       smaller);
-              if (slot != null) {
-                desiredBlockHours = smaller;
-                break;
-              }
+          for (int candidate = desiredBlockHours; candidate >= minBlockHours;
+               candidate--) {
+            slot = findAvailableSlot(busyByDate.get(date), preferredStart,
+                                     preferredEnd, candidate);
+            if (slot != null) {
+              desiredBlockHours = candidate;
+              break;
+            }
+          }
+
+          if (slot == null && remainingHours < minBlockHours &&
+              remainingCapacityToday >= remainingHours) {
+            slot = findAvailableSlot(busyByDate.get(date), preferredStart,
+                                     preferredEnd, remainingHours);
+            if (slot != null) {
+              desiredBlockHours = remainingHours;
             }
           }
 
@@ -168,8 +225,9 @@ public class ScheduleService {
             createdEntries.add(saved);
 
             busyByDate.get(date).add(new BusyWindow(slot.start(), slot.end()));
-            scheduledHoursByDate.put(date,
-                                     alreadyScheduledToday + desiredBlockHours);
+            taskHoursByDate.get(task.getId())
+                .put(date, alreadyScheduledForTaskToday + desiredBlockHours);
+
             remainingHours -= desiredBlockHours;
           }
         }
@@ -180,6 +238,7 @@ public class ScheduleService {
       if (remainingHours > 0) {
         warnings.add("Could not fully schedule task \"" + task.getTitle() +
                      "\" before " + task.getDueDate());
+        unscheduledTaskCount++;
       }
     }
 
@@ -187,23 +246,48 @@ public class ScheduleService {
         scheduleEntryRepository.findAllByOwnerIdOrderByDateAscStartTimeAscIdAsc(
             userId);
 
-    return new ScheduleGenerationResult(allEntries, warnings);
+    ScheduleStatus status;
+    if (unscheduledTaskCount == 0) {
+      status = ScheduleStatus.FEASIBLE;
+    } else if (!allEntries.isEmpty()) {
+      status = ScheduleStatus.PARTIALLY_FEASIBLE;
+    } else {
+      status = ScheduleStatus.INFEASIBLE;
+    }
+
+    return new ScheduleGenerationResult(status, allEntries, warnings);
   }
 
-  private Slot findAvailableSlot(List<BusyWindow> busyWindows,
-                                 LocalTime dayStart, LocalTime dayEnd,
-                                 int blockHours) {
+  private int difficultyRank(Difficulty difficulty) {
+    if (difficulty == null)
+      return 0;
+    return switch (difficulty) {
+      case LOW -> 1;
+      case MEDIUM -> 2;
+      case HIGH -> 3;
+    };
+  }
+
+  private boolean isWeekend(LocalDate date) {
+    DayOfWeek day = date.getDayOfWeek();
+    return day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY;
+  }
+
+  private Slot findAvailableSlot(List<BusyWindow> busyWindows, LocalTime start,
+                                 LocalTime end, int blockHours) {
     List<BusyWindow> sorted = new ArrayList<>(busyWindows);
     sorted.sort(Comparator.comparing(BusyWindow::start));
 
-    LocalTime candidateStart = dayStart;
-    LocalTime neededEnd = candidateStart.plusHours(blockHours);
+    LocalTime candidateStart = start;
 
     for (BusyWindow busy : sorted) {
-      neededEnd = candidateStart.plusHours(blockHours);
+      LocalTime neededEnd = candidateStart.plusHours(blockHours);
 
       if (!neededEnd.isAfter(busy.start())) {
-        return new Slot(candidateStart, neededEnd);
+        if (!neededEnd.isAfter(end)) {
+          return new Slot(candidateStart, neededEnd);
+        }
+        return null;
       }
 
       if (candidateStart.isBefore(busy.end())) {
@@ -211,8 +295,8 @@ public class ScheduleService {
       }
     }
 
-    neededEnd = candidateStart.plusHours(blockHours);
-    if (!neededEnd.isAfter(dayEnd)) {
+    LocalTime neededEnd = candidateStart.plusHours(blockHours);
+    if (!neededEnd.isAfter(end)) {
       return new Slot(candidateStart, neededEnd);
     }
 
@@ -270,9 +354,11 @@ public class ScheduleService {
   }
 
   private record BusyWindow(LocalTime start, LocalTime end) {}
-
   private record Slot(LocalTime start, LocalTime end) {}
 
-  public record ScheduleGenerationResult(List<ScheduleEntry> entries,
+  public enum ScheduleStatus { FEASIBLE, PARTIALLY_FEASIBLE, INFEASIBLE }
+
+  public record ScheduleGenerationResult(ScheduleStatus status,
+                                         List<ScheduleEntry> entries,
                                          List<String> warnings) {}
 }

@@ -2,7 +2,6 @@
 // SCHEDULE LYNX - MAIN SCRIPT
 // ============================
 
-// Global Variables
 let tasks = [];
 let scheduleEntries = [];
 let currentWeekStart = getMonday(new Date());
@@ -47,8 +46,7 @@ async function apiFetch(url, options = {}) {
 // ============================
 
 function isLoggedIn() {
-  const storedUser = localStorage.getItem("schedulelynxUser");
-  return storedUser !== null;
+  return localStorage.getItem("schedulelynxUser") !== null;
 }
 
 function getCurrentUser() {
@@ -56,7 +54,6 @@ function getCurrentUser() {
   return storedUser ? JSON.parse(storedUser) : null;
 }
 
-// Legacy fallback
 function handleLogin(event) {
   if (event) event.preventDefault();
 
@@ -70,10 +67,10 @@ function handleLogin(event) {
   }
 
   const user = {
-    username: username,
+    username,
     email: username.includes("@") ? username : `${username}@schedulelynx.app`,
     loginTime: new Date().toISOString(),
-    rememberMe: rememberMe,
+    rememberMe,
   };
 
   localStorage.setItem("schedulelynxUser", JSON.stringify(user));
@@ -89,7 +86,6 @@ function loginDemo() {
   handleLogin();
 }
 
-// Legacy fallback
 function handleSignup(event) {
   if (event) event.preventDefault();
 
@@ -117,9 +113,9 @@ function handleSignup(event) {
   }
 
   const user = {
-    username: username,
-    email: email,
-    name: name,
+    username,
+    email,
+    name,
     loginTime: new Date().toISOString(),
     rememberMe: true,
   };
@@ -137,7 +133,7 @@ async function logout() {
       method: "POST",
     });
   } catch (err) {
-    // ignore backend logout error
+    // ignore
   }
 
   localStorage.removeItem("schedulelynxUser");
@@ -192,7 +188,9 @@ document.addEventListener("DOMContentLoaded", function () {
   } else if (currentPage === "timetable.html") {
     initializeFormHandlers();
     initializeScheduleDisplay();
+    initializePreferenceHandlers();
     loadTasksFromStorage();
+    loadSchedulePreferences();
   }
 });
 
@@ -214,12 +212,79 @@ function initializeLoginHandlers() {
   const loginForm = document.getElementById("loginForm");
   const signupForm = document.getElementById("signupFormElement");
 
-  if (loginForm) {
-    loginForm.addEventListener("submit", handleLogin);
+  if (loginForm) loginForm.addEventListener("submit", handleLogin);
+  if (signupForm) signupForm.addEventListener("submit", handleSignup);
+}
+
+// ============================
+// PREFERENCES
+// ============================
+
+async function loadSchedulePreferences() {
+  try {
+    const prefs = await apiFetch("/api/preferences/schedule", {
+      method: "GET",
+    });
+
+    const allowWeekend = document.getElementById("scheduleAllowWeekend");
+    const quietStart = document.getElementById("scheduleQuietHoursStart");
+    const quietEnd = document.getElementById("scheduleQuietHoursEnd");
+
+    if (allowWeekend)
+      allowWeekend.checked = prefs.allowWeekendScheduling ?? true;
+    if (quietStart) quietStart.value = prefs.quietHoursStart || "23:00";
+    if (quietEnd) quietEnd.value = prefs.quietHoursEnd || "08:00";
+  } catch (err) {
+    console.error("Could not load schedule preferences:", err.message);
+  }
+}
+
+function initializePreferenceHandlers() {
+  const saveBtn = document.getElementById("savePreferencesBtn");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", saveSchedulePreferences);
   }
 
-  if (signupForm) {
-    signupForm.addEventListener("submit", handleSignup);
+  const preferenceIds = [
+    "scheduleAllowWeekend",
+    "scheduleQuietHoursStart",
+    "scheduleQuietHoursEnd",
+  ];
+
+  preferenceIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const eventType = el.type === "checkbox" ? "change" : "input";
+    el.addEventListener(eventType, () => {
+      markScheduleAsStale(
+        "Preferences changed. Save preferences, then generate again.",
+      );
+    });
+  });
+}
+
+async function saveSchedulePreferences() {
+  try {
+    const allowWeekendScheduling =
+      document.getElementById("scheduleAllowWeekend")?.checked ?? true;
+    const quietHoursStart =
+      document.getElementById("scheduleQuietHoursStart")?.value || null;
+    const quietHoursEnd =
+      document.getElementById("scheduleQuietHoursEnd")?.value || null;
+
+    await apiFetch("/api/preferences/schedule", {
+      method: "PUT",
+      body: JSON.stringify({
+        allowWeekendScheduling,
+        quietHoursStart,
+        quietHoursEnd,
+      }),
+    });
+
+    markScheduleAsStale("Preferences saved. Please generate again.");
+    alert("Schedule preferences saved.");
+  } catch (err) {
+    alert(err.message);
   }
 }
 
@@ -228,13 +293,8 @@ function initializeLoginHandlers() {
 // ============================
 
 async function loadUserTasks(username) {
-  const backendTasks = await apiFetch("/api/tasks", {
-    method: "GET",
-  });
-
-  const backendEvents = await apiFetch("/api/events", {
-    method: "GET",
-  });
+  const backendTasks = await apiFetch("/api/tasks", { method: "GET" });
+  const backendEvents = await apiFetch("/api/events", { method: "GET" });
 
   const normalizedTasks = backendTasks.map((task) => ({
     id: String(task.id),
@@ -251,7 +311,12 @@ async function loadUserTasks(username) {
     recurrenceType: null,
     recurrenceEnd: null,
     recurrenceDays: [],
-    difficulty: task.difficulty,
+    difficulty: task.difficulty || "MEDIUM",
+    preferredStartTime: task.preferredStartTime || "09:00",
+    preferredEndTime: task.preferredEndTime || "21:00",
+    maxHoursPerDay: task.maxHoursPerDay ?? 3,
+    minBlockHours: task.minBlockHours ?? 1,
+    maxBlockHours: task.maxBlockHours ?? 3,
   }));
 
   const normalizedEvents = backendEvents.map((event) => ({
@@ -271,15 +336,14 @@ async function loadUserTasks(username) {
       : null,
     recurrenceEnd: event.recurrenceEnd || null,
     recurrenceDays: (event.recurrenceDays || []).map(dayOfWeekToShort),
+    difficulty: null,
   }));
 
   tasks = [...normalizedTasks, ...normalizedEvents];
 }
 
 async function loadScheduleEntries() {
-  const entries = await apiFetch("/api/schedule", {
-    method: "GET",
-  });
+  const entries = await apiFetch("/api/schedule", { method: "GET" });
 
   scheduleEntries = entries.map((entry) => ({
     id: String(entry.id),
@@ -293,34 +357,26 @@ async function loadScheduleEntries() {
   }));
 }
 
-function saveUserTasks(username) {
-  // no-op: backend is source of truth
-}
-
-function saveTasksToStorage() {
-  if (currentUser) {
-    refreshDashboardIfVisible();
-  }
-}
-
 async function loadTasksFromStorage() {
-  if (currentUser) {
-    await loadUserTasks(currentUser.username);
-    await loadScheduleEntries();
-    updateTasksDisplay();
-    renderScheduleGrid();
-    renderTimeline(scheduleEntries);
+  if (!currentUser) return;
 
-    if (scheduleEntries.length > 0) {
-      hideScheduleNotice();
-    }
+  await loadUserTasks(currentUser.username);
+  await loadScheduleEntries();
 
-    const generateBtn = document.getElementById("generateSchedule");
-    if (generateBtn && tasks.length > 0) {
-      generateBtn.disabled = false;
-    }
-    refreshDashboardIfVisible();
+  updateTasksDisplay();
+  renderScheduleGrid();
+  renderTimeline(scheduleEntries);
+
+  if (scheduleEntries.length > 0) {
+    hideScheduleNotice();
   }
+
+  const generateBtn = document.getElementById("generateSchedule");
+  if (generateBtn && tasks.length > 0) {
+    generateBtn.disabled = false;
+  }
+
+  refreshDashboardIfVisible();
 }
 
 // ============================
@@ -357,10 +413,6 @@ function addDays(date, days) {
   return result;
 }
 
-function generateId() {
-  return Date.now() + Math.random().toString(36).substring(2, 11);
-}
-
 function shortDayToBackend(value) {
   const map = {
     Sun: "SUNDAY",
@@ -385,6 +437,31 @@ function dayOfWeekToShort(value) {
     SATURDAY: "Sat",
   };
   return map[value] || value;
+}
+
+function showScheduleNotice(message) {
+  const notice = document.getElementById("scheduleNotice");
+  const text = document.getElementById("scheduleNoticeText");
+  if (text) text.textContent = message;
+  if (notice) notice.style.display = "block";
+}
+
+function hideScheduleNotice() {
+  const notice = document.getElementById("scheduleNotice");
+  if (notice) notice.style.display = "none";
+}
+
+function markScheduleAsStale(
+  message = "Schedule changed. Please generate again.",
+) {
+  if (scheduleEntries.length === 0) {
+    showScheduleNotice(message);
+    return;
+  }
+
+  scheduleEntries = [];
+  renderTimeline(scheduleEntries);
+  showScheduleNotice(message);
 }
 
 function shouldShowRecurringEventOnDate(eventItem, dateStr) {
@@ -431,26 +508,6 @@ function shouldShowRecurringEventOnDate(eventItem, dateStr) {
   return eventItem.dueDate === dateStr;
 }
 
-function showScheduleNotice(message) {
-  const notice = document.getElementById("scheduleNotice");
-  const text = document.getElementById("scheduleNoticeText");
-
-  if (text) {
-    text.textContent = message;
-  }
-
-  if (notice) {
-    notice.style.display = "block";
-  }
-}
-
-function hideScheduleNotice() {
-  const notice = document.getElementById("scheduleNotice");
-  if (notice) {
-    notice.style.display = "none";
-  }
-}
-
 function exitEditMode() {
   selectedTaskId = null;
 
@@ -458,9 +515,7 @@ function exitEditMode() {
   if (taskForm) taskForm.reset();
 
   const formTitle = document.getElementById("taskFormTitle");
-  if (formTitle) {
-    formTitle.textContent = "Add / Edit Task";
-  }
+  if (formTitle) formTitle.textContent = "Add / Edit Task";
 
   const recurrenceOptions = document.getElementById("recurrenceOptions");
   const startTimeGroup = document.getElementById("startTimeGroup");
@@ -468,6 +523,8 @@ function exitEditMode() {
   const daysOfWeekGroup = document.getElementById("daysOfWeekGroup");
   const recurringGroup = document.getElementById("recurringGroup");
   const estimatedHoursGroup = document.getElementById("estimatedHoursGroup");
+  const difficultyGroup = document.getElementById("difficultyGroup");
+  const taskSchedulingFields = document.getElementById("taskSchedulingFields");
   const taskType = document.getElementById("taskType");
 
   if (taskType) taskType.value = "task";
@@ -477,20 +534,29 @@ function exitEditMode() {
   if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
   if (recurringGroup) recurringGroup.style.display = "none";
   if (estimatedHoursGroup) estimatedHoursGroup.style.display = "block";
+  if (difficultyGroup) difficultyGroup.style.display = "block";
+  if (taskSchedulingFields) taskSchedulingFields.style.display = "block";
+
+  const preferredStartTime = document.getElementById("preferredStartTime");
+  const preferredEndTime = document.getElementById("preferredEndTime");
+  const taskMaxHoursPerDay = document.getElementById("taskMaxHoursPerDay");
+  const taskMinBlockHours = document.getElementById("taskMinBlockHours");
+  const taskMaxBlockHours = document.getElementById("taskMaxBlockHours");
+  const difficulty = document.getElementById("difficulty");
+
+  if (preferredStartTime) preferredStartTime.value = "09:00";
+  if (preferredEndTime) preferredEndTime.value = "21:00";
+  if (taskMaxHoursPerDay) taskMaxHoursPerDay.value = "3";
+  if (taskMinBlockHours) taskMinBlockHours.value = "1";
+  if (taskMaxBlockHours) taskMaxBlockHours.value = "3";
+  if (difficulty) difficulty.value = "MEDIUM";
 
   document
     .querySelectorAll('input[name="recurrenceDays"]')
     .forEach((cb) => (cb.checked = false));
 
-  const titleField = document.getElementById("taskTitle");
-  if (titleField) {
-    titleField.placeholder = "e.g., EECS lab";
-  }
-
   const submitBtn = document.querySelector('#taskForm button[type="submit"]');
-  if (submitBtn) {
-    submitBtn.textContent = "Save Task";
-  }
+  if (submitBtn) submitBtn.textContent = "Save Task";
 }
 
 // ============================
@@ -503,6 +569,7 @@ async function initializeDashboard() {
   currentUser = getCurrentUser();
   await loadUserTasks(currentUser.username);
   await loadScheduleEntries();
+
   updateDashboardStats();
   updateUpcomingTasks();
   updateWeekScheduleMini();
@@ -680,9 +747,8 @@ function initializeFormHandlers() {
     !taskTypeSelect ||
     !isRecurringCheckbox ||
     !recurrenceTypeSelect
-  ) {
+  )
     return;
-  }
 
   taskTypeSelect.addEventListener("change", function () {
     const startTimeGroup = document.getElementById("startTimeGroup");
@@ -691,6 +757,10 @@ function initializeFormHandlers() {
     const recurringGroup = document.getElementById("recurringGroup");
     const recurrenceOptions = document.getElementById("recurrenceOptions");
     const daysOfWeekGroup = document.getElementById("daysOfWeekGroup");
+    const difficultyGroup = document.getElementById("difficultyGroup");
+    const taskSchedulingFields = document.getElementById(
+      "taskSchedulingFields",
+    );
     const recurringCheckbox = document.getElementById("isRecurring");
 
     if (
@@ -700,6 +770,8 @@ function initializeFormHandlers() {
       !recurringGroup ||
       !recurrenceOptions ||
       !daysOfWeekGroup ||
+      !difficultyGroup ||
+      !taskSchedulingFields ||
       !recurringCheckbox
     ) {
       return;
@@ -709,6 +781,8 @@ function initializeFormHandlers() {
       startTimeGroup.style.display = "none";
       endTimeGroup.style.display = "none";
       estimatedHoursGroup.style.display = "block";
+      difficultyGroup.style.display = "block";
+      taskSchedulingFields.style.display = "block";
       recurringGroup.style.display = "none";
       recurringCheckbox.checked = false;
       recurrenceOptions.style.display = "none";
@@ -717,6 +791,8 @@ function initializeFormHandlers() {
       startTimeGroup.style.display = "flex";
       endTimeGroup.style.display = "flex";
       estimatedHoursGroup.style.display = "none";
+      difficultyGroup.style.display = "none";
+      taskSchedulingFields.style.display = "none";
       recurringGroup.style.display = "block";
       recurrenceOptions.style.display = recurringCheckbox.checked
         ? "block"
@@ -764,11 +840,29 @@ async function addTask() {
   const title = document.getElementById("taskTitle")?.value.trim();
   const type = document.getElementById("taskType")?.value;
   const dueDate = document.getElementById("dueDate")?.value;
+  const difficulty = document.getElementById("difficulty")?.value || "MEDIUM";
 
-  const estimatedHoursInput = document.getElementById("estimatedHours");
-  const estimatedHours = estimatedHoursInput
-    ? parseFloat(estimatedHoursInput.value)
-    : 0;
+  const estimatedHours = parseInt(
+    document.getElementById("estimatedHours")?.value || "0",
+    10,
+  );
+
+  const preferredStartTime =
+    document.getElementById("preferredStartTime")?.value || "09:00";
+  const preferredEndTime =
+    document.getElementById("preferredEndTime")?.value || "21:00";
+  const taskMaxHoursPerDay = parseInt(
+    document.getElementById("taskMaxHoursPerDay")?.value || "3",
+    10,
+  );
+  const taskMinBlockHours = parseInt(
+    document.getElementById("taskMinBlockHours")?.value || "1",
+    10,
+  );
+  const taskMaxBlockHours = parseInt(
+    document.getElementById("taskMaxBlockHours")?.value || "3",
+    10,
+  );
 
   const startTime = document.getElementById("startTime")?.value || "";
   const endTime = document.getElementById("endTime")?.value || "";
@@ -786,6 +880,17 @@ async function addTask() {
   if (!title || !type || !dueDate) {
     alert("Please fill in Title, Type, and Date.");
     return;
+  }
+
+  if (type === "task") {
+    if (!estimatedHours || estimatedHours < 1) {
+      alert("Estimated hours must be at least 1 for a Task.");
+      return;
+    }
+    if (taskMinBlockHours > taskMaxBlockHours) {
+      alert("Task min block hours cannot be greater than max block hours.");
+      return;
+    }
   }
 
   if (type === "event") {
@@ -808,258 +913,72 @@ async function addTask() {
         return;
       }
     }
-  } else if (type === "task") {
-    if (!estimatedHours || estimatedHours < 1) {
-      alert("Estimated hours must be at least 1 for a Task.");
-      return;
-    }
   }
 
   const originalItem = selectedTaskId
     ? tasks.find((t) => t.id === selectedTaskId)
     : null;
 
-  let item = {
-    id: generateId(),
-    title: title,
-    type: type,
-    dueDate: dueDate,
-    description: description,
-    completed: false,
-    createdAt: new Date().toISOString(),
-  };
-
-  const generateBtn = document.getElementById("generateSchedule");
-  if (generateBtn) {
-    generateBtn.disabled = false;
-  }
-
   try {
-    if (originalItem && originalItem.type === type) {
-      if (type === "event") {
-        const payload = {
-          title: title,
-          date: dueDate,
-          startTime: startTime,
-          endTime: endTime,
-          recurring: isRecurring,
-          recurrenceType: isRecurring ? recurrenceType.toUpperCase() : null,
-          recurrenceEnd: isRecurring && recurrenceEnd ? recurrenceEnd : null,
-          recurrenceDays: isRecurring
-            ? selectedRecurrenceDays.map(shortDayToBackend)
-            : [],
-        };
+    let savedItem;
 
-        const saved = await apiFetch(`/api/events/${selectedTaskId}`, {
+    if (type === "task") {
+      const payload = {
+        title,
+        dueDate,
+        estimatedHours,
+        difficulty,
+        preferredStartTime,
+        preferredEndTime,
+        maxHoursPerDay: taskMaxHoursPerDay,
+        minBlockHours: taskMinBlockHours,
+        maxBlockHours: taskMaxBlockHours,
+      };
+
+      if (originalItem && originalItem.type === "task") {
+        savedItem = await apiFetch(`/api/tasks/${selectedTaskId}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
-
-        item = {
-          id: String(saved.id),
-          title: saved.title,
-          type: "event",
-          dueDate: saved.date,
-          description: description,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          estimatedHours: 0,
-          startTime: saved.startTime,
-          endTime: saved.endTime,
-          isRecurring: !!saved.recurring,
-          recurrenceType: saved.recurrenceType
-            ? saved.recurrenceType.toLowerCase()
-            : null,
-          recurrenceEnd: saved.recurrenceEnd || null,
-          recurrenceDays: (saved.recurrenceDays || []).map(dayOfWeekToShort),
-        };
       } else {
-        const payload = {
-          title: title,
-          dueDate: dueDate,
-          estimatedHours: Math.round(estimatedHours),
-          difficulty: "MEDIUM",
-        };
+        if (originalItem && originalItem.type === "event") {
+          await apiFetch(`/api/events/${selectedTaskId}`, { method: "DELETE" });
+        }
 
-        const saved = await apiFetch(`/api/tasks/${selectedTaskId}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
-
-        item = {
-          id: String(saved.id),
-          title: saved.title,
-          type: "task",
-          dueDate: saved.dueDate,
-          description: description,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          estimatedHours: saved.estimatedHours,
-          startTime: null,
-          endTime: null,
-          isRecurring: false,
-          recurrenceType: null,
-          recurrenceEnd: null,
-          recurrenceDays: [],
-          difficulty: saved.difficulty,
-        };
-      }
-
-      tasks = tasks.filter((t) => t.id !== selectedTaskId);
-      tasks.push(item);
-    } else if (originalItem && originalItem.type !== type) {
-      if (originalItem.type === "task") {
-        await apiFetch(`/api/tasks/${selectedTaskId}`, {
-          method: "DELETE",
-        });
-      } else {
-        await apiFetch(`/api/events/${selectedTaskId}`, {
-          method: "DELETE",
-        });
-      }
-
-      if (type === "event") {
-        const payload = {
-          title: title,
-          date: dueDate,
-          startTime: startTime,
-          endTime: endTime,
-          recurring: isRecurring,
-          recurrenceType: isRecurring ? recurrenceType.toUpperCase() : null,
-          recurrenceEnd: isRecurring && recurrenceEnd ? recurrenceEnd : null,
-          recurrenceDays: isRecurring
-            ? selectedRecurrenceDays.map(shortDayToBackend)
-            : [],
-        };
-
-        const saved = await apiFetch("/api/events", {
+        savedItem = await apiFetch("/api/tasks", {
           method: "POST",
           body: JSON.stringify(payload),
         });
-
-        item = {
-          id: String(saved.id),
-          title: saved.title,
-          type: "event",
-          dueDate: saved.date,
-          description: description,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          estimatedHours: 0,
-          startTime: saved.startTime,
-          endTime: saved.endTime,
-          isRecurring: !!saved.recurring,
-          recurrenceType: saved.recurrenceType
-            ? saved.recurrenceType.toLowerCase()
-            : null,
-          recurrenceEnd: saved.recurrenceEnd || null,
-          recurrenceDays: (saved.recurrenceDays || []).map(dayOfWeekToShort),
-        };
-      } else {
-        const payload = {
-          title: title,
-          dueDate: dueDate,
-          estimatedHours: Math.round(estimatedHours),
-          difficulty: "MEDIUM",
-        };
-
-        const saved = await apiFetch("/api/tasks", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-
-        item = {
-          id: String(saved.id),
-          title: saved.title,
-          type: "task",
-          dueDate: saved.dueDate,
-          description: description,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          estimatedHours: saved.estimatedHours,
-          startTime: null,
-          endTime: null,
-          isRecurring: false,
-          recurrenceType: null,
-          recurrenceEnd: null,
-          recurrenceDays: [],
-          difficulty: saved.difficulty,
-        };
       }
-
-      tasks = tasks.filter((t) => t.id !== selectedTaskId);
-      tasks.push(item);
     } else {
-      if (type === "event") {
-        const payload = {
-          title: title,
-          date: dueDate,
-          startTime: startTime,
-          endTime: endTime,
-          recurring: isRecurring,
-          recurrenceType: isRecurring ? recurrenceType.toUpperCase() : null,
-          recurrenceEnd: isRecurring && recurrenceEnd ? recurrenceEnd : null,
-          recurrenceDays: isRecurring
-            ? selectedRecurrenceDays.map(shortDayToBackend)
-            : [],
-        };
+      const payload = {
+        title,
+        date: dueDate,
+        startTime,
+        endTime,
+        recurring: isRecurring,
+        recurrenceType: isRecurring ? recurrenceType.toUpperCase() : null,
+        recurrenceEnd: isRecurring && recurrenceEnd ? recurrenceEnd : null,
+        recurrenceDays: isRecurring
+          ? selectedRecurrenceDays.map(shortDayToBackend)
+          : [],
+      };
 
-        const saved = await apiFetch("/api/events", {
-          method: "POST",
+      if (originalItem && originalItem.type === "event") {
+        savedItem = await apiFetch(`/api/events/${selectedTaskId}`, {
+          method: "PUT",
           body: JSON.stringify(payload),
         });
-
-        item = {
-          id: String(saved.id),
-          title: saved.title,
-          type: "event",
-          dueDate: saved.date,
-          description: description,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          estimatedHours: 0,
-          startTime: saved.startTime,
-          endTime: saved.endTime,
-          isRecurring: !!saved.recurring,
-          recurrenceType: saved.recurrenceType
-            ? saved.recurrenceType.toLowerCase()
-            : null,
-          recurrenceEnd: saved.recurrenceEnd || null,
-          recurrenceDays: (saved.recurrenceDays || []).map(dayOfWeekToShort),
-        };
       } else {
-        const payload = {
-          title: title,
-          dueDate: dueDate,
-          estimatedHours: Math.round(estimatedHours),
-          difficulty: "MEDIUM",
-        };
+        if (originalItem && originalItem.type === "task") {
+          await apiFetch(`/api/tasks/${selectedTaskId}`, { method: "DELETE" });
+        }
 
-        const saved = await apiFetch("/api/tasks", {
+        savedItem = await apiFetch("/api/events", {
           method: "POST",
           body: JSON.stringify(payload),
         });
-
-        item = {
-          id: String(saved.id),
-          title: saved.title,
-          type: "task",
-          dueDate: saved.dueDate,
-          description: description,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          estimatedHours: saved.estimatedHours,
-          startTime: null,
-          endTime: null,
-          isRecurring: false,
-          recurrenceType: null,
-          recurrenceEnd: null,
-          recurrenceDays: [],
-          difficulty: saved.difficulty,
-        };
       }
-
-      tasks.push(item);
     }
 
     await loadUserTasks(currentUser.username);
@@ -1070,14 +989,7 @@ async function addTask() {
     renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
 
-    if (scheduleEntries.length === 0) {
-      showScheduleNotice(
-        "Schedule cleared because your tasks or events changed. Please generate again.",
-      );
-    } else {
-      hideScheduleNotice();
-    }
-
+    markScheduleAsStale("Tasks or events changed. Please generate again.");
     exitEditMode();
   } catch (err) {
     alert(err.message);
@@ -1085,7 +997,7 @@ async function addTask() {
 }
 
 // ============================
-// TASK DISPLAY
+// DISPLAY / MODAL
 // ============================
 
 function updateTasksDisplay() {
@@ -1107,7 +1019,7 @@ function updateTasksDisplay() {
           <div class="task-card-dueDate">Due: ${formatDateDisplay(new Date(task.dueDate))}</div>
           ${
             task.type === "task"
-              ? `<div class="task-card-time">${task.estimatedHours} hours</div>`
+              ? `<div class="task-card-time">${task.estimatedHours}h | ${task.difficulty || "MEDIUM"}</div>`
               : task.startTime
                 ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
                 : ""
@@ -1126,7 +1038,6 @@ function viewTaskDetails(taskId) {
   selectedTaskId = taskId;
   const modal = document.getElementById("taskModal");
   const modalBody = document.getElementById("modalBody");
-
   if (!modal || !modalBody) return;
 
   const recurrenceText = task.isRecurring
@@ -1150,18 +1061,39 @@ function viewTaskDetails(taskId) {
       <span class="modal-detail-label">Due Date:</span>
       <span class="modal-detail-value">${formatDateDisplay(new Date(task.dueDate))}</span>
     </div>
+    ${
+      task.type === "task"
+        ? `
     <div class="modal-detail">
       <span class="modal-detail-label">Estimated Time:</span>
-      <span class="modal-detail-value">${task.estimatedHours || 0} hours</span>
+      <span class="modal-detail-value">${task.estimatedHours} hours</span>
     </div>
+    <div class="modal-detail">
+      <span class="modal-detail-label">Difficulty:</span>
+      <span class="modal-detail-value">${task.difficulty || "MEDIUM"}</span>
+    </div>
+    <div class="modal-detail">
+      <span class="modal-detail-label">Preferred Hours:</span>
+      <span class="modal-detail-value">${task.preferredStartTime || "09:00"} - ${task.preferredEndTime || "21:00"}</span>
+    </div>
+    <div class="modal-detail">
+      <span class="modal-detail-label">Max Hours/Day:</span>
+      <span class="modal-detail-value">${task.maxHoursPerDay ?? 3}</span>
+    </div>
+    <div class="modal-detail">
+      <span class="modal-detail-label">Block Range:</span>
+      <span class="modal-detail-value">${task.minBlockHours ?? 1} - ${task.maxBlockHours ?? 3} hours</span>
+    </div>
+    `
+        : ""
+    }
     ${
       task.startTime
         ? `
     <div class="modal-detail">
       <span class="modal-detail-label">Start Time:</span>
       <span class="modal-detail-value">${task.startTime}</span>
-    </div>
-    `
+    </div>`
         : ""
     }
     ${
@@ -1170,78 +1102,41 @@ function viewTaskDetails(taskId) {
     <div class="modal-detail">
       <span class="modal-detail-label">End Time:</span>
       <span class="modal-detail-value">${task.endTime}</span>
-    </div>
-    `
+    </div>`
         : ""
     }
     <div class="modal-detail">
       <span class="modal-detail-label">Recurring:</span>
       <span class="modal-detail-value">${recurrenceText}</span>
     </div>
-    ${
-      task.recurrenceEnd
-        ? `
-    <div class="modal-detail">
-      <span class="modal-detail-label">Recurs Until:</span>
-      <span class="modal-detail-value">${formatDateDisplay(new Date(task.recurrenceEnd))}</span>
-    </div>
-    `
-        : ""
-    }
-    ${
-      task.description
-        ? `
-    <div class="modal-detail">
-      <span class="modal-detail-label">Description:</span>
-      <span class="modal-detail-value">${task.description}</span>
-    </div>
-    `
-        : ""
-    }
   `;
 
   modal.classList.add("active");
 }
 
-// ============================
-// MODAL HANDLING
-// ============================
-
 document.addEventListener("DOMContentLoaded", function () {
   const modal = document.getElementById("taskModal");
+  if (!modal) return;
 
-  if (modal) {
-    const closeBtn = document.querySelector(".close-modal");
-    const closeModalBtn = document.getElementById("closeModalBtn");
-    const deleteTaskBtn = document.getElementById("deleteTaskBtn");
-    const editTaskBtn = document.getElementById("editTaskBtn");
+  const closeBtn = document.querySelector(".close-modal");
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  const deleteTaskBtn = document.getElementById("deleteTaskBtn");
+  const editTaskBtn = document.getElementById("editTaskBtn");
 
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () =>
-        modal.classList.remove("active"),
-      );
-    }
+  if (closeBtn)
+    closeBtn.addEventListener("click", () => modal.classList.remove("active"));
+  if (closeModalBtn)
+    closeModalBtn.addEventListener("click", () =>
+      modal.classList.remove("active"),
+    );
 
-    if (closeModalBtn) {
-      closeModalBtn.addEventListener("click", () =>
-        modal.classList.remove("active"),
-      );
-    }
+  window.addEventListener("click", (e) => {
+    if (e.target === modal) modal.classList.remove("active");
+  });
 
-    window.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.classList.remove("active");
-      }
-    });
-
-    if (deleteTaskBtn) {
-      deleteTaskBtn.addEventListener("click", deleteTaskListener);
-    }
-
-    if (editTaskBtn) {
-      editTaskBtn.addEventListener("click", editSelectedTask);
-    }
-  }
+  if (deleteTaskBtn)
+    deleteTaskBtn.addEventListener("click", deleteTaskListener);
+  if (editTaskBtn) editTaskBtn.addEventListener("click", editSelectedTask);
 });
 
 async function deleteTaskListener() {
@@ -1254,13 +1149,9 @@ async function deleteTaskListener() {
 
   try {
     if (item.type === "event") {
-      await apiFetch(`/api/events/${selectedTaskId}`, {
-        method: "DELETE",
-      });
+      await apiFetch(`/api/events/${selectedTaskId}`, { method: "DELETE" });
     } else {
-      await apiFetch(`/api/tasks/${selectedTaskId}`, {
-        method: "DELETE",
-      });
+      await apiFetch(`/api/tasks/${selectedTaskId}`, { method: "DELETE" });
     }
 
     await loadUserTasks(currentUser.username);
@@ -1271,17 +1162,10 @@ async function deleteTaskListener() {
     renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
 
-    if (scheduleEntries.length === 0) {
-      showScheduleNotice(
-        "Schedule cleared because your tasks or events changed. Please generate again.",
-      );
-    } else {
-      hideScheduleNotice();
-    }
-
     const modal = document.getElementById("taskModal");
     if (modal) modal.classList.remove("active");
 
+    markScheduleAsStale("Tasks or events changed. Please generate again.");
     exitEditMode();
   } catch (err) {
     alert(err.message);
@@ -1300,6 +1184,12 @@ function editSelectedTask() {
   const taskType = document.getElementById("taskType");
   const dueDate = document.getElementById("dueDate");
   const estimatedHours = document.getElementById("estimatedHours");
+  const difficulty = document.getElementById("difficulty");
+  const preferredStartTime = document.getElementById("preferredStartTime");
+  const preferredEndTime = document.getElementById("preferredEndTime");
+  const taskMaxHoursPerDay = document.getElementById("taskMaxHoursPerDay");
+  const taskMinBlockHours = document.getElementById("taskMinBlockHours");
+  const taskMaxBlockHours = document.getElementById("taskMaxBlockHours");
   const startTime = document.getElementById("startTime");
   const endTime = document.getElementById("endTime");
   const description = document.getElementById("description");
@@ -1310,18 +1200,25 @@ function editSelectedTask() {
   const startTimeGroup = document.getElementById("startTimeGroup");
   const endTimeGroup = document.getElementById("endTimeGroup");
   const estimatedHoursGroup = document.getElementById("estimatedHoursGroup");
+  const difficultyGroup = document.getElementById("difficultyGroup");
+  const taskSchedulingFields = document.getElementById("taskSchedulingFields");
   const recurringGroup = document.getElementById("recurringGroup");
   const recurrenceOptions = document.getElementById("recurrenceOptions");
   const daysOfWeekGroup = document.getElementById("daysOfWeekGroup");
 
-  if (formTitle) {
-    formTitle.textContent = `Editing: ${task.title}`;
-  }
-
+  if (formTitle) formTitle.textContent = `Editing: ${task.title}`;
   if (taskTitle) taskTitle.value = task.title;
   if (taskType) taskType.value = task.type;
   if (dueDate) dueDate.value = task.dueDate;
   if (estimatedHours) estimatedHours.value = task.estimatedHours || "";
+  if (difficulty) difficulty.value = task.difficulty || "MEDIUM";
+  if (preferredStartTime)
+    preferredStartTime.value = task.preferredStartTime || "09:00";
+  if (preferredEndTime)
+    preferredEndTime.value = task.preferredEndTime || "21:00";
+  if (taskMaxHoursPerDay) taskMaxHoursPerDay.value = task.maxHoursPerDay ?? 3;
+  if (taskMinBlockHours) taskMinBlockHours.value = task.minBlockHours ?? 1;
+  if (taskMaxBlockHours) taskMaxBlockHours.value = task.maxBlockHours ?? 3;
   if (startTime) startTime.value = task.startTime || "";
   if (endTime) endTime.value = task.endTime || "";
   if (description) description.value = task.description || "";
@@ -1337,15 +1234,16 @@ function editSelectedTask() {
     if (startTimeGroup) startTimeGroup.style.display = "flex";
     if (endTimeGroup) endTimeGroup.style.display = "flex";
     if (estimatedHoursGroup) estimatedHoursGroup.style.display = "none";
+    if (difficultyGroup) difficultyGroup.style.display = "none";
+    if (taskSchedulingFields) taskSchedulingFields.style.display = "none";
     if (recurringGroup) recurringGroup.style.display = "block";
 
     if (task.isRecurring) {
       if (recurrenceOptions) recurrenceOptions.style.display = "block";
       const showDays =
         task.recurrenceType === "weekly" || task.recurrenceType === "biweekly";
-      if (daysOfWeekGroup) {
+      if (daysOfWeekGroup)
         daysOfWeekGroup.style.display = showDays ? "flex" : "none";
-      }
     } else {
       if (recurrenceOptions) recurrenceOptions.style.display = "none";
       if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
@@ -1354,19 +1252,15 @@ function editSelectedTask() {
     if (startTimeGroup) startTimeGroup.style.display = "none";
     if (endTimeGroup) endTimeGroup.style.display = "none";
     if (estimatedHoursGroup) estimatedHoursGroup.style.display = "block";
+    if (difficultyGroup) difficultyGroup.style.display = "block";
+    if (taskSchedulingFields) taskSchedulingFields.style.display = "block";
     if (recurringGroup) recurringGroup.style.display = "none";
     if (recurrenceOptions) recurrenceOptions.style.display = "none";
     if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
   }
 
   const submitBtn = document.querySelector('#taskForm button[type="submit"]');
-  if (submitBtn) {
-    submitBtn.textContent = "Update Item";
-  }
-
-  if (taskTitle) {
-    taskTitle.placeholder = `Editing: ${task.title}`;
-  }
+  if (submitBtn) submitBtn.textContent = "Update Item";
 
   const modal = document.getElementById("taskModal");
   if (modal) modal.classList.remove("active");
@@ -1376,7 +1270,7 @@ function editSelectedTask() {
 }
 
 // ============================
-// SCHEDULE GENERATION & DISPLAY
+// SCHEDULE GENERATION
 // ============================
 
 function initializeScheduleDisplay() {
@@ -1431,7 +1325,6 @@ function renderScheduleGrid() {
     const dayDate = addDays(currentWeekStart, i);
     const dayName = getDayName(dayDate);
     const formattedDate = formatDate(dayDate);
-
     const dayEvents = getEventsForDay(formattedDate);
 
     const dayColumn = document.createElement("div");
@@ -1481,17 +1374,15 @@ function getEventsForDay(dateStr) {
       }
     }
 
-    if (item.type === "task") {
-      if (item.dueDate === dateStr) {
-        items.push({
-          id: item.id,
-          title: item.title,
-          type: "task",
-          startTime: null,
-          endTime: null,
-          label: "Due",
-        });
-      }
+    if (item.type === "task" && item.dueDate === dateStr) {
+      items.push({
+        id: item.id,
+        title: item.title,
+        type: "task",
+        startTime: null,
+        endTime: null,
+        label: "Due",
+      });
     }
   });
 
@@ -1525,10 +1416,6 @@ async function generateSchedule() {
       method: "POST",
       body: JSON.stringify({
         startDate: formatDate(new Date()),
-        dayStartTime: "09:00",
-        dayEndTime: "21:00",
-        maxHoursPerDay: 6,
-        maxBlockHours: 3,
       }),
     });
 
@@ -1582,9 +1469,7 @@ function renderTimeline(entries) {
   const groupedByDate = {};
   entries.forEach((entry) => {
     const key = entry.date;
-    if (!groupedByDate[key]) {
-      groupedByDate[key] = [];
-    }
+    if (!groupedByDate[key]) groupedByDate[key] = [];
     groupedByDate[key].push(entry);
   });
 
@@ -1618,10 +1503,6 @@ function renderTimeline(entries) {
     .join("");
 }
 
-// ============================
-// CLEAR ALL
-// ============================
-
 async function clearAllItems() {
   if (
     !confirm(
@@ -1632,17 +1513,9 @@ async function clearAllItems() {
   }
 
   try {
-    await apiFetch("/api/schedule", {
-      method: "DELETE",
-    });
-
-    await apiFetch("/api/tasks", {
-      method: "DELETE",
-    });
-
-    await apiFetch("/api/events", {
-      method: "DELETE",
-    });
+    await apiFetch("/api/schedule", { method: "DELETE" });
+    await apiFetch("/api/tasks", { method: "DELETE" });
+    await apiFetch("/api/events", { method: "DELETE" });
 
     tasks = [];
     scheduleEntries = [];
@@ -1657,9 +1530,7 @@ async function clearAllItems() {
     renderScheduleGrid();
 
     const generateBtn = document.getElementById("generateSchedule");
-    if (generateBtn) {
-      generateBtn.disabled = true;
-    }
+    if (generateBtn) generateBtn.disabled = true;
 
     refreshDashboardIfVisible();
     hideScheduleNotice();

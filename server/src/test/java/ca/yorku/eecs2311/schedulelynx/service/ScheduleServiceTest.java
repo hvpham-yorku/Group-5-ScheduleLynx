@@ -10,10 +10,12 @@ import ca.yorku.eecs2311.schedulelynx.domain.RecurrenceType;
 import ca.yorku.eecs2311.schedulelynx.domain.ScheduleEntry;
 import ca.yorku.eecs2311.schedulelynx.domain.Task;
 import ca.yorku.eecs2311.schedulelynx.domain.User;
+import ca.yorku.eecs2311.schedulelynx.domain.UserSchedulePreferences;
 import ca.yorku.eecs2311.schedulelynx.persistence.EventRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.ScheduleEntryRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.TaskRepository;
 import ca.yorku.eecs2311.schedulelynx.persistence.UserRepository;
+import ca.yorku.eecs2311.schedulelynx.persistence.UserSchedulePreferencesRepository;
 import ca.yorku.eecs2311.schedulelynx.web.dto.GenerateScheduleRequest;
 import java.lang.reflect.Constructor;
 import java.time.DayOfWeek;
@@ -41,13 +43,15 @@ class ScheduleServiceTest {
 
   @Mock private UserRepository userRepository;
 
+  @Mock private UserSchedulePreferencesRepository preferencesRepository;
+
   private ScheduleService scheduleService;
 
   @BeforeEach
   void setUp() {
-    scheduleService =
-        new ScheduleService(scheduleEntryRepository, taskRepository,
-                            eventRepository, userRepository);
+    scheduleService = new ScheduleService(
+        scheduleEntryRepository, taskRepository, eventRepository,
+        userRepository, preferencesRepository);
   }
 
   @Test
@@ -103,6 +107,8 @@ class ScheduleServiceTest {
                      2, Difficulty.MEDIUM);
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(preferencesRepository.findByOwnerId(userId))
+        .thenReturn(Optional.of(defaultPrefs(user)));
     when(taskRepository.findAllByOwnerIdOrderByDueDateAscIdAsc(userId))
         .thenReturn(List.of(task));
     when(
@@ -111,9 +117,8 @@ class ScheduleServiceTest {
     when(scheduleEntryRepository.save(any(ScheduleEntry.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
 
-    GenerateScheduleRequest req = new GenerateScheduleRequest(
-        LocalDate.of(2026, 3, 9), LocalTime.of(9, 0), LocalTime.of(17, 0), 6,
-        2);
+    GenerateScheduleRequest req =
+        new GenerateScheduleRequest(LocalDate.of(2026, 3, 9));
 
     ScheduleService.ScheduleGenerationResult result =
         scheduleService.generate(userId, req);
@@ -133,6 +138,8 @@ class ScheduleServiceTest {
                      2, Difficulty.MEDIUM);
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(preferencesRepository.findByOwnerId(userId))
+        .thenReturn(Optional.of(defaultPrefs(user)));
     when(taskRepository.findAllByOwnerIdOrderByDueDateAscIdAsc(userId))
         .thenReturn(List.of(task));
     when(
@@ -141,9 +148,8 @@ class ScheduleServiceTest {
     when(scheduleEntryRepository.save(any(ScheduleEntry.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
 
-    GenerateScheduleRequest req = new GenerateScheduleRequest(
-        LocalDate.of(2026, 3, 9), LocalTime.of(9, 0), LocalTime.of(17, 0), 6,
-        2);
+    GenerateScheduleRequest req =
+        new GenerateScheduleRequest(LocalDate.of(2026, 3, 9));
 
     scheduleService.generate(userId, req);
 
@@ -179,6 +185,8 @@ class ScheduleServiceTest {
         Set.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY));
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(preferencesRepository.findByOwnerId(userId))
+        .thenReturn(Optional.of(defaultPrefs(user)));
     when(taskRepository.findAllByOwnerIdOrderByDueDateAscIdAsc(userId))
         .thenReturn(List.of(task));
     when(
@@ -187,15 +195,23 @@ class ScheduleServiceTest {
     when(scheduleEntryRepository.save(any(ScheduleEntry.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
 
-    GenerateScheduleRequest req = new GenerateScheduleRequest(
-        LocalDate.of(2026, 3, 9), LocalTime.of(9, 0), LocalTime.of(18, 0), 6,
-        3);
+    GenerateScheduleRequest req =
+        new GenerateScheduleRequest(LocalDate.of(2026, 3, 9));
 
     ScheduleService.ScheduleGenerationResult result =
         scheduleService.generate(userId, req);
 
     assertNotNull(result);
     verify(scheduleEntryRepository).deleteAllByOwnerId(userId);
+  }
+
+  private UserSchedulePreferences defaultPrefs(User owner) {
+    UserSchedulePreferences prefs = new UserSchedulePreferences();
+    prefs.setOwner(owner);
+    prefs.setAllowWeekendScheduling(true);
+    prefs.setQuietHoursStart(LocalTime.of(23, 0));
+    prefs.setQuietHoursEnd(LocalTime.of(8, 0));
+    return prefs;
   }
 
   private User realUser(long id, String username) {
@@ -225,6 +241,11 @@ class ScheduleServiceTest {
     task.setDueDate(dueDate);
     task.setEstimatedHours(estimatedHours);
     task.setDifficulty(difficulty);
+    task.setPreferredStartTime(LocalTime.of(9, 0));
+    task.setPreferredEndTime(LocalTime.of(21, 0));
+    task.setMaxHoursPerDay(3);
+    task.setMinBlockHours(1);
+    task.setMaxBlockHours(3);
     return task;
   }
 

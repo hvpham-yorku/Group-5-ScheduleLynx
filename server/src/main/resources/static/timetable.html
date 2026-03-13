@@ -69,10 +69,66 @@
               <input
                 id="estimatedHours"
                 type="number"
-                min="0"
-                step="0.5"
+                min="1"
+                step="1"
                 value="1"
               />
+            </div>
+
+            <div id="difficultyGroup" class="form-group">
+              <label for="difficulty">Difficulty</label>
+              <select id="difficulty">
+                <option value="LOW">Low</option>
+                <option value="MEDIUM" selected>Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+            </div>
+
+            <div id="taskSchedulingFields">
+              <div class="form-group">
+                <label for="preferredStartTime">Preferred Start Time</label>
+                <input id="preferredStartTime" type="time" value="09:00" />
+              </div>
+
+              <div class="form-group">
+                <label for="preferredEndTime">Preferred End Time</label>
+                <input id="preferredEndTime" type="time" value="21:00" />
+              </div>
+
+              <div class="form-group">
+                <label for="taskMaxHoursPerDay"
+                  >Max Hours Per Day For This Task</label
+                >
+                <input
+                  id="taskMaxHoursPerDay"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value="3"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="taskMinBlockHours">Min Block Hours</label>
+                <input
+                  id="taskMinBlockHours"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value="1"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="taskMaxBlockHours">Max Block Hours</label>
+                <input
+                  id="taskMaxBlockHours"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value="3"
+                />
+              </div>
             </div>
 
             <div class="form-group">
@@ -155,6 +211,33 @@
             </div>
           </form>
         </section>
+
+        <section class="panel">
+          <h2>My Schedule Preferences</h2>
+
+          <div class="form-group">
+            <label>
+              <input id="scheduleAllowWeekend" type="checkbox" checked />
+              Allow Weekend Scheduling
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label for="scheduleQuietHoursStart">Quiet Hours Start</label>
+            <input id="scheduleQuietHoursStart" type="time" value="23:00" />
+          </div>
+
+          <div class="form-group">
+            <label for="scheduleQuietHoursEnd">Quiet Hours End</label>
+            <input id="scheduleQuietHoursEnd" type="time" value="08:00" />
+          </div>
+
+          <div class="form-buttons">
+            <button class="btn-primary" id="savePreferencesBtn" type="button">
+              Save Preferences
+            </button>
+          </div>
+        </section>
       </aside>
 
       <main class="main-content">
@@ -178,8 +261,7 @@
           style="display: none; margin-bottom: 1rem"
         >
           <p id="scheduleNoticeText" style="margin: 0">
-            Schedule cleared because your tasks or events changed. Please
-            generate again.
+            Schedule changed. Please generate again.
           </p>
         </div>
 

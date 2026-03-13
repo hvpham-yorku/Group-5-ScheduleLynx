@@ -4,11 +4,10 @@ import ca.yorku.eecs2311.schedulelynx.domain.ScheduleEntry;
 import ca.yorku.eecs2311.schedulelynx.service.ScheduleService;
 import ca.yorku.eecs2311.schedulelynx.web.SessionUser;
 import ca.yorku.eecs2311.schedulelynx.web.dto.GenerateScheduleRequest;
-import ca.yorku.eecs2311.schedulelynx.web.dto.GenerateScheduleResponse;
-import ca.yorku.eecs2311.schedulelynx.web.dto.ScheduleEntryResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,64 +15,55 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/schedule")
 public class ScheduleController {
 
-  private final ScheduleService service;
+  private final ScheduleService scheduleService;
 
-  public ScheduleController(ScheduleService service) { this.service = service; }
+  public ScheduleController(ScheduleService scheduleService) {
+    this.scheduleService = scheduleService;
+  }
 
   @GetMapping
-  public List<ScheduleEntryResponse>
-  getAll(@RequestParam(required = false) LocalDate startDate,
-         @RequestParam(required = false) LocalDate endDate,
-         HttpServletRequest request) {
+  public List<ScheduleEntryResponse> getAll(HttpServletRequest request) {
     long userId = SessionUser.requireUserId(request);
+    return scheduleService.getAll(userId)
+        .stream()
+        .map(this::toResponse)
+        .toList();
+  }
 
-    List<ScheduleEntry> entries;
-    if (startDate != null && endDate != null) {
-      entries = service.getBetween(userId, startDate, endDate);
-    } else {
-      entries = service.getAll(userId);
-    }
-
-    return entries.stream().map(this::toResponse).toList();
+  @GetMapping("/range")
+  public List<ScheduleEntryResponse>
+  getBetween(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+             LocalDate startDate,
+             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+             LocalDate endDate, HttpServletRequest request) {
+    long userId = SessionUser.requireUserId(request);
+    return scheduleService.getBetween(userId, startDate, endDate)
+        .stream()
+        .map(this::toResponse)
+        .toList();
   }
 
   @PostMapping("/generate")
-  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseStatus(HttpStatus.OK)
   public GenerateScheduleResponse
-  generate(@RequestBody(required = false) GenerateScheduleRequest req,
+  generate(@RequestBody(required = false) GenerateScheduleRequest body,
            HttpServletRequest request) {
     long userId = SessionUser.requireUserId(request);
-
     ScheduleService.ScheduleGenerationResult result =
-        service.generate(userId, req);
+        scheduleService.generate(userId, body);
 
     List<ScheduleEntryResponse> entries =
         result.entries().stream().map(this::toResponse).toList();
 
-    int unscheduledTaskCount = result.warnings().size();
-    boolean feasible = result.warnings().isEmpty();
-    boolean partiallyFeasible =
-        !result.warnings().isEmpty() && !entries.isEmpty();
-
-    String status;
-    if (feasible) {
-      status = "FEASIBLE";
-    } else if (partiallyFeasible) {
-      status = "PARTIALLY_FEASIBLE";
-    } else {
-      status = "INFEASIBLE";
-    }
-
-    return new GenerateScheduleResponse(feasible, partiallyFeasible, status,
-                                        entries.size(), unscheduledTaskCount,
-                                        result.warnings(), entries);
+    return new GenerateScheduleResponse(result.status().name(), entries,
+                                        result.warnings());
   }
 
   @DeleteMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void clear(HttpServletRequest request) {
     long userId = SessionUser.requireUserId(request);
-    service.clear(userId);
+    scheduleService.clear(userId);
   }
 
   private ScheduleEntryResponse toResponse(ScheduleEntry entry) {
@@ -82,4 +72,15 @@ public class ScheduleController {
         entry.getEndTime(), entry.getPlannedHours(), entry.getTask().getId(),
         entry.getTask().getTitle(), entry.getTask().getDueDate());
   }
+
+  public record ScheduleEntryResponse(Long id, LocalDate date,
+                                      java.time.LocalTime startTime,
+                                      java.time.LocalTime endTime,
+                                      Integer plannedHours, Long taskId,
+                                      String taskTitle, LocalDate taskDueDate) {
+  }
+
+  public record GenerateScheduleResponse(String status,
+                                         List<ScheduleEntryResponse> entries,
+                                         List<String> warnings) {}
 }

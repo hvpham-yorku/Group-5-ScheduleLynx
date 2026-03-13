@@ -525,6 +525,54 @@ function shouldShowRecurringEventOnDate(eventItem, dateStr) {
   return eventItem.dueDate === dateStr;
 }
 
+function parseTimeToMinutes(timeString) {
+  if (!timeString) return null;
+  const [hours, minutes] = timeString.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+function timesOverlap(startA, endA, startB, endB) {
+  return startA < endB && endA > startB;
+}
+
+function findOverlappingEvent(dateStr, startTime, endTime, ignoreTaskId) {
+  const startMinutes = parseTimeToMinutes(startTime);
+  const endMinutes = parseTimeToMinutes(endTime);
+  if (startMinutes === null || endMinutes === null) return null;
+
+  return tasks.find((task) => {
+    if (task.type !== "event") return false;
+    if (task.id === ignoreTaskId) return false;
+    if (!shouldShowRecurringEventOnDate(task, dateStr)) return false;
+
+    const otherStart = parseTimeToMinutes(task.startTime);
+    const otherEnd = parseTimeToMinutes(task.endTime);
+    if (otherStart === null || otherEnd === null) return false;
+
+    return timesOverlap(startMinutes, endMinutes, otherStart, otherEnd);
+  });
+}
+
+function showTimeConflictWarning(message) {
+  const notice = document.getElementById("scheduleNotice");
+  const text = document.getElementById("scheduleNoticeText");
+  if (!notice || !text) return;
+
+  notice.classList.add("warning-box");
+  text.textContent = message;
+  notice.style.display = "block";
+}
+
+function hideTimeConflictWarning() {
+  const notice = document.getElementById("scheduleNotice");
+  const text = document.getElementById("scheduleNoticeText");
+  if (!notice || !text) return;
+
+  notice.style.display = "none";
+  notice.classList.remove("warning-box");
+  text.textContent = "";
+}
+
 function exitEditMode() {
   selectedTaskId = null;
 
@@ -543,7 +591,9 @@ function exitEditMode() {
   const difficultyGroup = document.getElementById("difficultyGroup");
   const taskSchedulingFields = document.getElementById("taskSchedulingFields");
   const taskType = document.getElementById("taskType");
+  const difficultyField = document.getElementById("difficulty");
 
+  if (difficultyField) difficultyField.value = "MEDIUM";
   if (taskType) taskType.value = "task";
   if (recurrenceOptions) recurrenceOptions.style.display = "none";
   if (startTimeGroup) startTimeGroup.style.display = "none";
@@ -567,6 +617,7 @@ function exitEditMode() {
   if (taskMinBlockHours) taskMinBlockHours.value = "1";
   if (taskMaxBlockHours) taskMaxBlockHours.value = "3";
   if (difficulty) difficulty.value = "MEDIUM";
+  if (difficultyGroup) difficultyGroup.style.display = "block";
 
   document
     .querySelectorAll('input[name="recurrenceDays"]')
@@ -574,6 +625,7 @@ function exitEditMode() {
 
   const submitBtn = document.querySelector('#taskForm button[type="submit"]');
   if (submitBtn) submitBtn.textContent = "Save Task";
+  hideTimeConflictWarning();
 }
 
 // ============================
@@ -845,6 +897,17 @@ function initializeFormHandlers() {
     addTask();
   });
 
+  const startTimeInput = document.getElementById("startTime");
+  const endTimeInput = document.getElementById("endTime");
+  const dueDateInput = document.getElementById("dueDate");
+
+  [startTimeInput, endTimeInput, dueDateInput, taskTypeSelect].forEach((el) => {
+    if (el) {
+      el.addEventListener("input", hideTimeConflictWarning);
+      el.addEventListener("change", hideTimeConflictWarning);
+    }
+  });
+
   taskTypeSelect.dispatchEvent(new Event("change"));
 }
 
@@ -894,6 +957,8 @@ async function addTask() {
     document.querySelectorAll('input[name="recurrenceDays"]:checked'),
   ).map((cb) => cb.value);
 
+  hideTimeConflictWarning();
+
   if (!title || !type || !dueDate) {
     alert("Please fill in Title, Type, and Date.");
     return;
@@ -913,6 +978,29 @@ async function addTask() {
   if (type === "event") {
     if (!startTime || !endTime) {
       alert("Please enter start and end time for an Event.");
+      return;
+    }
+
+const startMinutes = parseTimeToMinutes(startTime);
+    const endMinutes = parseTimeToMinutes(endTime);
+
+    if (endMinutes <= startMinutes) {
+      alert("End time must be after start time.");
+      return;
+    }
+
+    const conflictingEvent = findOverlappingEvent(
+      dueDate,
+      startTime,
+      endTime,
+      selectedTaskId,
+    );
+
+    if (conflictingEvent) {
+      const conflictDate = formatDateDisplay(new Date(dueDate));
+      showTimeConflictWarning(
+        `Time conflict: "${conflictingEvent.title}" (${conflictingEvent.startTime} - ${conflictingEvent.endTime}) is already scheduled on ${conflictDate}. Please choose a different time.`,
+      );
       return;
     }
 
@@ -1005,7 +1093,8 @@ async function addTask() {
     renderScheduleGrid();
     renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
-
+    hideScheduleNotice();
+    
     markScheduleAsStale("Tasks or events changed. Please generate again.");
     exitEditMode();
   } catch (err) {
@@ -1177,6 +1266,7 @@ async function deleteTaskListener() {
     updateTasksDisplay();
     renderScheduleGrid();
     renderTimeline(scheduleEntries);
+    renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
 
     const modal = document.getElementById("taskModal");
@@ -1213,6 +1303,7 @@ function editSelectedTask() {
   const isRecurring = document.getElementById("isRecurring");
   const recurrenceType = document.getElementById("recurrenceType");
   const recurrenceEnd = document.getElementById("recurrenceEnd");
+  const difficultyField = document.getElementById("difficulty");
 
   const startTimeGroup = document.getElementById("startTimeGroup");
   const endTimeGroup = document.getElementById("endTimeGroup");
@@ -1242,12 +1333,14 @@ function editSelectedTask() {
   if (isRecurring) isRecurring.checked = !!task.isRecurring;
   if (recurrenceType) recurrenceType.value = task.recurrenceType || "";
   if (recurrenceEnd) recurrenceEnd.value = task.recurrenceEnd || "";
+  if (difficultyField) difficultyField.value = task.difficulty || "MEDIUM";
 
   document.querySelectorAll('input[name="recurrenceDays"]').forEach((cb) => {
     cb.checked = task.recurrenceDays?.includes(cb.value) || false;
   });
 
   if (task.type === "event") {
+    if (difficultyGroup) difficultyGroup.style.display = "none";
     if (startTimeGroup) startTimeGroup.style.display = "flex";
     if (endTimeGroup) endTimeGroup.style.display = "flex";
     if (estimatedHoursGroup) estimatedHoursGroup.style.display = "none";
@@ -1266,6 +1359,7 @@ function editSelectedTask() {
       if (daysOfWeekGroup) daysOfWeekGroup.style.display = "none";
     }
   } else {
+    if (difficultyGroup) difficultyGroup.style.display = "block";
     if (startTimeGroup) startTimeGroup.style.display = "none";
     if (endTimeGroup) endTimeGroup.style.display = "none";
     if (estimatedHoursGroup) estimatedHoursGroup.style.display = "block";

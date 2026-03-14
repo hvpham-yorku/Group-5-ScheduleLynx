@@ -999,7 +999,7 @@ const startMinutes = parseTimeToMinutes(startTime);
     if (conflictingEvent) {
       const conflictDate = formatDateDisplay(new Date(dueDate));
       showTimeConflictWarning(
-        `Time conflict: "${conflictingEvent.title}" (${conflictingEvent.startTime} - ${conflictingEvent.endTime}) is already scheduled on ${conflictDate}. Please choose a different time.`,
+        `TIME CONFLICT: "${conflictingEvent.title}" (${conflictingEvent.startTime} - ${conflictingEvent.endTime}) is already scheduled on ${conflictDate}. Please choose a different time.`,
       );
       return;
     }

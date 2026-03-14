@@ -23,7 +23,7 @@
 ## Task Assignments
 
 * Backend Server - Mykola
-* Frontend GUI - Beerkamal, Yauqoot
+* Frontend GUI - Beerkamal, Yauqoot, Matthew
 * Backend-Frontend Communication - Eric
 * Log.MD - Eric
 

@@ -1651,3 +1651,9 @@ async function clearAllItems() {
     alert(err.message);
   }
 }
+
+function printScheduleArea() {
+    // NEW: Call the browser's built-in print function
+    // The @media print styles in style.css handle hiding/showing the right elements
+    window.print();
+}

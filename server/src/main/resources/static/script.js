@@ -5,6 +5,8 @@
 let tasks = [];
 let scheduleEntries = [];
 let currentWeekStart = getMonday(new Date());
+let currentMonthDate = new Date();
+let currentView = "week";
 let selectedTaskId = null;
 let currentUser = null;
 
@@ -183,20 +185,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const authLink = document.getElementById("authLink");
 
-if (authLink) {
-  if (isLoggedIn()) {
-    authLink.textContent = "Logout";
-    authLink.href = "#";
-    authLink.onclick = function (e) {
-      e.preventDefault();
-      logout();
-    };
-  } else {
-    authLink.textContent = "Login";
-    authLink.href = "login.html";
-    authLink.onclick = null;
+  if (authLink) {
+    if (isLoggedIn()) {
+      authLink.textContent = "Logout";
+      authLink.href = "#";
+      authLink.onclick = function (e) {
+        e.preventDefault();
+        logout();
+      };
+    } else {
+      authLink.textContent = "Login";
+      authLink.href = "login.html";
+      authLink.onclick = null;
+    }
   }
-}
 
   if (currentPage === "login.html") {
     initializeLoginHandlers();
@@ -381,7 +383,7 @@ async function loadTasksFromStorage() {
   await loadScheduleEntries();
 
   updateTasksDisplay();
-  renderScheduleGrid();
+  renderCurrentScheduleView();
   renderTimeline(scheduleEntries);
 
   if (scheduleEntries.length > 0) {
@@ -406,6 +408,71 @@ function getMonday(d) {
   const diff = d.getDate() - day + (day === 0 ? -6 : 1);
   return new Date(d.setDate(diff));
 }
+
+function getStartOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function getEndOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
+function isSameDate(dateA, dateB) {
+  return (
+    dateA.getFullYear() === dateB.getFullYear() &&
+    dateA.getMonth() === dateB.getMonth() &&
+    dateA.getDate() === dateB.getDate()
+  );
+}
+
+function getMonthGridStart(date) {
+  const firstDay = getStartOfMonth(date);
+  return getMonday(firstDay);
+}
+
+function updateViewToggleButtons() {
+  const weeklyBtn = document.getElementById("weeklyViewBtn");
+  const monthlyBtn = document.getElementById("monthlyViewBtn");
+
+  if (weeklyBtn) {
+    weeklyBtn.classList.toggle("active-view", currentView === "week");
+  }
+
+  if (monthlyBtn) {
+    monthlyBtn.classList.toggle("active-view", currentView === "month");
+  }
+}
+
+function updateScheduleSectionTitle() {
+  const title = document.getElementById("scheduleSectionTitle");
+  if (!title) return;
+
+  title.textContent = currentView === "week" ? "This Week" : "This Month";
+}
+
+function updatePeriodDisplay() {
+  const periodDisplay = document.getElementById("periodDisplay");
+  if (!periodDisplay) return;
+
+  if (currentView === "week") {
+    const weekEnd = addDays(currentWeekStart, 6);
+    periodDisplay.textContent = `Week of ${formatDateDisplay(currentWeekStart)} - ${formatDateDisplay(weekEnd)}`;
+  } else {
+    periodDisplay.textContent = currentMonthDate.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
+  }
+}
+
+function renderCurrentScheduleView() {
+  if (currentView === "week") {
+    renderScheduleGrid();
+  } else {
+    renderMonthlyGrid();
+  }
+}
+
 
 function formatDate(date) {
   const year = date.getFullYear();
@@ -981,7 +1048,7 @@ async function addTask() {
       return;
     }
 
-const startMinutes = parseTimeToMinutes(startTime);
+    const startMinutes = parseTimeToMinutes(startTime);
     const endMinutes = parseTimeToMinutes(endTime);
 
     if (endMinutes <= startMinutes) {
@@ -1090,11 +1157,11 @@ const startMinutes = parseTimeToMinutes(startTime);
     await loadScheduleEntries();
 
     updateTasksDisplay();
-    renderScheduleGrid();
+    renderCurrentScheduleView();
     renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
     hideScheduleNotice();
-    
+
     markScheduleAsStale("Tasks or events changed. Please generate again.");
     exitEditMode();
   } catch (err) {
@@ -1123,13 +1190,12 @@ function updateTasksDisplay() {
           <div class="task-card-type">${task.type.charAt(0).toUpperCase() + task.type.slice(1)}</div>
           <div class="task-card-title">${task.title}</div>
           <div class="task-card-dueDate">Due: ${formatDateDisplay(new Date(task.dueDate))}</div>
-          ${
-            task.type === "task"
-              ? `<div class="task-card-time">${task.estimatedHours}h | ${task.difficulty || "MEDIUM"}</div>`
-              : task.startTime
-                ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
-                : ""
-          }
+          ${task.type === "task"
+          ? `<div class="task-card-time">${task.estimatedHours}h | ${task.difficulty || "MEDIUM"}</div>`
+          : task.startTime
+            ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
+            : ""
+        }
           ${task.isRecurring ? `<div class="task-card-time">Recurring: ${task.recurrenceType}</div>` : ""}
         </div>
       `,
@@ -1147,11 +1213,10 @@ function viewTaskDetails(taskId) {
   if (!modal || !modalBody) return;
 
   const recurrenceText = task.isRecurring
-    ? `${task.recurrenceType.charAt(0).toUpperCase() + task.recurrenceType.slice(1)}${
-        task.recurrenceDays && task.recurrenceDays.length > 0
-          ? ` (${task.recurrenceDays.join(", ")})`
-          : ""
-      }`
+    ? `${task.recurrenceType.charAt(0).toUpperCase() + task.recurrenceType.slice(1)}${task.recurrenceDays && task.recurrenceDays.length > 0
+      ? ` (${task.recurrenceDays.join(", ")})`
+      : ""
+    }`
     : "No";
 
   modalBody.innerHTML = `
@@ -1167,9 +1232,8 @@ function viewTaskDetails(taskId) {
       <span class="modal-detail-label">Due Date:</span>
       <span class="modal-detail-value">${formatDateDisplay(new Date(task.dueDate))}</span>
     </div>
-    ${
-      task.type === "task"
-        ? `
+    ${task.type === "task"
+      ? `
     <div class="modal-detail">
       <span class="modal-detail-label">Estimated Time:</span>
       <span class="modal-detail-value">${task.estimatedHours} hours</span>
@@ -1191,25 +1255,23 @@ function viewTaskDetails(taskId) {
       <span class="modal-detail-value">${task.minBlockHours ?? 1} - ${task.maxBlockHours ?? 3} hours</span>
     </div>
     `
-        : ""
+      : ""
     }
-    ${
-      task.startTime
-        ? `
+    ${task.startTime
+      ? `
     <div class="modal-detail">
       <span class="modal-detail-label">Start Time:</span>
       <span class="modal-detail-value">${task.startTime}</span>
     </div>`
-        : ""
+      : ""
     }
-    ${
-      task.endTime
-        ? `
+    ${task.endTime
+      ? `
     <div class="modal-detail">
       <span class="modal-detail-label">End Time:</span>
       <span class="modal-detail-value">${task.endTime}</span>
     </div>`
-        : ""
+      : ""
     }
     <div class="modal-detail">
       <span class="modal-detail-label">Recurring:</span>
@@ -1264,7 +1326,7 @@ async function deleteTaskListener() {
     await loadScheduleEntries();
 
     updateTasksDisplay();
-    renderScheduleGrid();
+    renderCurrentScheduleView();
     renderTimeline(scheduleEntries);
     renderTimeline(scheduleEntries);
     refreshDashboardIfVisible();
@@ -1385,27 +1447,71 @@ function editSelectedTask() {
 // ============================
 
 function initializeScheduleDisplay() {
-  updateWeekDisplay();
-  renderScheduleGrid();
+  updatePeriodDisplay();
+  renderCurrentScheduleView();
+  updateViewToggleButtons();
+  updateScheduleSectionTitle();
 
-  const prevWeek = document.getElementById("prevWeek");
-  const nextWeek = document.getElementById("nextWeek");
+  const prevPeriod = document.getElementById("prevPeriod");
+  const nextPeriod = document.getElementById("nextPeriod");
+  const weeklyViewBtn = document.getElementById("weeklyViewBtn");
+  const monthlyViewBtn = document.getElementById("monthlyViewBtn");
   const generateScheduleBtn = document.getElementById("generateSchedule");
   const clearAllBtn = document.getElementById("clearAll");
 
-  if (prevWeek) {
-    prevWeek.addEventListener("click", () => {
-      currentWeekStart = addDays(currentWeekStart, -7);
-      updateWeekDisplay();
-      renderScheduleGrid();
+  if (prevPeriod) {
+    prevPeriod.addEventListener("click", () => {
+      if (currentView === "week") {
+        currentWeekStart = addDays(currentWeekStart, -7);
+      } else {
+        currentMonthDate = new Date(
+          currentMonthDate.getFullYear(),
+          currentMonthDate.getMonth() - 1,
+          1,
+        );
+      }
+
+      updatePeriodDisplay();
+      renderCurrentScheduleView();
     });
   }
 
-  if (nextWeek) {
-    nextWeek.addEventListener("click", () => {
-      currentWeekStart = addDays(currentWeekStart, 7);
-      updateWeekDisplay();
-      renderScheduleGrid();
+  if (nextPeriod) {
+    nextPeriod.addEventListener("click", () => {
+      if (currentView === "week") {
+        currentWeekStart = addDays(currentWeekStart, 7);
+      } else {
+        currentMonthDate = new Date(
+          currentMonthDate.getFullYear(),
+          currentMonthDate.getMonth() + 1,
+          1,
+        );
+      }
+
+      updatePeriodDisplay();
+      renderCurrentScheduleView();
+    });
+  }
+
+  if (weeklyViewBtn) {
+    weeklyViewBtn.addEventListener("click", () => {
+      currentView = "week";
+      currentWeekStart = getMonday(new Date(currentMonthDate));
+      updatePeriodDisplay();
+      renderCurrentScheduleView();
+      updateViewToggleButtons();
+      updateScheduleSectionTitle();
+    });
+  }
+
+  if (monthlyViewBtn) {
+    monthlyViewBtn.addEventListener("click", () => {
+      currentView = "month";
+      currentMonthDate = new Date(currentWeekStart);
+      updatePeriodDisplay();
+      renderCurrentScheduleView();
+      updateViewToggleButtons();
+      updateScheduleSectionTitle();
     });
   }
 
@@ -1418,18 +1524,11 @@ function initializeScheduleDisplay() {
   }
 }
 
-function updateWeekDisplay() {
-  const weekDisplay = document.getElementById("weekDisplay");
-  if (!weekDisplay) return;
-
-  const weekEnd = addDays(currentWeekStart, 6);
-  weekDisplay.textContent = `Week of ${formatDateDisplay(currentWeekStart)} - ${formatDateDisplay(weekEnd)}`;
-}
-
 function renderScheduleGrid() {
   const scheduleGrid = document.getElementById("scheduleGrid");
   if (!scheduleGrid) return;
 
+  scheduleGrid.className = "schedule-grid";
   scheduleGrid.innerHTML = "";
 
   for (let i = 0; i < 7; i++) {
@@ -1443,22 +1542,82 @@ function renderScheduleGrid() {
     dayColumn.innerHTML = `
       <div class="day-header">${dayName}<br>${dayDate.getDate()}</div>
       <div class="day-content">
+        ${dayEvents.length > 0
+        ? dayEvents
+          .map(
+            (event) => `
+                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
+                      <div class="schedule-event-title">${event.title}</div>
+                      ${event.startTime
+                ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>`
+                : `<div class="schedule-event-time">${event.label || "Due"}</div>`
+              }
+                    </div>
+                  `,
+          )
+          .join("")
+        : '<p class="empty-state">No events</p>'
+      }
+      </div>
+    `;
+
+    scheduleGrid.appendChild(dayColumn);
+  }
+}
+
+function renderMonthlyGrid() {
+  const scheduleGrid = document.getElementById("scheduleGrid");
+  if (!scheduleGrid) return;
+
+  scheduleGrid.className = "monthly-grid";
+  scheduleGrid.innerHTML = "";
+
+  const gridStart = getMonthGridStart(currentMonthDate);
+  const today = new Date();
+
+  for (let i = 0; i < 42; i++) {
+    const dayDate = addDays(gridStart, i);
+    const formattedDate = formatDate(dayDate);
+    const dayEvents = getEventsForDay(formattedDate);
+    const isCurrentMonth = dayDate.getMonth() === currentMonthDate.getMonth();
+
+    const dayColumn = document.createElement("div");
+    dayColumn.className = "month-day-column";
+
+    if (!isCurrentMonth) {
+      dayColumn.classList.add("other-month");
+    }
+
+    if (isSameDate(dayDate, today)) {
+      dayColumn.classList.add("today");
+    }
+
+    dayColumn.innerHTML = `
+      <div class="month-day-header">
+        <div class="month-day-name">${getDayName(dayDate)}</div>
+        <div class="month-day-number">${dayDate.getDate()}</div>
+      </div>
+      <div class="month-day-content">
         ${
           dayEvents.length > 0
             ? dayEvents
+                .slice(0, 3)
                 .map(
                   (event) => `
                     <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
                       <div class="schedule-event-title">${event.title}</div>
                       ${
                         event.startTime
-                          ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>`
+                          ? `<div class="schedule-event-time">${event.startTime}${event.endTime ? ` - ${event.endTime}` : ""}</div>`
                           : `<div class="schedule-event-time">${event.label || "Due"}</div>`
                       }
                     </div>
                   `,
                 )
-                .join("")
+                .join("") +
+              (dayEvents.length > 3
+                ? `<div class="schedule-event-time">+${dayEvents.length - 3} more</div>`
+                : "")
             : '<p class="empty-state">No events</p>'
         }
       </div>
@@ -1595,8 +1754,8 @@ function renderTimeline(entries) {
         <div class="timeline-item">
           <div class="timeline-date">${formatDateDisplay(new Date(dateKey + "T12:00:00"))}</div>
           ${dateItems
-            .map(
-              (item) => `
+          .map(
+            (item) => `
                 <div class="timeline-task task">
                   <div class="timeline-task-title">${item.taskTitle}</div>
                   <div class="timeline-task-info">
@@ -1606,8 +1765,8 @@ function renderTimeline(entries) {
                   </div>
                 </div>
               `,
-            )
-            .join("")}
+          )
+          .join("")}
         </div>
       `;
     })
@@ -1638,7 +1797,7 @@ async function clearAllItems() {
         '<p class="empty-state">Tasks will appear here once you add them and generate the schedule.</p>';
     }
 
-    renderScheduleGrid();
+    renderCurrentScheduleView();
 
     const generateBtn = document.getElementById("generateSchedule");
     if (generateBtn) generateBtn.disabled = true;

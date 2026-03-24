@@ -124,20 +124,13 @@
             </div>
 
             <div id="daysOfWeekGroup" class="form-group days-checkbox" style="display: none">
-              <label><input type="checkbox" name="recurrenceDays" value="Mon" />
-                Mon</label>
-              <label><input type="checkbox" name="recurrenceDays" value="Tue" />
-                Tue</label>
-              <label><input type="checkbox" name="recurrenceDays" value="Wed" />
-                Wed</label>
-              <label><input type="checkbox" name="recurrenceDays" value="Thu" />
-                Thu</label>
-              <label><input type="checkbox" name="recurrenceDays" value="Fri" />
-                Fri</label>
-              <label><input type="checkbox" name="recurrenceDays" value="Sat" />
-                Sat</label>
-              <label><input type="checkbox" name="recurrenceDays" value="Sun" />
-                Sun</label>
+              <label><input type="checkbox" name="recurrenceDays" value="Mon" /> Mon</label>
+              <label><input type="checkbox" name="recurrenceDays" value="Tue" /> Tue</label>
+              <label><input type="checkbox" name="recurrenceDays" value="Wed" /> Wed</label>
+              <label><input type="checkbox" name="recurrenceDays" value="Thu" /> Thu</label>
+              <label><input type="checkbox" name="recurrenceDays" value="Fri" /> Fri</label>
+              <label><input type="checkbox" name="recurrenceDays" value="Sat" /> Sat</label>
+              <label><input type="checkbox" name="recurrenceDays" value="Sun" /> Sun</label>
             </div>
 
             <div class="form-group">
@@ -186,9 +179,9 @@
     <main class="main-content">
       <div class="controls">
         <div class="control-buttons">
-          <button class="btn-nav" id="prevPeriod">◀ Prev</button>
+          <button class="btn-nav" id="prevPeriod" type="button">◀ Prev</button>
           <div class="week-display" id="periodDisplay">Week</div>
-          <button class="btn-nav" id="nextPeriod">Next ▶</button>
+          <button class="btn-nav" id="nextPeriod" type="button">Next ▶</button>
         </div>
 
         <div class="view-toggle">
@@ -201,10 +194,13 @@
         </div>
 
         <div class="control-actions">
-          <button class="btn-primary" id="generateSchedule" enabled>
+          <button class="btn-print" id="printSchedule" type="button" onclick="printScheduleArea()" title="Print Schedule">
+            🖨️ Print
+          </button>
+          <button class="btn-primary" id="generateSchedule" type="button">
             Generate Schedule
           </button>
-          <button class="btn-danger" id="clearAll">Clear All</button>
+          <button class="btn-danger" id="clearAll" type="button">Clear All</button>
         </div>
       </div>
 
@@ -214,24 +210,27 @@
         </p>
       </div>
 
-      <section class="tasks-panel">
-        <h3>Your Tasks</h3>
-        <div id="tasksList" class="tasks-list"></div>
-      </section>
+      <div id="printableArea">
+        <section class="tasks-panel">
+          <h3>Your Tasks</h3>
+          <div id="tasksList" class="tasks-list"></div>
+        </section>
 
-      <section class="schedule-section">
-        <h3 id="scheduleSectionTitle">This Week</h3>        <div id="scheduleGrid" class="schedule-grid"></div>
-      </section>
+        <section class="schedule-section">
+          <h3 id="scheduleSectionTitle">This Week</h3>
+          <div id="scheduleGrid" class="schedule-grid"></div>
+        </section>
 
-      <section class="timeline-section">
-        <h3>Generated Timeline</h3>
-        <div id="timeline">
-          <p class="empty-state">
-            Tasks will appear here once you add them and generate the
-            schedule.
-          </p>
-        </div>
-      </section>
+        <section class="timeline-section">
+          <h3>Generated Timeline</h3>
+          <div id="timeline">
+            <p class="empty-state">
+              Tasks will appear here once you add them and generate the
+              schedule.
+            </p>
+          </div>
+        </section>
+      </div>
     </main>
   </div>
 
@@ -240,9 +239,9 @@
       <span class="close-modal">&times;</span>
       <div id="modalBody"></div>
       <div class="modal-actions">
-        <button id="editTaskBtn" class="btn-primary">Edit</button>
-        <button id="deleteTaskBtn" class="btn-danger">Delete</button>
-        <button id="closeModalBtn" class="btn-secondary">Close</button>
+        <button id="editTaskBtn" class="btn-primary" type="button">Edit</button>
+        <button id="deleteTaskBtn" class="btn-danger" type="button">Delete</button>
+        <button id="closeModalBtn" class="btn-secondary" type="button">Close</button>
       </div>
     </div>
   </div>

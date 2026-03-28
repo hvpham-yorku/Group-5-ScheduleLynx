@@ -435,11 +435,11 @@ function updateViewToggleButtons() {
   const monthlyBtn = document.getElementById("monthlyViewBtn");
 
   if (weeklyBtn) {
-    weeklyBtn.classList.toggle("active-view", currentView === "week");
+    weeklyBtn.classList.toggle("active-pill", currentView === "week");
   }
 
   if (monthlyBtn) {
-    monthlyBtn.classList.toggle("active-view", currentView === "month");
+    monthlyBtn.classList.toggle("active-pill", currentView === "month");
   }
 }
 
@@ -456,7 +456,7 @@ function updatePeriodDisplay() {
 
   if (currentView === "week") {
     const weekEnd = addDays(currentWeekStart, 6);
-    periodDisplay.textContent = `Week of ${formatDateDisplay(currentWeekStart)} - ${formatDateDisplay(weekEnd)}`;
+    periodDisplay.textContent = `${formatDateDisplay(currentWeekStart)} - ${formatDateDisplay(weekEnd)}`;
   } else {
     periodDisplay.textContent = currentMonthDate.toLocaleDateString("en-US", {
       month: "long",

@@ -108,18 +108,22 @@
                     </section>
                 </div>
 
-                <!-- Quick Stats by Task Type -->
-                <section class="task-breakdown">
-                    <div class="section-header">
-                        <h3>Task Breakdown</h3>
-                    </div>
-                    <div class="breakdown-grid" id="taskBreakdown">
-                        <p class="empty-state">Add tasks to see breakdown</p>
-                    </div>
-                </section>
-            </div>
-        </div>
+    <!-- Quick Stats by Task Type -->
+    <section class="task-breakdown">
+    <div class="section-header">
+        <h3>Task Breakdown</h3>
+    </div>
 
+    <!-- Chart -->
+    <div id="chartContainer" style="display:none; margin-bottom: 1.5rem;">
+        <canvas id="taskChart" height="120"></canvas>
+    </div>
+
+    <!-- Breakdown Cards -->
+    <div class="breakdown-grid" id="taskBreakdown">
+        <p class="empty-state">Add tasks to see breakdown</p>
+    </div>
+</section>
         <!-- CTA Section -->
         <section class="dashboard-cta">
             <div class="container">
@@ -139,6 +143,7 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

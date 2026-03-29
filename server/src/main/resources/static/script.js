@@ -1584,7 +1584,7 @@ function renderScheduleGrid() {
         ? dayEvents
           .map(
             (event) => `
-                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
+                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')" style="border-left: 3px solid ${event.color};">
                       <div class="schedule-event-title">${event.title}</div>
                       ${event.startTime
                 ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>`
@@ -1656,7 +1656,7 @@ function renderMonthlyGrid() {
                 .slice(0, 3)
                 .map(
                   (event) => `
-                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
+                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')" style="border-left: 3px solid ${event.color};">
                       <div class="schedule-event-title">${event.title}</div>
                       ${
                         event.startTime
@@ -1693,15 +1693,16 @@ function getEventsForDay(dateStr) {
     if (item.type === "event") {
       if (shouldShowRecurringEventOnDate(item, dateStr)) {
         items.push({
-          id: item.id,
-          title: item.title,
-          type: "event",
-          startTime: item.startTime,
-          endTime: item.endTime,
-          label: null,
-          description: item.description || "", // NEW: Pass description to calendar cards
-          difficulty: item.difficulty || null, // NEW: Pass difficulty to calendar cards
-        });
+        id: item.id,
+        title: item.title,
+        type: "event",
+        startTime: item.startTime,
+        endTime: item.endTime,
+        label: null,
+        description: item.description || "",
+        difficulty: item.difficulty || null,
+        color: localStorage.getItem(`taskColor_${item.title}_${item.dueDate}`) || "#10b981",
+      });
       }
     }
 
@@ -1715,6 +1716,7 @@ function getEventsForDay(dateStr) {
         label: "Due",
         description: item.description || "",  // NEW: Pass description to calendar cards
         difficulty: item.difficulty || null,  // NEW: Pass difficulty to calendar cards
+        color: localStorage.getItem(`taskColor_${item.title}_${item.dueDate}`) || "#10b981",
       });
     }
   });

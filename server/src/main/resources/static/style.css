@@ -999,6 +999,22 @@ body.login-page {
    LOGIN PAGE STYLES
    ============================ */
 
+.signup-slide button {
+    display: block !important;
+}
+
+.signup-slide {
+    height: auto !important;
+}
+
+.login-form-slider {
+    height: auto !important;
+}
+
+.login-form-box {
+    overflow: visible !important;
+}
+
 .login-container {
     display: flex;
     justify-content: center;

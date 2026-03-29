@@ -342,7 +342,7 @@ async function loadUserTasks(username) {
     id: String(event.id),
     title: event.title,
     type: "event",
-    dueDate: event.date,
+    date: event.date,
     description: "",
     completed: false,
     createdAt: null,
@@ -550,7 +550,7 @@ function markScheduleAsStale(
 
 function shouldShowRecurringEventOnDate(eventItem, dateStr) {
   const current = new Date(`${dateStr}T12:00:00`);
-  const start = new Date(`${eventItem.dueDate}T12:00:00`);
+  const start = new Date(`${eventItem.date}T12:00:00`);
 
   if (current < start) return false;
 
@@ -560,7 +560,7 @@ function shouldShowRecurringEventOnDate(eventItem, dateStr) {
   }
 
   if (!eventItem.isRecurring || !eventItem.recurrenceType) {
-    return eventItem.dueDate === dateStr;
+    return eventItem.date === dateStr;
   }
 
   if (eventItem.recurrenceType === "daily") {
@@ -589,7 +589,7 @@ function shouldShowRecurringEventOnDate(eventItem, dateStr) {
     return matchesDay && diffWeeks % 2 === 0;
   }
 
-  return eventItem.dueDate === dateStr;
+  return eventItem.date === dateStr;
 }
 
 function parseTimeToMinutes(timeString) {
@@ -736,20 +736,20 @@ function updateDashboardStats() {
   totalTasksCount.textContent = tasks.length;
 
   const upcoming = tasks.filter((task) => {
-    const dueDate = new Date(task.dueDate);
+    const dueDate = new Date(task.type === "event" ? task.date : task.dueDate);
     return dueDate > today && dueDate <= weekFromNow;
   });
   upcomingCount.textContent = upcoming.length;
 
   const overdue = tasks.filter((task) => {
-    const dueDate = new Date(task.dueDate);
+    const dueDate = new Date(task.type === "event" ? task.date : task.dueDate);
     return dueDate < today && !task.completed;
   });
   overdueCount.textContent = overdue.length;
 
   let totalHours = 0;
   tasks.forEach((task) => {
-    const dueDate = new Date(task.dueDate);
+    const dueDate = new Date(task.type === "event" ? task.date : task.dueDate);
     if (
       dueDate >= getMonday(today) &&
       dueDate <= addDays(getMonday(today), 6)
@@ -769,7 +769,7 @@ function updateUpcomingTasks() {
 
   const upcoming = tasks
     .filter((task) => {
-      const dueDate = new Date(task.dueDate);
+      const dueDate = new Date(task.type === "event" ? task.date : task.dueDate);
       return dueDate > today && dueDate <= weekFromNow && !task.completed;
     })
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
@@ -787,7 +787,10 @@ function updateUpcomingTasks() {
         <div class="task-item-dashboard ${task.type}" onclick="viewTaskDetails('${task.id}')">
           <div class="task-item-badge ${task.type}">${task.type}</div>
           <div class="task-item-title">${task.title}</div>
-          <div class="task-item-dueDate">Due: ${formatDateDisplay(new Date(task.dueDate))}</div>
+          <div class="task-item-dueDate">
+            ${task.type === "event" ? "Date" : "Due"}: 
+            ${formatDateDisplay(new Date(task.type === "event" ? task.date : task.dueDate))}
+          </div>        
         </div>
       `,
     )
@@ -1186,19 +1189,27 @@ function updateTasksDisplay() {
   tasksList.innerHTML = tasks
     .map(
       (task) => `
-        <div class="task-card ${task.type}" onclick="viewTaskDetails('${task.id}')">
-          <div class="task-card-type">${task.type.charAt(0).toUpperCase() + task.type.slice(1)}</div>
-          <div class="task-card-title">${task.title}</div>
-          <div class="task-card-dueDate">Due: ${formatDateDisplay(new Date(task.dueDate))}</div>
-          ${task.type === "task"
+      <div class="task-card ${task.type}" onclick="viewTaskDetails('${task.id}')">
+        <div class="task-card-type">${task.type.charAt(0).toUpperCase() + task.type.slice(1)}</div>
+        <div class="task-card-title">${task.title}</div>
+
+        <div class="task-card-dueDate">
+          ${task.type === "event" ? "Date" : "Due"}: 
+          ${formatDateDisplay(new Date(task.type === "event" ? task.date : task.dueDate))}
+        </div>
+
+        ${task.type === "task"
           ? `<div class="task-card-time">${task.estimatedHours}h | ${task.difficulty || "MEDIUM"}</div>`
           : task.startTime
             ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
             : ""
         }
-          ${task.isRecurring ? `<div class="task-card-time">Recurring: ${task.recurrenceType}</div>` : ""}
-        </div>
-      `,
+
+        ${task.type === "event" && task.isRecurring
+          ? `<div class="task-card-time">Recurring: ${task.recurrenceType}</div>`
+          : ""}
+      </div>
+    `,
     )
     .join("");
 }
@@ -1228,10 +1239,14 @@ function viewTaskDetails(taskId) {
       <span class="modal-detail-label">Type:</span>
       <span class="modal-detail-value">${task.type}</span>
     </div>
-    <div class="modal-detail">
-      <span class="modal-detail-label">Due Date:</span>
-      <span class="modal-detail-value">${formatDateDisplay(new Date(task.dueDate))}</span>
-    </div>
+   <div class="modal-detail">
+  <span class="modal-detail-label">
+    ${task.type === "event" ? "Date" : "Due Date"}:
+  </span>
+  <span class="modal-detail-value">
+    ${formatDateDisplay(new Date(task.type === "event" ? task.date : task.dueDate))}
+  </span>
+</div>
     ${task.type === "task"
       ? `
     <div class="modal-detail">
@@ -1273,10 +1288,14 @@ function viewTaskDetails(taskId) {
     </div>`
       : ""
     }
-    <div class="modal-detail">
-      <span class="modal-detail-label">Recurring:</span>
-      <span class="modal-detail-value">${recurrenceText}</span>
-    </div>
+ ${task.type === "event" ? `
+  <div class="modal-detail">
+    <span class="modal-detail-label">Recurring:</span>
+    <span class="modal-detail-value">
+      ${task.isRecurring ? recurrenceText : "No"}
+    </span>
+  </div>
+` : ""}
   `;
 
   modal.classList.add("active");
@@ -1379,8 +1398,7 @@ function editSelectedTask() {
   if (formTitle) formTitle.textContent = `Editing: ${task.title}`;
   if (taskTitle) taskTitle.value = task.title;
   if (taskType) taskType.value = task.type;
-  if (dueDate) dueDate.value = task.dueDate;
-  if (estimatedHours) estimatedHours.value = task.estimatedHours || "";
+  if (dueDate) dueDate.value = task.type === "event" ? task.date : task.dueDate; if (estimatedHours) estimatedHours.value = task.estimatedHours || "";
   if (difficulty) difficulty.value = task.difficulty || "MEDIUM";
   if (preferredStartTime)
     preferredStartTime.value = task.preferredStartTime || "09:00";
@@ -1598,28 +1616,26 @@ function renderMonthlyGrid() {
         <div class="month-day-number">${dayDate.getDate()}</div>
       </div>
       <div class="month-day-content">
-        ${
-          dayEvents.length > 0
-            ? dayEvents
-                .slice(0, 3)
-                .map(
-                  (event) => `
+        ${dayEvents.length > 0
+        ? dayEvents
+          .slice(0, 3)
+          .map(
+            (event) => `
                     <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
                       <div class="schedule-event-title">${event.title}</div>
-                      ${
-                        event.startTime
-                          ? `<div class="schedule-event-time">${event.startTime}${event.endTime ? ` - ${event.endTime}` : ""}</div>`
-                          : `<div class="schedule-event-time">${event.label || "Due"}</div>`
-                      }
+                      ${event.startTime
+                ? `<div class="schedule-event-time">${event.startTime}${event.endTime ? ` - ${event.endTime}` : ""}</div>`
+                : `<div class="schedule-event-time">${event.label || "Due"}</div>`
+              }
                     </div>
                   `,
-                )
-                .join("") +
-              (dayEvents.length > 3
-                ? `<div class="schedule-event-time">+${dayEvents.length - 3} more</div>`
-                : "")
-            : '<p class="empty-state">No events</p>'
-        }
+          )
+          .join("") +
+        (dayEvents.length > 3
+          ? `<div class="schedule-event-time">+${dayEvents.length - 3} more</div>`
+          : "")
+        : '<p class="empty-state">No events</p>'
+      }
       </div>
     `;
 
@@ -1812,7 +1828,7 @@ async function clearAllItems() {
 }
 
 function printScheduleArea() {
-    // NEW: Call the browser's built-in print function
-    // The @media print styles in style.css handle hiding/showing the right elements
-    window.print();
+  // NEW: Call the browser's built-in print function
+  // The @media print styles in style.css handle hiding/showing the right elements
+  window.print();
 }

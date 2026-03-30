@@ -236,21 +236,11 @@ The main behavioural changes in ITR3 are:
 - tasks are now shown with colors to improve readability
 - schedule presentation is more visual and easier to interpret
 
-### Structural / Codebase Changes
-
-During ITR3, the project continued moving toward a more complete release version through:
-
-- additional backend refinement
-- frontend feature additions
-- testing improvements
-- refactoring and cleanup work
-- documentation updates for release and demo preparation
-
 ---
 
 ## 10. Known Issues / Unresolved Items
 
-At the time of submission, all issues indentified on GitHub still are active.
+At the time of submission, all issues indentified, are shown on GitHub isseus, they still are active.
 
 ---
 

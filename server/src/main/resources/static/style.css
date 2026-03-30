@@ -610,16 +610,35 @@ body.login-page {
     text-align: center;
 }
 
-.view-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+.view-toggle-pill {
+    display: inline-flex;                          
+    border: 1px solid var(--light-border);         
+    border-radius: 999px;                          
+    overflow: hidden;                              
+    background-color: var(--light-bg);             
 }
 
-.view-toggle .btn-nav.active-view {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+.pill-option {
+    padding: 0.5rem 1.1rem;                        
+    border: none;                                  
+    background: transparent;                       
+    color: var(--text-light);                      
+    font-size: 0.9rem;                             
+    font-weight: 600;                              
+    cursor: pointer;                               
+    transition: background 0.2s ease, color 0.2s ease; 
+    line-height: 1;                                
+}
+
+.pill-option:hover {
+    background-color: rgba(99, 102, 241, 0.08);   
+    color: var(--text-dark);                       
+}
+
+.pill-option.active-pill {
+    background-color: var(--primary-color);        
+    color: white;                                  
+    border-radius: 999px;                          
 }
 
 .tasks-panel {
@@ -820,17 +839,17 @@ body.login-page {
 }
 
 .month-day-header {
-    background-color: #eef2ff;
-    color: var(--text-dark);
+    background-color: var(--primary-color);
+    color: white;
     padding: 0.75rem;
     text-align: center;
     font-weight: 700;
-    border-bottom: 1px solid var(--light-border);
+    border-bottom: none;
 }
 
 .month-day-name {
     font-size: 0.8rem;
-    color: var(--text-light);
+    color: rgba(255, 255, 255, 0.75);
     margin-bottom: 0.25rem;
 }
 
@@ -2116,7 +2135,9 @@ body.timetable-page .month-grid {
     .schedule-section,
     .task-card,
     .timeline-task,
-    .timeline-item {
+    .timeline-item,
+    .month-day-column,    
+    .month-day-content {  
         background: white !important;
         color: #1e293b !important;
         border-color: #cbd5e1 !important;
@@ -2127,6 +2148,13 @@ body.timetable-page .month-grid {
         color: white !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+    }
+
+    .month-day-header {
+        background-color: #6366f1 !important;   
+        color: white !important;                 
+        -webkit-print-color-adjust: exact;       
+        print-color-adjust: exact;               
     }
 
     .schedule-event {

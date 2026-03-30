@@ -435,11 +435,11 @@ function updateViewToggleButtons() {
   const monthlyBtn = document.getElementById("monthlyViewBtn");
 
   if (weeklyBtn) {
-    weeklyBtn.classList.toggle("active-view", currentView === "week");
+    weeklyBtn.classList.toggle("active-pill", currentView === "week");
   }
 
   if (monthlyBtn) {
-    monthlyBtn.classList.toggle("active-view", currentView === "month");
+    monthlyBtn.classList.toggle("active-pill", currentView === "month");
   }
 }
 
@@ -456,7 +456,7 @@ function updatePeriodDisplay() {
 
   if (currentView === "week") {
     const weekEnd = addDays(currentWeekStart, 6);
-    periodDisplay.textContent = `Week of ${formatDateDisplay(currentWeekStart)} - ${formatDateDisplay(weekEnd)}`;
+    periodDisplay.textContent = `${formatDateDisplay(currentWeekStart)} - ${formatDateDisplay(weekEnd)}`;
   } else {
     periodDisplay.textContent = currentMonthDate.toLocaleDateString("en-US", {
       month: "long",
@@ -692,6 +692,9 @@ function exitEditMode() {
 
   const submitBtn = document.querySelector('#taskForm button[type="submit"]');
   if (submitBtn) submitBtn.textContent = "Save Task";
+  // NEW: Reset color picker back to default purple when exiting edit mode
+  const taskColorPicker = document.getElementById("taskColor");
+  if (taskColorPicker) taskColorPicker.value = "#6366f1";
   hideTimeConflictWarning();
 }
 
@@ -1022,6 +1025,7 @@ async function addTask() {
   const isRecurring = document.getElementById("isRecurring")?.checked || false;
   const recurrenceType = document.getElementById("recurrenceType")?.value || "";
   const recurrenceEnd = document.getElementById("recurrenceEnd")?.value || "";
+  const taskColor = document.getElementById("taskColor")?.value || "#6366f1";
 
   const selectedRecurrenceDays = Array.from(
     document.querySelectorAll('input[name="recurrenceDays"]:checked'),
@@ -1109,7 +1113,7 @@ async function addTask() {
         minBlockHours: taskMinBlockHours,
         maxBlockHours: taskMaxBlockHours,
       };
-
+      localStorage.setItem(`taskColor_${title}_${dueDate}`, taskColor);
       if (originalItem && originalItem.type === "task") {
         savedItem = await apiFetch(`/api/tasks/${selectedTaskId}`, {
           method: "PUT",
@@ -1138,6 +1142,8 @@ async function addTask() {
           ? selectedRecurrenceDays.map(shortDayToBackend)
           : [],
       };
+
+      localStorage.setItem(`taskColor_${title}_${dueDate}`, taskColor);
 
       if (originalItem && originalItem.type === "event") {
         savedItem = await apiFetch(`/api/events/${selectedTaskId}`, {
@@ -1187,30 +1193,64 @@ function updateTasksDisplay() {
   }
 
   tasksList.innerHTML = tasks
-    .map(
-      (task) => `
-      <div class="task-card ${task.type}" onclick="viewTaskDetails('${task.id}')">
-        <div class="task-card-type">${task.type.charAt(0).toUpperCase() + task.type.slice(1)}</div>
-        <div class="task-card-title">${task.title}</div>
+.map((task) => {
+  const savedColor =
+    localStorage.getItem(`taskColor_${task.title}_${task.dueDate}`) ||
+    (task.type === "event" ? "#10b981" : "#6366f1");
 
-        <div class="task-card-dueDate">
-          ${task.type === "event" ? "Date" : "Due"}: 
-          ${formatDateDisplay(new Date(task.type === "event" ? task.date : task.dueDate))}
+  const difficultyColor = {
+    LOW: "#10b981",
+    MEDIUM: "#f59e0b",
+    HIGH: "#ef4444",
+  }[task.difficulty] || "#64748b";
+
+  return `
+    <div class="task-card ${task.type}" onclick="viewTaskDetails('${task.id}')"
+      style="border-left-color: ${savedColor};">
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.35rem;">
+        <div class="task-card-type" style="background-color: ${savedColor};">
+          ${task.type.charAt(0).toUpperCase() + task.type.slice(1)}
         </div>
 
-        ${task.type === "task"
-          ? `<div class="task-card-time">${task.estimatedHours}h | ${task.difficulty || "MEDIUM"}</div>`
-          : task.startTime
-            ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
-            : ""
-        }
-
-        ${task.type === "event" && task.isRecurring
-          ? `<div class="task-card-time">Recurring: ${task.recurrenceType}</div>`
-          : ""}
+        ${task.type === "task" ? `
+          <span style="
+            font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem;
+            border-radius: 20px; color: white; background-color: ${difficultyColor};
+            white-space: nowrap;
+          ">${task.difficulty || "MEDIUM"}</span>
+        ` : ""}
       </div>
-    `,
-    )
+
+      <div class="task-card-title">${task.title}</div>
+
+      <div class="task-card-dueDate">
+        ${task.type === "event" ? "Date" : "Due"}: 
+        ${formatDateDisplay(new Date(task.type === "event" ? task.date : task.dueDate))}
+      </div>
+
+      ${task.type === "task"
+        ? `<div class="task-card-time">${task.estimatedHours}h</div>`
+        : task.startTime
+          ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
+          : ""
+      }
+
+      ${task.type === "event"
+        ? `<div class="task-card-time">Recurring: ${task.isRecurring ? task.recurrenceType : "No"}</div>`
+        : ""
+      }
+
+      ${task.description ? `
+        <div style="
+          font-size: 0.8rem; color: var(--text-light); margin-top: 0.4rem;
+          overflow: hidden; display: -webkit-box;
+          -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        ">${task.description}</div>
+      ` : ""}
+    </div>
+  `;
+})
     .join("");
 }
 
@@ -1564,12 +1604,26 @@ function renderScheduleGrid() {
         ? dayEvents
           .map(
             (event) => `
-                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
+                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')" style="border-left: 3px solid ${event.color};">
                       <div class="schedule-event-title">${event.title}</div>
                       ${event.startTime
                 ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>`
                 : `<div class="schedule-event-time">${event.label || "Due"}</div>`
               }
+                      ${event.description ? `
+                        <!-- NEW: Description on weekly calendar cards -->
+                        <div style="font-size:0.72rem; color:var(--text-light); margin-top:0.2rem;
+                          overflow:hidden; display:-webkit-box;
+                          -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                          ${event.description}
+                        </div>` : ""}
+                      ${event.difficulty ? `
+                        <!-- NEW: Difficulty badge on weekly calendar cards -->
+                        <span style="font-size:0.65rem; font-weight:700; padding:0.15rem 0.4rem;
+                          border-radius:10px; color:white; margin-top:0.2rem; display:inline-block;
+                          background-color:${{ LOW:"#10b981", MEDIUM:"#f59e0b", HIGH:"#ef4444" }[event.difficulty] || "#64748b"};">
+                          ${event.difficulty}
+                        </span>` : ""}
                     </div>
                   `,
           )
@@ -1616,17 +1670,26 @@ function renderMonthlyGrid() {
         <div class="month-day-number">${dayDate.getDate()}</div>
       </div>
       <div class="month-day-content">
-        ${dayEvents.length > 0
-        ? dayEvents
-          .slice(0, 3)
-          .map(
-            (event) => `
-                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')">
+        ${
+          dayEvents.length > 0
+            ? dayEvents
+                .slice(0, 3)
+                .map(
+                  (event) => `
+                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')" style="border-left: 3px solid ${event.color};">
                       <div class="schedule-event-title">${event.title}</div>
-                      ${event.startTime
-                ? `<div class="schedule-event-time">${event.startTime}${event.endTime ? ` - ${event.endTime}` : ""}</div>`
-                : `<div class="schedule-event-time">${event.label || "Due"}</div>`
-              }
+                      ${
+                        event.startTime
+                          ? `<div class="schedule-event-time">${event.startTime}${event.endTime ? ` - ${event.endTime}` : ""}</div>`
+                          : `<div class="schedule-event-time">${event.label || "Due"}</div>`
+                      }
+                      ${event.description ? `
+                        <!-- NEW: Description on monthly calendar cards -->
+                        <div style="font-size:0.68rem; color:var(--text-light); margin-top:0.15rem;
+                          overflow:hidden; display:-webkit-box;
+                          -webkit-line-clamp:1; -webkit-box-orient:vertical;">
+                          ${event.description}
+                        </div>` : ""}
                     </div>
                   `,
           )
@@ -1650,13 +1713,16 @@ function getEventsForDay(dateStr) {
     if (item.type === "event") {
       if (shouldShowRecurringEventOnDate(item, dateStr)) {
         items.push({
-          id: item.id,
-          title: item.title,
-          type: "event",
-          startTime: item.startTime,
-          endTime: item.endTime,
-          label: null,
-        });
+        id: item.id,
+        title: item.title,
+        type: "event",
+        startTime: item.startTime,
+        endTime: item.endTime,
+        label: null,
+        description: item.description || "",
+        difficulty: item.difficulty || null,
+        color: localStorage.getItem(`taskColor_${item.title}_${item.dueDate}`) || "#10b981",
+      });
       }
     }
 
@@ -1668,6 +1734,9 @@ function getEventsForDay(dateStr) {
         startTime: null,
         endTime: null,
         label: "Due",
+        description: item.description || "",  // NEW: Pass description to calendar cards
+        difficulty: item.difficulty || null,  // NEW: Pass difficulty to calendar cards
+        color: localStorage.getItem(`taskColor_${item.title}_${item.dueDate}`) || "#10b981",
       });
     }
   });

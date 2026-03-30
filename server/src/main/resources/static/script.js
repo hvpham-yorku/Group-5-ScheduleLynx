@@ -379,12 +379,8 @@ async function loadScheduleEntries() {
 async function loadTasksFromStorage() {
   if (!currentUser) return;
 
-  await loadUserTasks(currentUser.username);
-  await loadScheduleEntries();
+  await reloadAndRefreshAll();
 
-  updateTasksDisplay();
-  renderCurrentScheduleView();
-  renderTimeline(scheduleEntries);
 
   if (scheduleEntries.length > 0) {
     hideScheduleNotice();
@@ -705,14 +701,8 @@ function exitEditMode() {
 async function initializeDashboard() {
   if (!isLoggedIn()) return;
 
-  currentUser = getCurrentUser();
-  await loadUserTasks(currentUser.username);
-  await loadScheduleEntries();
+  await reloadAndRefreshAll();
 
-  updateDashboardStats();
-  updateUpcomingTasks();
-  updateWeekScheduleMini();
-  updateTaskBreakdown();
 }
 
 function refreshDashboardIfVisible() {
@@ -1228,6 +1218,15 @@ document.addEventListener("DOMContentLoaded", function () {
   if (editTaskBtn) editTaskBtn.addEventListener("click", editSelectedTask);
 });
 
+async function reloadAndRefreshAll() {
+  await loadUserTasks(currentUser.username);
+  await loadScheduleEntries();
+  updateTasksDisplay();
+  renderCurrentScheduleView();
+  renderTimeline(scheduleEntries);
+  refreshDashboardIfVisible();
+}
+
 async function deleteTaskListener() {
   if (!selectedTaskId) return;
 
@@ -1243,14 +1242,7 @@ async function deleteTaskListener() {
       await apiFetch(`/api/tasks/${selectedTaskId}`, { method: "DELETE" });
     }
 
-    await loadUserTasks(currentUser.username);
-    await loadScheduleEntries();
-
-    updateTasksDisplay();
-    renderCurrentScheduleView();
-    renderTimeline(scheduleEntries);
-    renderTimeline(scheduleEntries);
-    refreshDashboardIfVisible();
+    await reloadAndRefreshAll();
 
     const modal = document.getElementById("taskModal");
     if (modal) modal.classList.remove("active");

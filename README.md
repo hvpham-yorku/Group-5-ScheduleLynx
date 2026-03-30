@@ -2,26 +2,28 @@
 
 ## 1. Project Description
 
-ScheduleLynx is a rule-based schedule and workload management system designed to help students manage academic, professional, and personal responsibilities.
+ScheduleLynx is a schedule and workload management system designed to help students organize academic, work, and personal responsibilities in one place.
 
 The system allows users to:
 
-- add tasks with due dates, estimated effort, and scheduling preferences
-- define weekly availability blocks
-- add fixed and recurring events such as classes, labs, work shifts, or appointments
-- automatically generate a weekly schedule
-- modify and delete tasks and events
-- detect invalid inputs and scheduling conflicts
+- create, edit, and delete tasks
+- define availability blocks
+- create fixed and recurring events
+- save scheduling preferences
+- generate a weekly schedule automatically
+- view schedules visually in weekly and monthly formats
+- print schedules for offline use
+- distinguish tasks visually using task colors
 
-The scheduling engine distributes workload into available time blocks before due dates using a rule-based time-blocking approach.
+The scheduling engine distributes work into available time blocks before due dates while respecting stored preferences and existing events.
 
 ---
 
 ## 2. Description of Submission Contents
 
-This submission includes:
+This submission includes the material required for ITR2 and ITR3.
 
-### Backend (Spring Boot / Java)
+### Source Code
 
 Location:
 
@@ -30,11 +32,11 @@ Location:
 Includes:
 
 - domain models
-- database-backed repositories
-- service layer (business logic)
+- persistence layer
+- service layer
 - REST controllers
-- schedule generation engine
-- user/session support
+- scheduling logic
+- authentication/session-related backend support
 - unit tests
 - integration tests
 
@@ -46,12 +48,15 @@ Location:
 
 Includes:
 
-- UI for task management
-- UI for event management
-- UI for schedule preferences
-- schedule visualization
-- login/register interface
-- forms for schedule generation settings
+- login/register pages
+- task management interface
+- event management interface
+- availability management interface
+- schedule preferences UI
+- weekly schedule view
+- monthly calendar view
+- schedule printing support
+- color-based task visualization
 
 ### Documentation
 
@@ -61,102 +66,64 @@ Location:
 
 Includes:
 
-- project documentation
-- architecture/design documentation
+- planning documents
+- architecture sketch / design artifacts
 - database documentation
 - testing documentation
-- development log
+- log file
+- UML/design documentation
+- customer meeting summaries
 
 ---
 
-## 3. Implemented Features (ITR2 Scope Including ITR1)
+## 3. Features Implemented
 
-### Task Management
+### Core Features from Earlier Iterations
 
-- create task
-- retrieve tasks
-- update task
-- delete task
-- input validation
-- task-specific scheduling settings such as:
-  - preferred time window
-  - max hours per day
-  - min block length
-  - max block length
+- task creation, update, deletion, and retrieval
+- fixed event support
+- recurring event support
+- availability input and management
+- user-specific schedule preferences
+- automatic schedule generation
+- validation of required input fields
+- persistent database-backed storage
 
-### Event Management
+### ITR3 Features / Major Changes
 
-- create event
-- retrieve events
-- update event
-- delete event
-- support recurring events
-- validate required fields
-
-### Schedule Preferences
-
-- save user-specific scheduling preferences
-- support weekend scheduling toggle
-- support quiet hours / unavailable hours
-
-### Schedule Generation
-
-- time-block tasks into available time
-- avoid overlap with events
-- split tasks across multiple blocks if necessary
-- respect due dates
-- use stored schedule preferences
-- support feasibility result reporting
-
-### Persistence
-
-- persistent database-backed storage using H2
-- data remains available after application restart
-
-### Testing
-
-- service-layer unit tests
-- integration tests
-- backend scheduling and persistence behavior verified through automated tests
-
-All tests pass using:
-
-    mvn clean test
+- monthly calendar view added
+- schedule printing feature added
+- task colors added for better visual distinction
+- GUI improvements for displaying schedules more clearly
 
 ---
 
-## 4. Deployment Instructions
+## 4. Database
 
-### Prerequisites
+The project uses an H2 database for persistence.
 
-- Java 17+
-- Maven 3.8+
+Database-related material is documented in:
 
-### Run Backend
+    /docs/database.md
 
-From project root:
+The database allows the application to store data between runs and supports the backend scheduling workflow required for the project.
 
-    cd server
+---
 
-Windows:
+## 5. Testing
 
-    mvnw.cmd spring-boot:run
+The project includes:
 
-Mac/Linux:
+- unit tests for service/business logic
+- integration tests for persistence and scheduling-related flows
 
-    ./mvnw spring-boot:run
+Testing documentation is available in:
 
-You can also use:
+    /docs/testing.md
 
-    mvn spring-boot:run
+To run tests:
 
-Server runs at:
-
-    http://localhost:8080
-
-### Run Tests
-
-From project root:
+From the project root:
 
     cd server
 
@@ -168,142 +135,130 @@ Mac/Linux:
 
     ./mvnw clean test
 
-Or:
+---
 
-    mvn clean test
+## 6. Deployment Instructions
+
+### Prerequisites
+
+- Java 17 or newer
+- Maven 3.8 or newer
+
+### Run the Application
+
+From the project root:
+
+    cd server
+
+Windows:
+
+    mvnw.cmd spring-boot:run
+
+Mac/Linux:
+
+    ./mvnw spring-boot:run
+
+You may also use:
+
+    mvn spring-boot:run
+
+Default local address:
+
+    http://localhost:8080
 
 ---
 
-## 5. API Overview
+## 7. User Guide
+
+1. Start the backend server.
+2. Open the application in the browser.
+3. Register or log in.
+4. Add availability blocks.
+5. Add fixed or recurring events.
+6. Add tasks with due dates and other scheduling details.
+7. Adjust schedule preferences if needed.
+8. Generate the schedule.
+9. View the generated weekly schedule.
+10. Use the monthly view for a broader calendar display.
+11. Use the print feature to print the schedule.
+12. Use task colors to distinguish tasks more easily.
+
+---
+
+## 8. API Overview
 
 ### Tasks
 
-- POST /api/tasks
-- GET /api/tasks
-- PUT /api/tasks/{id}
-- DELETE /api/tasks/{id}
+- POST `/api/tasks`
+- GET `/api/tasks`
+- PUT `/api/tasks/{id}`
+- DELETE `/api/tasks/{id}`
 
 ### Events
 
-- POST /api/events
-- GET /api/events
-- PUT /api/events/{id}
-- DELETE /api/events/{id}
+- POST `/api/events`
+- GET `/api/events`
+- PUT `/api/events/{id}`
+- DELETE `/api/events/{id}`
 
 ### Availability
 
-- POST /api/availability
-- GET /api/availability
-- PUT /api/availability/{id}
-- DELETE /api/availability/{id}
+- POST `/api/availability`
+- GET `/api/availability`
+- PUT `/api/availability/{id}`
+- DELETE `/api/availability/{id}`
 
 ### Schedule Preferences
 
-- GET /api/schedule/preferences
-- PUT /api/schedule/preferences
+- GET `/api/schedule/preferences`
+- PUT `/api/schedule/preferences`
 
 ### Schedule
 
-- POST /api/schedule/generate
-- GET /api/schedule
-- DELETE /api/schedule
+- POST `/api/schedule/generate`
+- GET `/api/schedule`
+- DELETE `/api/schedule`
 
-### Authentication / Session Support
+### Authentication / Session
 
-- login/register/session-related endpoints as implemented in backend
-
----
-
-## 6. User Guide
-
-1. Start the backend server.
-2. Open the frontend in a browser.
-3. Register or log in.
-4. Add weekly availability blocks.
-5. Add fixed or recurring events.
-6. Add tasks with due dates and estimated effort.
-7. Adjust schedule preferences if needed.
-8. Generate schedule.
-9. View the time-blocked weekly plan.
-10. Update tasks, events, or preferences and regenerate the schedule when necessary.
+- login/register/session-related endpoints as implemented in the backend
 
 ---
 
-## 7. ITR2 Improvements
+## 9. Major ITR3 Changes in Structure and Behaviour
 
-The main additions and improvements for ITR2 are:
+### Behaviour Changes
 
-- persistent database-backed storage using H2
-- improved backend integration using Spring Boot
-- support for recurring events
-- support for user-specific schedule preferences
-- improved scheduling workflow and constraints
-- more complete task and event editing/deletion support
+The main behavioural changes in ITR3 are:
 
----
+- users can now view schedules in a monthly format
+- users can print schedules directly from the interface
+- tasks are now shown with colors to improve readability
+- schedule presentation is more visual and easier to interpret
 
-## 8. Database Info
+### Structural / Codebase Changes
 
-This version uses an H2 file-based database.
+During ITR3, the project continued moving toward a more complete release version through:
 
-Main points:
-
-- data is stored persistently
-- data remains after restarting the application
-- schema is updated automatically at startup
-- tasks, events, users, schedule preferences, and generated schedule entries are stored in the database
-
-Typical local database location:
-
-    /server/data
-
-More details are provided in:
-
-    /docs/database.md
+- additional backend refinement
+- frontend feature additions
+- testing improvements
+- refactoring and cleanup work
+- documentation updates for release and demo preparation
 
 ---
 
-## 9. Testing Info
+## 10. Known Issues / Unresolved Items
 
-This version includes both unit and integration tests.
-
-The tests help verify:
-
-- service-layer business logic
-- controller behavior
-- scheduling logic
-- persistence-related functionality
-
-More details are provided in:
-
-    /docs/testing.md
+At the time of submission, all issues indentified on GitHub still are active.
 
 ---
 
-## 10. Known Limitations
+## 11. Final Notes
 
-Current limitations include:
+This repository contains the code, tests, and documents for the final ITR3 / Delivery 2 submission. The README is intended to help the TA understand:
 
-- some UI feedback still uses simple browser-style messages
-- frontend polish can still be improved
-- duplicate task names may still be allowed depending on validation rules
-- H2 is suitable, but not for full-scale production deployment
-
----
-
-## 11. Future Improvements
-
-Possible future improvements include:
-
-- stronger validation for duplicate or conflicting input
-- improved UI notifications
-- more advanced schedule optimization
-- stronger authentication/security features
-
----
-
-## 12. Summary
-
-ScheduleLynx is a web-based scheduling and workload planning system designed to help students organize tasks, events, and availability more effectively.
-
-For ITR2, the project was improved with persistent storage, stronger backend integration, updated scheduling functionality.
+- what is included in the submission
+- how to run the system
+- what features are implemented
+- what changed during ITR3

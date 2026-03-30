@@ -9,6 +9,15 @@ let currentMonthDate = new Date();
 let currentView = "week";
 let selectedTaskId = null;
 let currentUser = null;
+const DEFAULTS = {
+  PREFERRED_START_TIME: "09:00",
+  PREFERRED_END_TIME: "21:00",
+  MAX_HOURS_PER_DAY: 3,
+  MIN_BLOCK_HOURS: 1,
+  MAX_BLOCK_HOURS: 3,
+  DIFFICULTY: "MEDIUM",
+  TASK_COLOR: "#6366f1",
+};
 
 // ============================
 // API HELPERS
@@ -330,12 +339,12 @@ async function loadUserTasks(username) {
     recurrenceType: null,
     recurrenceEnd: null,
     recurrenceDays: [],
-    difficulty: task.difficulty || "MEDIUM",
-    preferredStartTime: task.preferredStartTime || "09:00",
-    preferredEndTime: task.preferredEndTime || "21:00",
-    maxHoursPerDay: task.maxHoursPerDay ?? 3,
-    minBlockHours: task.minBlockHours ?? 1,
-    maxBlockHours: task.maxBlockHours ?? 3,
+    difficulty: task.difficulty || DEFAULTS.DIFFICULTY,
+    preferredStartTime: task.preferredStartTime || DEFAULTS.PREFERRED_START_TIME,
+    preferredEndTime: task.preferredEndTime || DEFAULTS.PREFERRED_END_TIME,
+    maxHoursPerDay: task.maxHoursPerDay ?? DEFAULTS.MAX_HOURS_PER_DAY,
+    minBlockHours: task.minBlockHours ?? DEFAULTS.MIN_BLOCK_HOURS,
+    maxBlockHours: task.maxBlockHours ?? DEFAULTS.MAX_BLOCK_HOURS,
   }));
 
   const normalizedEvents = backendEvents.map((event) => ({
@@ -674,23 +683,13 @@ function exitEditMode() {
   const taskMaxBlockHours = document.getElementById("taskMaxBlockHours");
   const difficulty = document.getElementById("difficulty");
 
-  if (preferredStartTime) preferredStartTime.value = "09:00";
-  if (preferredEndTime) preferredEndTime.value = "21:00";
-  if (taskMaxHoursPerDay) taskMaxHoursPerDay.value = "3";
-  if (taskMinBlockHours) taskMinBlockHours.value = "1";
-  if (taskMaxBlockHours) taskMaxBlockHours.value = "3";
-  if (difficulty) difficulty.value = "MEDIUM";
-  if (difficultyGroup) difficultyGroup.style.display = "block";
-
-  document
-    .querySelectorAll('input[name="recurrenceDays"]')
-    .forEach((cb) => (cb.checked = false));
-
-  const submitBtn = document.querySelector('#taskForm button[type="submit"]');
-  if (submitBtn) submitBtn.textContent = "Save Task";
-  // NEW: Reset color picker back to default purple when exiting edit mode
-  const taskColorPicker = document.getElementById("taskColor");
-  if (taskColorPicker) taskColorPicker.value = "#6366f1";
+if (preferredStartTime) preferredStartTime.value = DEFAULTS.PREFERRED_START_TIME;
+if (preferredEndTime) preferredEndTime.value = DEFAULTS.PREFERRED_END_TIME;
+if (taskMaxHoursPerDay) taskMaxHoursPerDay.value = String(DEFAULTS.MAX_HOURS_PER_DAY);
+if (taskMinBlockHours) taskMinBlockHours.value = String(DEFAULTS.MIN_BLOCK_HOURS);
+if (taskMaxBlockHours) taskMaxBlockHours.value = String(DEFAULTS.MAX_BLOCK_HOURS);
+if (difficulty) difficulty.value = DEFAULTS.DIFFICULTY;
+if (taskColorPicker) taskColorPicker.value = DEFAULTS.TASK_COLOR;
   hideTimeConflictWarning();
 }
 
@@ -1048,7 +1047,7 @@ function updateTasksDisplay() {
 
       const savedColor =
         localStorage.getItem(`taskColor_${task.title}_${dateKey}`) ||
-        (task.type === "event" ? "#10b981" : "#6366f1");
+        (task.type === "event" ? "#10b981" : DEFAULTS.TASK_COLOR);
 
       const difficultyColor = {
         LOW: "#10b981",

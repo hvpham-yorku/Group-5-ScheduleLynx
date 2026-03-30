@@ -342,7 +342,7 @@ async function loadUserTasks(username) {
     id: String(event.id),
     title: event.title,
     type: "event",
-    dueDate: event.date,
+    date: event.date,
     description: "",
     completed: false,
     createdAt: null,
@@ -550,7 +550,7 @@ function markScheduleAsStale(
 
 function shouldShowRecurringEventOnDate(eventItem, dateStr) {
   const current = new Date(`${dateStr}T12:00:00`);
-  const start = new Date(`${eventItem.dueDate}T12:00:00`);
+  const start = new Date(`${eventItem.date}T12:00:00`);
 
   if (current < start) return false;
 
@@ -560,7 +560,7 @@ function shouldShowRecurringEventOnDate(eventItem, dateStr) {
   }
 
   if (!eventItem.isRecurring || !eventItem.recurrenceType) {
-    return eventItem.dueDate === dateStr;
+    return eventItem.date === dateStr;
   }
 
   if (eventItem.recurrenceType === "daily") {
@@ -589,7 +589,7 @@ function shouldShowRecurringEventOnDate(eventItem, dateStr) {
     return matchesDay && diffWeeks % 2 === 0;
   }
 
-  return eventItem.dueDate === dateStr;
+  return eventItem.date === dateStr;
 }
 
 function parseTimeToMinutes(timeString) {
@@ -739,20 +739,20 @@ function updateDashboardStats() {
   totalTasksCount.textContent = tasks.length;
 
   const upcoming = tasks.filter((task) => {
-    const dueDate = new Date(task.dueDate);
+    const dueDate = new Date(task.type === "event" ? task.date : task.dueDate);
     return dueDate > today && dueDate <= weekFromNow;
   });
   upcomingCount.textContent = upcoming.length;
 
   const overdue = tasks.filter((task) => {
-    const dueDate = new Date(task.dueDate);
+    const dueDate = new Date(task.type === "event" ? task.date : task.dueDate);
     return dueDate < today && !task.completed;
   });
   overdueCount.textContent = overdue.length;
 
   let totalHours = 0;
   tasks.forEach((task) => {
-    const dueDate = new Date(task.dueDate);
+    const dueDate = new Date(task.type === "event" ? task.date : task.dueDate);
     if (
       dueDate >= getMonday(today) &&
       dueDate <= addDays(getMonday(today), 6)
@@ -772,7 +772,7 @@ function updateUpcomingTasks() {
 
   const upcoming = tasks
     .filter((task) => {
-      const dueDate = new Date(task.dueDate);
+      const dueDate = new Date(task.type === "event" ? task.date : task.dueDate);
       return dueDate > today && dueDate <= weekFromNow && !task.completed;
     })
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
@@ -790,7 +790,10 @@ function updateUpcomingTasks() {
         <div class="task-item-dashboard ${task.type}" onclick="viewTaskDetails('${task.id}')">
           <div class="task-item-badge ${task.type}">${task.type}</div>
           <div class="task-item-title">${task.title}</div>
-          <div class="task-item-dueDate">Due: ${formatDateDisplay(new Date(task.dueDate))}</div>
+          <div class="task-item-dueDate">
+            ${task.type === "event" ? "Date" : "Due"}: 
+            ${formatDateDisplay(new Date(task.type === "event" ? task.date : task.dueDate))}
+          </div>        
         </div>
       `,
     )
@@ -1190,54 +1193,64 @@ function updateTasksDisplay() {
   }
 
   tasksList.innerHTML = tasks
-    .map((task) => {
-      // NEW: Retrieve saved color from localStorage, fall back to type-based default
-      const savedColor = localStorage.getItem(`taskColor_${task.title}_${task.dueDate}`)
-        || (task.type === "event" ? "#10b981" : "#6366f1");
+.map((task) => {
+  const savedColor =
+    localStorage.getItem(`taskColor_${task.title}_${task.dueDate}`) ||
+    (task.type === "event" ? "#10b981" : "#6366f1");
 
-      // NEW: Difficulty badge color mapping
-      const difficultyColor = {
-        LOW: "#10b981",    // green
-        MEDIUM: "#f59e0b", // amber
-        HIGH: "#ef4444",   // red
-      }[task.difficulty] || "#64748b";
+  const difficultyColor = {
+    LOW: "#10b981",
+    MEDIUM: "#f59e0b",
+    HIGH: "#ef4444",
+  }[task.difficulty] || "#64748b";
 
-      return `
-        <div class="task-card ${task.type}" onclick="viewTaskDetails('${task.id}')"
-          style="border-left-color: ${savedColor};">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.35rem;">
-            <div class="task-card-type" style="background-color: ${savedColor};">
-              ${task.type.charAt(0).toUpperCase() + task.type.slice(1)}
-            </div>
-            ${task.type === "task" ? `
-              <!-- NEW: Difficulty badge displayed top-right of the card -->
-              <span style="
-                font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem;
-                border-radius: 20px; color: white; background-color: ${difficultyColor};
-                white-space: nowrap;
-              ">${task.difficulty || "MEDIUM"}</span>
-            ` : ""}
-          </div>
-          <div class="task-card-title">${task.title}</div>
-          <div class="task-card-dueDate">Due: ${formatDateDisplay(new Date(task.dueDate))}</div>
-          ${task.type === "task"
-            ? `<div class="task-card-time">${task.estimatedHours}h</div>`
-            : task.startTime
-              ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
-              : ""
-          }
-          ${task.isRecurring ? `<div class="task-card-time">Recurring: ${task.recurrenceType}</div>` : ""}
-          ${task.description ? `
-            <!-- NEW: Description shown as tertiary text below timing info -->
-            <div style="
-              font-size: 0.8rem; color: var(--text-light); margin-top: 0.4rem;
-              overflow: hidden; display: -webkit-box;
-              -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            ">${task.description}</div>
-          ` : ""}
+  return `
+    <div class="task-card ${task.type}" onclick="viewTaskDetails('${task.id}')"
+      style="border-left-color: ${savedColor};">
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.35rem;">
+        <div class="task-card-type" style="background-color: ${savedColor};">
+          ${task.type.charAt(0).toUpperCase() + task.type.slice(1)}
         </div>
-      `;
-    })
+
+        ${task.type === "task" ? `
+          <span style="
+            font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem;
+            border-radius: 20px; color: white; background-color: ${difficultyColor};
+            white-space: nowrap;
+          ">${task.difficulty || "MEDIUM"}</span>
+        ` : ""}
+      </div>
+
+      <div class="task-card-title">${task.title}</div>
+
+      <div class="task-card-dueDate">
+        ${task.type === "event" ? "Date" : "Due"}: 
+        ${formatDateDisplay(new Date(task.type === "event" ? task.date : task.dueDate))}
+      </div>
+
+      ${task.type === "task"
+        ? `<div class="task-card-time">${task.estimatedHours}h</div>`
+        : task.startTime
+          ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
+          : ""
+      }
+
+      ${task.type === "event"
+        ? `<div class="task-card-time">Recurring: ${task.isRecurring ? task.recurrenceType : "No"}</div>`
+        : ""
+      }
+
+      ${task.description ? `
+        <div style="
+          font-size: 0.8rem; color: var(--text-light); margin-top: 0.4rem;
+          overflow: hidden; display: -webkit-box;
+          -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        ">${task.description}</div>
+      ` : ""}
+    </div>
+  `;
+})
     .join("");
 }
 
@@ -1266,10 +1279,14 @@ function viewTaskDetails(taskId) {
       <span class="modal-detail-label">Type:</span>
       <span class="modal-detail-value">${task.type}</span>
     </div>
-    <div class="modal-detail">
-      <span class="modal-detail-label">Due Date:</span>
-      <span class="modal-detail-value">${formatDateDisplay(new Date(task.dueDate))}</span>
-    </div>
+   <div class="modal-detail">
+  <span class="modal-detail-label">
+    ${task.type === "event" ? "Date" : "Due Date"}:
+  </span>
+  <span class="modal-detail-value">
+    ${formatDateDisplay(new Date(task.type === "event" ? task.date : task.dueDate))}
+  </span>
+</div>
     ${task.type === "task"
       ? `
     <div class="modal-detail">
@@ -1311,10 +1328,14 @@ function viewTaskDetails(taskId) {
     </div>`
       : ""
     }
-    <div class="modal-detail">
-      <span class="modal-detail-label">Recurring:</span>
-      <span class="modal-detail-value">${recurrenceText}</span>
-    </div>
+ ${task.type === "event" ? `
+  <div class="modal-detail">
+    <span class="modal-detail-label">Recurring:</span>
+    <span class="modal-detail-value">
+      ${task.isRecurring ? recurrenceText : "No"}
+    </span>
+  </div>
+` : ""}
   `;
 
   modal.classList.add("active");
@@ -1417,8 +1438,7 @@ function editSelectedTask() {
   if (formTitle) formTitle.textContent = `Editing: ${task.title}`;
   if (taskTitle) taskTitle.value = task.title;
   if (taskType) taskType.value = task.type;
-  if (dueDate) dueDate.value = task.dueDate;
-  if (estimatedHours) estimatedHours.value = task.estimatedHours || "";
+  if (dueDate) dueDate.value = task.type === "event" ? task.date : task.dueDate; if (estimatedHours) estimatedHours.value = task.estimatedHours || "";
   if (difficulty) difficulty.value = task.difficulty || "MEDIUM";
   if (preferredStartTime)
     preferredStartTime.value = task.preferredStartTime || "09:00";
@@ -1672,13 +1692,13 @@ function renderMonthlyGrid() {
                         </div>` : ""}
                     </div>
                   `,
-                )
-                .join("") +
-              (dayEvents.length > 3
-                ? `<div class="schedule-event-time">+${dayEvents.length - 3} more</div>`
-                : "")
-            : '<p class="empty-state">No events</p>'
-        }
+          )
+          .join("") +
+        (dayEvents.length > 3
+          ? `<div class="schedule-event-time">+${dayEvents.length - 3} more</div>`
+          : "")
+        : '<p class="empty-state">No events</p>'
+      }
       </div>
     `;
 
@@ -1877,7 +1897,7 @@ async function clearAllItems() {
 }
 
 function printScheduleArea() {
-    // NEW: Call the browser's built-in print function
-    // The @media print styles in style.css handle hiding/showing the right elements
-    window.print();
+  // NEW: Call the browser's built-in print function
+  // The @media print styles in style.css handle hiding/showing the right elements
+  window.print();
 }

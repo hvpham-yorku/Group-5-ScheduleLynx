@@ -1193,18 +1193,20 @@ function updateTasksDisplay() {
   }
 
   tasksList.innerHTML = tasks
-.map((task) => {
-  const savedColor =
-    localStorage.getItem(`taskColor_${task.title}_${task.dueDate}`) ||
-    (task.type === "event" ? "#10b981" : "#6366f1");
+    .map((task) => {
+      const dateKey = task.type === "event" ? task.date : task.dueDate;
 
-  const difficultyColor = {
-    LOW: "#10b981",
-    MEDIUM: "#f59e0b",
-    HIGH: "#ef4444",
-  }[task.difficulty] || "#64748b";
+      const savedColor =
+        localStorage.getItem(`taskColor_${task.title}_${dateKey}`) ||
+        (task.type === "event" ? "#10b981" : "#6366f1");
 
-  return `
+      const difficultyColor = {
+        LOW: "#10b981",
+        MEDIUM: "#f59e0b",
+        HIGH: "#ef4444",
+      }[task.difficulty] || "#64748b";
+
+      return `
     <div class="task-card ${task.type}" onclick="viewTaskDetails('${task.id}')"
       style="border-left-color: ${savedColor};">
 
@@ -1230,16 +1232,16 @@ function updateTasksDisplay() {
       </div>
 
       ${task.type === "task"
-        ? `<div class="task-card-time">${task.estimatedHours}h</div>`
-        : task.startTime
-          ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
-          : ""
-      }
+          ? `<div class="task-card-time">${task.estimatedHours}h</div>`
+          : task.startTime
+            ? `<div class="task-card-time">${task.startTime} - ${task.endTime}</div>`
+            : ""
+        }
 
       ${task.type === "event"
-        ? `<div class="task-card-time">Recurring: ${task.isRecurring ? task.recurrenceType : "No"}</div>`
-        : ""
-      }
+          ? `<div class="task-card-time">Recurring: ${task.isRecurring ? task.recurrenceType : "No"}</div>`
+          : ""
+        }
 
       ${task.description ? `
         <div style="
@@ -1250,7 +1252,7 @@ function updateTasksDisplay() {
       ` : ""}
     </div>
   `;
-})
+    })
     .join("");
 }
 
@@ -1621,7 +1623,7 @@ function renderScheduleGrid() {
                         <!-- NEW: Difficulty badge on weekly calendar cards -->
                         <span style="font-size:0.65rem; font-weight:700; padding:0.15rem 0.4rem;
                           border-radius:10px; color:white; margin-top:0.2rem; display:inline-block;
-                          background-color:${{ LOW:"#10b981", MEDIUM:"#f59e0b", HIGH:"#ef4444" }[event.difficulty] || "#64748b"};">
+                          background-color:${{ LOW: "#10b981", MEDIUM: "#f59e0b", HIGH: "#ef4444" }[event.difficulty] || "#64748b"};">
                           ${event.difficulty}
                         </span>` : ""}
                     </div>
@@ -1670,19 +1672,17 @@ function renderMonthlyGrid() {
         <div class="month-day-number">${dayDate.getDate()}</div>
       </div>
       <div class="month-day-content">
-        ${
-          dayEvents.length > 0
-            ? dayEvents
-                .slice(0, 3)
-                .map(
-                  (event) => `
+        ${dayEvents.length > 0
+        ? dayEvents
+          .slice(0, 3)
+          .map(
+            (event) => `
                     <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')" style="border-left: 3px solid ${event.color};">
                       <div class="schedule-event-title">${event.title}</div>
-                      ${
-                        event.startTime
-                          ? `<div class="schedule-event-time">${event.startTime}${event.endTime ? ` - ${event.endTime}` : ""}</div>`
-                          : `<div class="schedule-event-time">${event.label || "Due"}</div>`
-                      }
+                      ${event.startTime
+                ? `<div class="schedule-event-time">${event.startTime}${event.endTime ? ` - ${event.endTime}` : ""}</div>`
+                : `<div class="schedule-event-time">${event.label || "Due"}</div>`
+              }
                       ${event.description ? `
                         <!-- NEW: Description on monthly calendar cards -->
                         <div style="font-size:0.68rem; color:var(--text-light); margin-top:0.15rem;
@@ -1713,16 +1713,16 @@ function getEventsForDay(dateStr) {
     if (item.type === "event") {
       if (shouldShowRecurringEventOnDate(item, dateStr)) {
         items.push({
-        id: item.id,
-        title: item.title,
-        type: "event",
-        startTime: item.startTime,
-        endTime: item.endTime,
-        label: null,
-        description: item.description || "",
-        difficulty: item.difficulty || null,
-        color: localStorage.getItem(`taskColor_${item.title}_${item.dueDate}`) || "#10b981",
-      });
+          id: item.id,
+          title: item.title,
+          type: "event",
+          startTime: item.startTime,
+          endTime: item.endTime,
+          label: null,
+          description: item.description || "",
+          difficulty: item.difficulty || null,
+          color: localStorage.getItem(`taskColor_${item.title}_${item.dueDate}`) || "#10b981",
+        });
       }
     }
 

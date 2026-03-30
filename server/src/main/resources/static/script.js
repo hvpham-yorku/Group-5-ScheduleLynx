@@ -407,6 +407,41 @@ async function loadTasksFromStorage() {
 // UTILITY FUNCTIONS
 // ============================
 
+function getDifficultyColor(difficulty) {
+  const map = { LOW: "#10b981", MEDIUM: "#f59e0b", HIGH: "#ef4444" };
+  return map[difficulty] || "#64748b";
+}
+
+function renderScheduleEventCard(event) {
+  const difficultyBadge = event.difficulty ? `
+    <span style="font-size:0.65rem; font-weight:700; padding:0.15rem 0.4rem;
+      border-radius:10px; color:white; margin-top:0.2rem; display:inline-block;
+      background-color:${getDifficultyColor(event.difficulty)};">
+      ${event.difficulty}
+    </span>` : "";
+
+  const descriptionSnippet = event.description ? `
+    <div style="font-size:0.72rem; color:var(--text-light); margin-top:0.2rem;
+      overflow:hidden; display:-webkit-box;
+      -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+      ${event.description}
+    </div>` : "";
+
+  const timeDisplay = event.startTime
+    ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>`
+    : `<div class="schedule-event-time">${event.label || "Due"}</div>`;
+
+  return `
+    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')"
+      style="border-left: 3px solid ${event.color};">
+      <div class="schedule-event-title">${event.title}</div>
+      ${timeDisplay}
+      ${descriptionSnippet}
+      ${difficultyBadge}
+    </div>`;
+}
+
+
 function getMonday(d) {
   d = new Date(d);
   const day = d.getDay();
@@ -1454,33 +1489,8 @@ function renderScheduleGrid() {
       <div class="day-header">${dayName}<br>${dayDate.getDate()}</div>
       <div class="day-content">
         ${dayEvents.length > 0
-        ? dayEvents
-          .map(
-            (event) => `
-                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')" style="border-left: 3px solid ${event.color};">
-                      <div class="schedule-event-title">${event.title}</div>
-                      ${event.startTime
-                ? `<div class="schedule-event-time">${event.startTime} - ${event.endTime}</div>`
-                : `<div class="schedule-event-time">${event.label || "Due"}</div>`
-              }
-                      ${event.description ? `
-                        <!-- NEW: Description on weekly calendar cards -->
-                        <div style="font-size:0.72rem; color:var(--text-light); margin-top:0.2rem;
-                          overflow:hidden; display:-webkit-box;
-                          -webkit-line-clamp:2; -webkit-box-orient:vertical;">
-                          ${event.description}
-                        </div>` : ""}
-                      ${event.difficulty ? `
-                        <!-- NEW: Difficulty badge on weekly calendar cards -->
-                        <span style="font-size:0.65rem; font-weight:700; padding:0.15rem 0.4rem;
-                          border-radius:10px; color:white; margin-top:0.2rem; display:inline-block;
-                          background-color:${{ LOW: "#10b981", MEDIUM: "#f59e0b", HIGH: "#ef4444" }[event.difficulty] || "#64748b"};">
-                          ${event.difficulty}
-                        </span>` : ""}
-                    </div>
-                  `,
-          )
-          .join("")
+        ? dayEvents.map(renderScheduleEventCard).join("")
+
         : '<p class="empty-state">No events</p>'
       }
       </div>
@@ -1524,30 +1534,10 @@ function renderMonthlyGrid() {
       </div>
       <div class="month-day-content">
         ${dayEvents.length > 0
-        ? dayEvents
-          .slice(0, 3)
-          .map(
-            (event) => `
-                    <div class="schedule-event ${event.type}" onclick="viewTaskDetails('${event.id}')" style="border-left: 3px solid ${event.color};">
-                      <div class="schedule-event-title">${event.title}</div>
-                      ${event.startTime
-                ? `<div class="schedule-event-time">${event.startTime}${event.endTime ? ` - ${event.endTime}` : ""}</div>`
-                : `<div class="schedule-event-time">${event.label || "Due"}</div>`
-              }
-                      ${event.description ? `
-                        <!-- NEW: Description on monthly calendar cards -->
-                        <div style="font-size:0.68rem; color:var(--text-light); margin-top:0.15rem;
-                          overflow:hidden; display:-webkit-box;
-                          -webkit-line-clamp:1; -webkit-box-orient:vertical;">
-                          ${event.description}
-                        </div>` : ""}
-                    </div>
-                  `,
-          )
-          .join("") +
-        (dayEvents.length > 3
-          ? `<div class="schedule-event-time">+${dayEvents.length - 3} more</div>`
-          : "")
+        ? dayEvents.slice(0, 3).map(renderScheduleEventCard).join("") +
+  (dayEvents.length > 3
+    ? `<div class="schedule-event-time">+${dayEvents.length - 3} more</div>`
+    : "")
         : '<p class="empty-state">No events</p>'
       }
       </div>
